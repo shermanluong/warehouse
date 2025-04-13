@@ -1,9 +1,9 @@
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import React, { useState, usestate } from 'react';
-import AdminOrders from '../components/AdminOrders';
-import AdminPerformance from '../components/AdminPerformance';
-import AdminPhotos from '../components/AdminPhotos';
+import AdminOrders from '../../components/AdminOrders';
+import AdminPerformance from '../../components/AdminPerformance';
+import AdminPhotos from '../../components/AdminPhotos';
 
 const user = {
   name: 'Tom Cook',
