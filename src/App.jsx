@@ -5,9 +5,12 @@ import './App.css'
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import AdminDashboard from './pages/Admin/Dashboard';
+import Users from './pages/Admin/Users';
 import PickerOrders from './pages/Picker/Orders';
 import PackerOrders from './pages/Packer/Orders';
 import ProtectedRoute from './routes/ProtectedRoute';
+import ScanItem from './pages/Picker/ScanItem';
+import Finalise from './pages/Packer/Finalise';
 
 
 function App() {
@@ -21,17 +24,16 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Redirect root to login */}
         <Route path="/" element={<Navigate to="/login" />} />
-
-        {/* Catch-all route: redirect to login if no route matches */}
         <Route path="*" element={<Navigate to="/login" replace />} />
-
         <Route path="/login" element={<Login setUser={setUser} />} />
         <Route path="/register" element={<Register/>} />
         <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles= {["admin"]}><AdminDashboard/></ProtectedRoute>} />
+        <Route path="/admin/users" element={<ProtectedRoute allowedRoles= {["admin"]}><Users/></ProtectedRoute>} />
         <Route path="/picker/orders" element={<ProtectedRoute allowedRoles={["picker"]}><PickerOrders /></ProtectedRoute>} />
+        <Route path="/picker/scanitem" element={<ProtectedRoute allowedRoles={["picker"]}><ScanItem /></ProtectedRoute>} />
         <Route path="/packer/orders" element={<ProtectedRoute allowedRoles={["packer"]}><PackerOrders /></ProtectedRoute>} />
+        <Route path="/packer/finalise" element={<ProtectedRoute allowedRoles={["packer"]}><Finalise /></ProtectedRoute>} />
       </Routes>
     </Router>
   );
