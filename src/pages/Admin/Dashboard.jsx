@@ -35,10 +35,8 @@ const AdminPage = () => {
     return (
         <Layout headerTitle={"Dashboard"}>
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                {/* Your content */}
-                {/* First line: 5 horizontal cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-                    <div className="bg-white p-4 rounded-sm shadow-md">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
+                    <div className="bg-white p-6 rounded-lg shadow-md">
                         <div className="flex justify-center mb-2">
                             <div className="bg-blue-100 p-4 rounded-full">
                                 <CubeIcon className="h-6 w-6 text-blue-600" />
@@ -48,7 +46,7 @@ const AdminPage = () => {
                         <p className="font-semibold text-lg flex justify-center">{stats?.newOrders || 0}</p>
                     </div>
 
-                    <div className="bg-white p-4 rounded-sm shadow-md">
+                    <div className="bg-white p-6 rounded-lg shadow-md">
                         <div className="flex justify-center mb-2">
                             <div className="bg-lime-100 p-4 rounded-full">
                                 <CubeIcon className="h-6 w-6 text-lime-600" />
@@ -58,7 +56,7 @@ const AdminPage = () => {
                         <p className="font-semibold text-lg flex justify-center">{stats?.pickingOrders || 0}</p>
                     </div>
 
-                    <div className="bg-white p-4 rounded-sm shadow-md">
+                    <div className="bg-white p-6 rounded-lg shadow-md">
                         <div className="flex justify-center mb-2">
                             <div className="bg-green-100 p-4 rounded-full">
                                 <CheckCircleIcon className="h-6 w-6 text-green-600" />
@@ -68,7 +66,7 @@ const AdminPage = () => {
                         <p className="font-semibold text-lg flex justify-center">{stats?.pickedOrders || 0}</p>
                     </div>
 
-                    <div className="bg-white p-4 rounded-sm shadow-md">
+                    <div className="bg-white p-6 rounded-lg shadow-md">
                         <div className="flex justify-center mb-2">
                             <div className="bg-orange-100 p-4 rounded-full">
                                 <ClockIcon className="h-6 w-6 text-orange-600" />
@@ -78,7 +76,7 @@ const AdminPage = () => {
                         <p className="font-semibold text-lg flex justify-center">{stats?.packingOrders || 0}</p>
                     </div>
 
-                    <div className="bg-white p-4 rounded-sm shadow-md">
+                    <div className="bg-white p-6 rounded-lg shadow-md">
                         <div className="flex justify-center mb-2">
                             <div className="bg-orange-100 p-4 rounded-full">
                                 <TruckIcon className="h-6 w-6 text-orange-600" />

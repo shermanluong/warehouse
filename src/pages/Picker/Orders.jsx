@@ -38,22 +38,23 @@ export default function Orders() {
                 <div className="flex justify-between items-start">
                   <h3 className="font-bold text-gray-900">Order #{order.shopifyOrderId}</h3>
                   <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                    3 items
+                    {order.totalQuantity} items
                   </span>
                 </div>
-                <div className="mt-2">
-                  <p className="text-sm text-gray-500">Customer: <span className="font-mono">d3k R72</span></p>
+                <div className="mt-2 flex justify-between">
+                  <p className="text-sm text-gray-500">Customer: </p>
+                  <span className="font-mono text-sm text-gray-500">{order.customer.first_name} {order.customer.last_name}</span>
                 </div>
                 {/* Progress Bar for Substitution */}
                 <div className="mt-4 mb-3">
                   <div className="flex justify-between text-xs text-gray-500 mb-1">
                     <span>Progress</span>
-                    <span>33%</span>
+                    <span>{order.pickedCount * 100 / order.totalQuantity}%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div 
                       className="bg-green-300 h-2 rounded-full" 
-                      style={{ width: '33%' }}
+                      style={{ width: order.pickedCount * 100 / order.totalQuantity}}
                     ></div>
                   </div>
                 </div>
