@@ -1,10 +1,13 @@
 import Layout from "../../layouts/layout"
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Function to fetch orders from API
@@ -60,7 +63,10 @@ export default function Orders() {
                 </div>
                 {/* Action Buttons */}
                 <div className="mt-4 flex space-x-2">
-                  <button className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded-lg text-sm">
+                  <button
+                    onClick={() => navigate(`/picker/order/${order._id}`)}
+                    className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded-lg text-sm"
+                  >
                     Start Picking
                   </button>
                 </div>

@@ -1,15 +1,50 @@
 import React, {useState, useEffect, useRef} from "react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
+import axios from 'axios';
 
-const PickingList = () => {
+const PickingList = ({ order }) => {
+    const [lineItems, setLineItems] = useState(order.lineItems);
     const [isScanningPreview, setIsScanningPreview] = useState(false);
     const [barcode, setBarcode] = useState("");
     const isScanning = useRef(false);
     const [isButtonScanning, setIsButtonScanning] = useState(false);
-    const handleScan = (err, result)=> {
+    const [allPicked, setAllPicked] = useState(false);
+    const token = localStorage.getItem("token");
+
+    useEffect(() => {
+        console.log('Received order in PickingList:', order);
+    }, [order]);
+
+    useEffect(() => {
+        setAllPicked(lineItems.every(item => item.picked));
+    }, [lineItems]);
+
+    const handlePick = async (productId) => {
+        try {
+            await axios.patch(`${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-item`,  { productId }, { headers: { Authorization: `Bearer ${token}` } });
+            setLineItems(lineItems =>
+                lineItems.map(item =>
+                item.productId === productId ? { ...item, picked: true } : item
+                )
+            );
+        } catch (err) {
+            console.error('Failed to pick item', err);
+        }
+    };
+
+    const handleScan = async (err, result)=> {
         if (isScanning.current) {
             if (result) {
                 setBarcode(result.text);
+
+                const res = await axios.patch(`${API_URL}/picker/order/${order._id}/scan`, { barcode });
+                const updatedItem = res.data.item;
+                setOrder(prev => ({
+                ...prev,
+                lineItems: prev.lineItems.map(item =>
+                    item.variantId === barcode ? updatedItem : item
+                )
+                }));
             }
             else setBarcode("Not Found");
         } else {
@@ -17,11 +52,20 @@ const PickingList = () => {
         }
     };
 
+    const handleCompletePicking = async () => {
+        try {
+          await axios.post(`${import.meta.env.VITE_API_URL}/picker/order/${order._id}/complete-picking`, { status: 'picked' }, { headers: { Authorization: `Bearer ${token}` } });
+          console.log('Order marked as picked!');
+        } catch (err) {
+          console.error('Failed to complete picking', err);
+        }
+    };
+
     return (
         <div className="bg-white p-4 rounded-sm shadow-md">
             {/* Second line: Search input and button */}
             <div className="flex flex-row mb-4 justify-between">
-                <h3 className="font-semibold text-xl">Order #ORD-9122</h3>
+                <h3 className="font-semibold text-xl">Order #{order?.shopifyOrderId}</h3>
                 <button className="px-4 rounded-md hover:bg-blue-300">
                     Back to list
                 </button>
@@ -29,7 +73,7 @@ const PickingList = () => {
 
             <div className="flex flex-row mb-4 justify-between">
                 <p>Customer: Customer bps</p>
-                <div className="bg-green-400 text-sm px-2 rounded-xl">4items</div>
+                <div className="bg-green-400 text-sm px-2 rounded-xl">{order.lineItems.length} items</div>
             </div>
 
             {/* Scan input and button */}
@@ -103,15 +147,55 @@ const PickingList = () => {
 
             {/* Cards */}
             <div className="flex flex-col gap-4">
-                {Array(3).fill().map((_, index) => (
-                <div key={index} className="border border-gray-300 p-4 rounded-lg">
-                    <h3 className="font-semibold text-lg">Card {index + 6}</h3>
-                    <p className="text-gray-600">Some content for card {index + 6}</p>
-                </div>
+                {lineItems.map((lineItem) => (
+                    <div
+                    key={lineItem.variantId}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between border border-gray-200 rounded-lg p-4 shadow-md"
+                    >
+                        {/* Left side: image + name + SKU */}
+                        <div className="flex items-start sm:items-center">
+                            <img
+                            src={lineItem?.photoImg}
+                            alt={lineItem?.name}
+                            className="w-16 h-16 rounded object-cover"
+                            />
+                            <div className="ml-4 mt-2 sm:mt-0">
+                            <h3 className="font-semibold text-gray-900">{lineItem?.name}</h3>
+                            <p className="text-sm text-gray-500">SKU: {lineItem?.sku}</p>
+                            </div>
+                        </div>
+
+                        {lineItem.picked ? (
+                            <span className="text-green-600">✅ Verified</span>
+                        ) : (
+                            <div className="flex items-center  sm:justify-end mt-4 sm:mt-0 space-x-3">
+                                <span className="flex-1 text-sm text-gray-700 whitespace-nowrap">
+                                0 picked / {lineItem.quantity} units
+                                </span>
+                                <button 
+                                    onClick={() => handlePick(lineItem.productId)}
+                                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded"
+                                >
+                                    ✓
+                                </button>
+                                <button className="border border-red-500 text-red-500 hover:bg-red-100 px-3 py-2 rounded">
+                                ✕
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 ))}
             </div>
 
-            <button className="bg-blue-500 w-full mt-4 text-white rounded-sm p-2">
+            <button 
+                disabled={!allPicked}
+                onClick={handleCompletePicking}
+                className={`w-full mt-4 rounded-sm p-2 
+                    ${allPicked 
+                        ? 'bg-blue-500 hover:bg-blue-600 text-white' 
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
+                `}
+            >
                 Complete Picking
             </button>
         </div>
