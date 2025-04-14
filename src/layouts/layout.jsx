@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
 
 const navigation = [
-    { name: 'Dashboard', href: 'dashboard', current: true, roles: ['admin']},
+    { name: 'Dashboard', href: 'dashboard', current: false, roles: ['admin']},
     { name: 'Users', href: 'users', current: false, roles: ['admin']},
 ]
 
