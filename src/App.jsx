@@ -33,7 +33,7 @@ function App() {
         <Route path="/picker/orders" element={<ProtectedRoute allowedRoles={["picker"]}><PickerOrders /></ProtectedRoute>} />
         <Route path="/picker/order/:id" element={<ProtectedRoute allowedRoles={["picker"]}><PickOrder /></ProtectedRoute>} />
         <Route path="/packer/orders" element={<ProtectedRoute allowedRoles={["packer"]}><PackerOrders /></ProtectedRoute>} />
-        <Route path="/packer/finalise" element={<ProtectedRoute allowedRoles={["packer"]}><Finalise /></ProtectedRoute>} />
+        <Route path="/packer/order/:id" element={<ProtectedRoute allowedRoles={["packer"]}><Finalise /></ProtectedRoute>} />
       </Routes>
     </Router>
   );
