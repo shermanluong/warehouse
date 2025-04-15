@@ -66,8 +66,11 @@ export default function Orders() {
                   <button
                     onClick={() => navigate(`/picker/order/${order._id}`)}
                     className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded-lg text-sm"
-                  >
-                    Start Picking
+                  > {Math.round(order.pickedCount * 100 / order.totalQuantity) >  0 ?
+                      "Continue" 
+                      :
+                      "Start Picking"
+                    }
                   </button>
                 </div>
               </div>
