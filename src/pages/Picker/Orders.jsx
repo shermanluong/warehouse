@@ -15,7 +15,7 @@ export default function Orders() {
 
     const fetchOrders = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/orders`, { headers: { Authorization: `Bearer ${token}` } });
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/picker/orders`, { headers: { Authorization: `Bearer ${token}` } });
         console.log(res?.data);
         setOrders(res?.data || []);
         setLoading(false);
@@ -40,8 +40,8 @@ export default function Orders() {
               <div className="p-4">
                 <div className="flex justify-between items-start">
                   <h3 className="font-bold text-gray-900">Order #{order.shopifyOrderId}</h3>
-                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                    {order.totalQuantity} items
+                  <span className="bg-green-100 font-mono text-green-800 text-xs px-2 py-1 rounded-full">
+                    {order.lineItemCount} items
                   </span>
                 </div>
                 <div className="mt-2 flex justify-between">
