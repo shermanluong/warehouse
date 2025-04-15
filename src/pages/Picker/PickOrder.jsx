@@ -90,7 +90,7 @@ const PickOrder = () => {
                         </button>
                     </div>
                     <div className="flex flex-row mb-4 justify-between">
-                        <p>Customer: Customer bps</p>
+                        <p>Customer: {order?.customer}</p>
                         <div className="bg-green-400 text-sm px-2 rounded-xl">{order.lineItems.length} items</div>
                     </div>
 
