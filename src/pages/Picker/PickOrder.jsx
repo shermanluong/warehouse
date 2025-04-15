@@ -67,8 +67,8 @@ const PickOrder = () => {
 
     const handleCompletePicking = async () => {
         try {
-          await axios.post(`${import.meta.env.VITE_API_URL}/picker/order/${order._id}/complete-picking`, { status: 'picked' }, { headers: { Authorization: `Bearer ${token}` } });
-          console.log('Order marked as picked!');
+            await axios.post(`${import.meta.env.VITE_API_URL}/picker/order/${order._id}/complete-picking`, { status: 'picked' }, { headers: { Authorization: `Bearer ${token}` } });
+            navigate(`/picker/orders`);
         } catch (err) {
           console.error('Failed to complete picking', err);
         }
