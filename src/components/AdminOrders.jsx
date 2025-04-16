@@ -36,7 +36,7 @@ const AdminOrders = () => {
             </div>
 
             <div className="grid grid-cols-1 gap-4">
-                {orders.map(order => (
+                {orders?.map(order => (
                     <div key={order._id} className="bg-white p-4 rounded-lg shadow-md">
                         <div className="flex justify-between items-start">
                             <h3 className="font-bold text-gray-900">Order #{order.shopifyOrderId}</h3>

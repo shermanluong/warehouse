@@ -36,7 +36,7 @@ export default function Orders() {
         {/* Your content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-          {orders.map(order => (
+          {orders?.map(order => (
             <div key = {order._id} className="bg-white border border-gray-200 rounded-x1 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
               <div className="p-4">
                 <div className="flex justify-between items-start">
