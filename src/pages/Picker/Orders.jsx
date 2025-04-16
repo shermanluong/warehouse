@@ -47,7 +47,7 @@ export default function Orders() {
                 <div className="mt-2 flex justify-between">
                   <p className="text-sm text-gray-500">Customer: </p>
                   <span className="font-mono text-sm text-gray-500">
-                    {order.customer.first_name} {order.customer.last_name}
+                    {order.customer?.first_name} {order.customer?.last_name}
                   </span>
                 </div>
                 {/* Progress Bar for Substitution */}

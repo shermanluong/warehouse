@@ -49,11 +49,11 @@ export default function Orders() {
                 <div className="mt-2 mb-4 flex justify-between">
                   <p className="text-sm text-gray-500">Customer: </p>
                   <span className="font-mono text-sm text-gray-500">
-                    {order.customer.first_name} {order.customer.last_name}
+                    {order.customer?.first_name} {order.customer?.last_name}
                   </span>
                 </div>
                 <span className="bg-green-100 text-green-800 border border-green-600 text-xs px-2 py-1 rounded-full">
-                  com 0
+                  ✓ 0
                 </span>
                 {/* Action Buttons */}
                 <div className="mt-4 flex space-x-2">

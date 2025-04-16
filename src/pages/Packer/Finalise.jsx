@@ -84,8 +84,12 @@ export default function Finalise() {
                     </div>
 
                     <div className="flex flex-row mb-4 justify-between">
-                        <p>Customer: Customer bps</p>
-                        <div className="bg-green-400 text-sm px-2 rounded-xl">4 items</div>
+                        <p>Customer: 
+                            <span className="font-mono text-sm text-gray-500">
+                                {order?.customer?.first_name} {order?.customer?.last_name}
+                            </span>
+                        </p>
+                        <div className="bg-green-400 text-sm px-2 rounded-xl">{order?.lineItems.length} items</div>
                     </div>
 
                     {/* Scan input and buttons */}
