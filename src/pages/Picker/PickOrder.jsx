@@ -176,13 +176,13 @@ const PickOrder = () => {
                                 {/* Left side: image + name + SKU */}
                                 <div className="flex items-start sm:items-center">
                                     <img
-                                    src={lineItem?.photoImg}
-                                    alt={lineItem?.name}
-                                    className="w-16 h-16 rounded object-cover"
+                                    src={lineItem?.image}
+                                    alt={lineItem?.productTitle}
+                                    className="w-36 h-36 rounded object-cover"
                                     />
                                     <div className="ml-4 mt-2 sm:mt-0">
-                                    <h3 className="font-semibold text-gray-900">{lineItem?.name}</h3>
-                                    <p className="text-sm text-gray-500">SKU: {lineItem?.sku}</p>
+                                    <h3 className="font-semibold text-gray-900">{lineItem?.variantInfo?.title == "Default Title"? lineItem?.productTitle : lineItem?.variantInfo?.title}</h3>
+                                    <p className="text-sm text-gray-500">SKU: {lineItem?.variantInfo?.sku}</p>
                                     </div>
                                 </div>
 
