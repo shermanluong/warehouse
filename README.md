@@ -71,8 +71,8 @@ App will be available at: http://localhost:5173
 
 ## 🧪 Testing
 To be added...
-## 📸 Screenshots
 
+## 📸 Screenshots
 ### 🔑 Login
 ![Login](public/screenshots/login.png)
 

@@ -18,6 +18,7 @@ export default function Finalise() {
     const [capturedImage, setCapturedImage] = useState(null);
     const [photoCaptured, setPhotoCaptured] = useState(false);
     const videoElement = useRef(null);
+    const token = localStorage.getItem("token");
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -65,6 +66,19 @@ export default function Finalise() {
     const handleAcceptImage = () => {
         setPhotoCaptured(true);
         setCameraStarted(false);
+    };
+
+    const handlePick = async (productId) => {
+        try {
+            await axios.patch(`${import.meta.env.VITE_API_URL}/packer/order/${order._id}/pack-item`,  { productId }, { headers: { Authorization: `Bearer ${token}` } });
+            setLineItems(lineItems =>
+                lineItems.map(item =>
+                item.productId === productId ? { ...item, packed: true } : item
+                )
+            );
+        } catch (err) {
+            console.error('Failed to pack item', err);
+        }
     };
 
     return (
