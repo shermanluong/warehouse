@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import React, { useEffect, useState, useRef} from 'react';
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
+import { PlusIcon, MinusIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import axios from 'axios';
 import Layout from '../../layouts/layout';
 
@@ -170,39 +171,72 @@ const PickOrder = () => {
                     <div className="flex flex-col gap-4">
                         {lineItems.map((lineItem) => (
                             <div
-                            key={lineItem.variantId}
-                            className="flex flex-col sm:flex-row sm:items-center justify-between border border-gray-200 rounded-lg p-4 shadow-md"
+                                key={lineItem.variantId}
+                                className="flex flex-col sm:flex-row justify-between border border-gray-200 rounded-lg p-4 shadow-md"
                             >
                                 {/* Left side: image + name + SKU */}
-                                <div className="flex items-start sm:items-center">
+                                <div className="flex items-start">
                                     <img
-                                    src={lineItem?.image}
-                                    alt={lineItem?.productTitle}
-                                    className="w-36 h-36 rounded object-cover"
+                                        src={lineItem?.image}
+                                        alt={lineItem?.productTitle}
+                                        className="w-36 h-36 rounded object-cover"
                                     />
-                                    <div className="ml-4 mt-2 sm:mt-0">
-                                    <h3 className="font-semibold text-gray-900">{lineItem?.variantInfo?.title == "Default Title"? lineItem?.productTitle : lineItem?.variantInfo?.title}</h3>
-                                    <p className="text-sm text-gray-500">SKU: {lineItem?.variantInfo?.sku}</p>
+                                    <div className="ml-4">
+                                        <h3 className="font-semibold text-lg text-gray-900">
+                                            {lineItem?.variantInfo?.title === "Default Title"
+                                                ? lineItem?.productTitle
+                                                : lineItem?.variantInfo?.title}
+                                            {(lineItem.adminNote || lineItem.customerNote) && (
+                                                <span title="This item has notes" className="text-yellow-500 ml-2">📌</span>
+                                            )}
+                                        </h3>
+                                        <p className="font-semibold text-sm text-gray-900">SKU: {lineItem?.variantInfo?.sku}</p>
+                                        <span className="font-semibold text-sm text-gray-900">
+                                            0 picked / {lineItem.quantity} units
+                                        </span>
+                                        {/* Notes Display */}
+                                        {lineItem.adminNote && (
+                                        <p className="text-xs text-red-600 mt-1">Admin: {lineItem.adminNote}</p>
+                                        )}
+                                        {lineItem.customerNote && (
+                                        <p className="text-xs text-blue-600 mt-1">Customer: {lineItem.customerNote}</p>
+                                        )}
                                     </div>
                                 </div>
-
+                          
+                                {/* Right side: picked info + buttons */}
                                 {lineItem.picked ? (
-                                    <span className="text-green-600">✅ Verified</span>
+                                <span className="text-green-600 mt-2 sm:mt-0">✅ Verified</span>
                                 ) : (
-                                    <div className="flex items-center  sm:justify-end mt-4 sm:mt-0 space-x-3">
-                                        <span className="flex-1 text-sm text-gray-700 whitespace-nowrap">
-                                        0 picked / {lineItem.quantity} units
-                                        </span>
-                                        <button 
+                                <div className="flex mt-4 sm:flex-col space-x-3 sm:items-start sm:mt-0 sm:space-y-2 ">
+                                    {lineItem.quantity <= 1 ? (
+                                        <button
                                             onClick={() => handlePick(lineItem.productId)}
-                                            className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded"
+                                            className="bg-blue-500 hover:bg-blue-600 text-white w-10 h-10 rounded text-center"
                                         >
-                                            ✓
+                                        ✓
                                         </button>
-                                        <button className="border border-red-500 text-red-500 hover:bg-red-100 px-3 py-2 rounded">
-                                        ✕
-                                        </button>
-                                    </div>
+                                        ) : (
+                                        <>
+                                            <button
+                                            onClick={() => handlePick(lineItem.productId)}
+                                            className="bg-blue-500 hover:bg-blue-600 text-white w-10 h-10 rounded flex items-center justify-center"
+                                            >
+                                                <PlusIcon className="w-5 h-5" />
+                                            </button>
+                                            <button
+                                                onClick={() => handlePick(lineItem.productId)}
+                                                className="bg-green-500 hover:bg-green-600 text-white w-10 h-10 rounded flex items-center justify-center"
+                                            >
+                                                <MinusIcon className="w-5 h-5" />
+                                            </button>
+                                        </>
+                                    )}
+                                    
+                                    <button className="bg-gray-500 hover:bg-gray-600 text-white w-10 h-10 rounded flex items-center justify-center">
+                                        <XMarkIcon className="w-5 h-5" />
+                                    </button>
+                                </div>
                                 )}
                             </div>
                         ))}

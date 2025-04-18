@@ -169,36 +169,53 @@ export default function Finalise() {
                             <div
                             key={lineItem.variantId}
                             className="flex flex-col sm:flex-row sm:items-center justify-between border border-gray-200 rounded-lg p-4 shadow-md"
-                            >
-                                {/* Left side: image + name + SKU */}
-                                <div className="flex items-start sm:items-center">
-                                    <img
-                                    src={lineItem?.image}
-                                    alt={lineItem?.productTitle}
-                                    className="w-36 h-36 rounded object-cover"
-                                    />
-                                    <div className="ml-4 mt-2 sm:mt-0">
-                                    <h3 className="font-semibold text-gray-900">{lineItem?.variantInfo?.title == "Default Title"? lineItem?.productTitle : lineItem?.variantInfo?.title}</h3>
-                                    <p className="text-sm text-gray-500">SKU: {lineItem?.variantInfo?.sku}</p>
-                                    </div>
-                                </div>
-
-                                {lineItem.packed ? (
-                                    <span className="text-green-600">✅ Verified</span>
-                                ) : (
-                                    <div className="flex items-center  sm:justify-end mt-4 sm:mt-0 space-x-3">
-                                        <span className="flex-1 text-sm text-gray-700 whitespace-nowrap">
-                                        0 packed / {lineItem.quantity} units
-                                        </span>
-                                        <button 
-                                            onClick={() => handlePick(lineItem.productId)}
-                                            className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded"
-                                        >
-                                            ✓
-                                        </button>
-                                    </div>
+                          >
+                            {/* Left side: image + name + SKU */}
+                            <div className="flex items-start sm:items-center">
+                              <img
+                                src={lineItem?.image}
+                                alt={lineItem?.productTitle}
+                                className="w-36 h-36 rounded object-cover"
+                              />
+                              <div className="ml-4 mt-2 sm:mt-0">
+                                <h3 className="font-semibold text-gray-900 flex items-center gap-1">
+                                  {lineItem?.variantInfo?.title === "Default Title"
+                                    ? lineItem?.productTitle
+                                    : lineItem?.variantInfo?.title}
+                          
+                                  {(lineItem.adminNote || lineItem.customerNote) && (
+                                    <span title="This item has notes" className="text-yellow-500 ml-2">📌</span>
+                                  )}
+                                </h3>
+                                <p className="text-sm text-gray-500">SKU: {lineItem?.variantInfo?.sku}</p>
+                          
+                                {/* Show notes if any */}
+                                {lineItem.adminNote && (
+                                  <p className="text-xs text-red-600 mt-1">Admin note: {lineItem.adminNote}</p>
                                 )}
+                                {lineItem.customerNote && (
+                                  <p className="text-xs text-blue-600 mt-1">Customer note: {lineItem.customerNote}</p>
+                                )}
+                              </div>
                             </div>
+                          
+                            {/* Right side */}
+                            {lineItem.packed ? (
+                              <span className="text-green-600">✅ Verified</span>
+                            ) : (
+                              <div className="flex items-center sm:justify-end mt-4 sm:mt-0 space-x-3">
+                                <span className="flex-1 text-sm text-gray-700 whitespace-nowrap">
+                                  0 packed / {lineItem.quantity} units
+                                </span>
+                                <button
+                                  onClick={() => handlePick(lineItem.productId)}
+                                  className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded"
+                                >
+                                  ✓
+                                </button>
+                              </div>
+                            )}
+                          </div>                          
                         ))}
                     </div>
 
