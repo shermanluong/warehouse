@@ -1,6 +1,7 @@
 import Layout from '../../layouts/layout';
 import { useParams, useNavigate } from 'react-router-dom';
 import React, { useEffect, useState, useRef } from "react";
+import { PlusIcon, MinusIcon, XMarkIcon, CheckIcon} from '@heroicons/react/24/outline'
 import axios from 'axios';
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import Webcam from "react-webcam";
@@ -68,7 +69,7 @@ export default function Finalise() {
         setCameraStarted(false);
     };
 
-    const handlePick = async (productId) => {
+    const handlePack = async (productId) => {
         try {
             await axios.patch(`${import.meta.env.VITE_API_URL}/packer/order/${order._id}/pack-item`,  { productId }, { headers: { Authorization: `Bearer ${token}` } });
             setLineItems(lineItems =>
@@ -78,6 +79,50 @@ export default function Finalise() {
             );
         } catch (err) {
             console.error('Failed to pack item', err);
+        }
+    };
+
+    const handlePackPlus = async (productId) => {
+        try {
+            const res = await axios.patch(
+                `${import.meta.env.VITE_API_URL}/packer/order/${order._id}/pack-plus`,
+                { productId },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+    
+            const updatedItem = res.data.item;
+            console.log(updatedItem);
+            setLineItems(prevItems =>
+                prevItems.map(item =>
+                    item.productId === productId
+                        ? { ...item, packed: updatedItem.packed, packedQuantity: updatedItem.packedQuantity }
+                        : item
+                )
+            );
+        } catch (err) {
+            console.error('Failed to pick plus', err);
+        }
+    };
+
+    const handlePackMinus = async (productId) => {
+        try {
+            const res = await axios.patch(
+                `${import.meta.env.VITE_API_URL}/packer/order/${order._id}/pack-minus`,
+                { productId },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+    
+            const updatedItem = res.data.item;
+    
+            setLineItems(prevItems =>
+                prevItems.map(item =>
+                    item.productId === productId
+                        ? { ...item, packed: updatedItem.packed, packedQuantity: updatedItem.packedQuantity }
+                        : item
+                )
+            );
+        } catch (err) {
+            console.error('Failed to pick minus', err);
         }
     };
 
@@ -168,17 +213,17 @@ export default function Finalise() {
                         {lineItems.map((lineItem) => (
                             <div
                             key={lineItem.variantId}
-                            className="flex flex-col sm:flex-row sm:items-center justify-between border border-gray-200 rounded-lg p-4 shadow-md"
+                            className="flex flex-col sm:flex-row  justify-between border border-gray-200 rounded-lg p-4 shadow-md"
                           >
                             {/* Left side: image + name + SKU */}
-                            <div className="flex items-start sm:items-center">
+                            <div className="flex items-start">
                               <img
                                 src={lineItem?.image}
                                 alt={lineItem?.productTitle}
                                 className="w-36 h-36 rounded object-cover"
                               />
                               <div className="ml-4 mt-2 sm:mt-0">
-                                <h3 className="font-semibold text-gray-900 flex items-center gap-1">
+                                <h3 className="font-semibold text-lg text-gray-900">
                                   {lineItem?.variantInfo?.title === "Default Title"
                                     ? lineItem?.productTitle
                                     : lineItem?.variantInfo?.title}
@@ -187,7 +232,10 @@ export default function Finalise() {
                                     <span title="This item has notes" className="text-yellow-500 ml-2">📌</span>
                                   )}
                                 </h3>
-                                <p className="text-sm text-gray-500">SKU: {lineItem?.variantInfo?.sku}</p>
+                                <p className="font-semibold text-sm text-gray-900">SKU: {lineItem?.variantInfo?.sku}</p>
+                                <span className="font-semibold text-sm text-gray-900">
+                                  {lineItem?.packedQuantity || 0} packed / {lineItem.quantity} units
+                                </span>
                           
                                 {/* Show notes if any */}
                                 {lineItem.adminNote && (
@@ -199,21 +247,39 @@ export default function Finalise() {
                               </div>
                             </div>
                           
-                            {/* Right side */}
+                            {/* Right side: picked info + buttons */}
                             {lineItem.packed ? (
-                              <span className="text-green-600">✅ Verified</span>
-                            ) : (
-                              <div className="flex items-center sm:justify-end mt-4 sm:mt-0 space-x-3">
-                                <span className="flex-1 text-sm text-gray-700 whitespace-nowrap">
-                                  0 packed / {lineItem.quantity} units
-                                </span>
-                                <button
-                                  onClick={() => handlePick(lineItem.productId)}
-                                  className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded"
-                                >
-                                  ✓
-                                </button>
-                              </div>
+                                <span className="text-green-600 mt-2 sm:mt-0">✅ Verified</span>
+                                ) : (
+                                <div className="flex mt-4 sm:flex-col space-x-3 sm:items-start sm:mt-0 sm:space-x-0 sm:space-y-2 ">
+                                    {lineItem.quantity <= 1 ? (
+                                        <button
+                                            onClick={() => handlePackPlus(lineItem.productId)}
+                                            className="bg-blue-500 hover:bg-blue-600 text-white w-10 h-10 rounded flex items-center justify-center"
+                                        >
+                                            <CheckIcon className="w-5 h-5" />
+                                        </button>
+                                        ) : (
+                                        <>
+                                            <button
+                                            onClick={() => handlePackPlus(lineItem.productId)}
+                                            className="bg-blue-500 hover:bg-blue-600 text-white w-10 h-10 rounded flex items-center justify-center"
+                                            >
+                                                <PlusIcon className="w-5 h-5" />
+                                            </button>
+                                            <button
+                                                onClick={() => handlePackMinus(lineItem.productId)}
+                                                className="bg-green-500 hover:bg-green-600 text-white w-10 h-10 rounded flex items-center justify-center"
+                                            >
+                                                <MinusIcon className="w-5 h-5" />
+                                            </button>
+                                        </>
+                                    )}
+
+                                    <button className="bg-gray-500 hover:bg-gray-600 text-white w-10 h-10 rounded flex items-center justify-center">
+                                        <XMarkIcon className="w-5 h-5" />
+                                    </button>
+                                </div>
                             )}
                           </div>                          
                         ))}

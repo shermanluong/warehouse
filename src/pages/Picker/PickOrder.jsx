@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import React, { useEffect, useState, useRef} from 'react';
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
-import { PlusIcon, MinusIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { PlusIcon, MinusIcon, XMarkIcon, CheckIcon} from '@heroicons/react/24/outline'
 import axios from 'axios';
 import Layout from '../../layouts/layout';
 
@@ -35,7 +35,11 @@ const PickOrder = () => {
 
     const handlePick = async (productId) => {
         try {
-            await axios.patch(`${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-item`,  { productId }, { headers: { Authorization: `Bearer ${token}` } });
+            await axios.patch(
+                `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-item`,  
+                { productId }, 
+                { headers: { Authorization: `Bearer ${token}` } 
+            });
             setLineItems(lineItems =>
                 lineItems.map(item =>
                 item.productId === productId ? { ...item, picked: true } : item
@@ -43,6 +47,50 @@ const PickOrder = () => {
             );
         } catch (err) {
             console.error('Failed to pick item', err);
+        }
+    };
+
+    const handlePickPlus = async (productId) => {
+        try {
+            const res = await axios.patch(
+                `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-plus`,
+                { productId },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+    
+            const updatedItem = res.data.item;
+    
+            setLineItems(prevItems =>
+                prevItems.map(item =>
+                    item.productId === productId
+                        ? { ...item, picked: updatedItem.picked, pickedQuantity: updatedItem.pickedQuantity }
+                        : item
+                )
+            );
+        } catch (err) {
+            console.error('Failed to pick plus', err);
+        }
+    };
+
+    const handlePickMinus = async (productId) => {
+        try {
+            const res = await axios.patch(
+                `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-minus`,
+                { productId },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+    
+            const updatedItem = res.data.item;
+    
+            setLineItems(prevItems =>
+                prevItems.map(item =>
+                    item.productId === productId
+                        ? { ...item, picked: updatedItem.picked, pickedQuantity: updatedItem.pickedQuantity }
+                        : item
+                )
+            );
+        } catch (err) {
+            console.error('Failed to pick minus', err);
         }
     };
 
@@ -192,7 +240,7 @@ const PickOrder = () => {
                                         </h3>
                                         <p className="font-semibold text-sm text-gray-900">SKU: {lineItem?.variantInfo?.sku}</p>
                                         <span className="font-semibold text-sm text-gray-900">
-                                            0 picked / {lineItem.quantity} units
+                                            {lineItem?.pickedQuantity} / {lineItem?.quantity} units
                                         </span>
                                         {/* Notes Display */}
                                         {lineItem.adminNote && (
@@ -208,24 +256,24 @@ const PickOrder = () => {
                                 {lineItem.picked ? (
                                 <span className="text-green-600 mt-2 sm:mt-0">✅ Verified</span>
                                 ) : (
-                                <div className="flex mt-4 sm:flex-col space-x-3 sm:items-start sm:mt-0 sm:space-y-2 ">
+                                <div className="flex mt-4 space-x-3 sm:flex-col sm:items-start sm:mt-0 sm:space-x-0 sm:space-y-2 ">
                                     {lineItem.quantity <= 1 ? (
                                         <button
-                                            onClick={() => handlePick(lineItem.productId)}
-                                            className="bg-blue-500 hover:bg-blue-600 text-white w-10 h-10 rounded text-center"
+                                            onClick={() => handlePickPlus(lineItem.productId)}
+                                            className="bg-blue-500 hover:bg-blue-600 text-white w-10 h-10 rounded flex items-center justify-center"
                                         >
-                                        ✓
+                                            <CheckIcon className="w-5 h-5" />
                                         </button>
                                         ) : (
                                         <>
                                             <button
-                                            onClick={() => handlePick(lineItem.productId)}
-                                            className="bg-blue-500 hover:bg-blue-600 text-white w-10 h-10 rounded flex items-center justify-center"
+                                                onClick={() => handlePickPlus(lineItem.productId)}
+                                                className="bg-blue-500 hover:bg-blue-600 text-white w-10 h-10 rounded flex items-center justify-center"
                                             >
                                                 <PlusIcon className="w-5 h-5" />
                                             </button>
                                             <button
-                                                onClick={() => handlePick(lineItem.productId)}
+                                                onClick={() => handlePickMinus(lineItem.productId)}
                                                 className="bg-green-500 hover:bg-green-600 text-white w-10 h-10 rounded flex items-center justify-center"
                                             >
                                                 <MinusIcon className="w-5 h-5" />
