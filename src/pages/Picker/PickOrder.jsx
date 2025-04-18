@@ -1,7 +1,14 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import React, { useEffect, useState, useRef} from 'react';
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
-import { PlusIcon, MinusIcon, XMarkIcon, CheckIcon} from '@heroicons/react/24/outline'
+import { 
+    PlusIcon, 
+    MinusIcon, 
+    XMarkIcon, 
+    CheckIcon,
+    CameraIcon,
+    PencilSquareIcon
+} from '@heroicons/react/24/outline'
 import axios from 'axios';
 import Layout from '../../layouts/layout';
 
@@ -98,15 +105,7 @@ const PickOrder = () => {
         if (isScanning.current) {
             if (result) {
                 setBarcode(result.text);
-
-                const res = await axios.patch(`${API_URL}/picker/order/${order._id}/scan`, { barcode });
-                const updatedItem = res.data.item;
-                setOrder(prev => ({
-                ...prev,
-                lineItems: prev.lineItems.map(item =>
-                    item.variantId === barcode ? updatedItem : item
-                )
-                }));
+                handlePickPlus(result.text);
             }
             else setBarcode("Not Found");
         } else {
@@ -152,7 +151,7 @@ const PickOrder = () => {
                         <div className="flex flex-col sm:flex-row sm:space-x-2 mb-3">
                             <input
                             type="text"
-                            placeholder="Scan item barcode"
+                            placeholder="Type item barcode"
                             className="flex-1 border border-gray-300 rounded-md p-2 mb-4 sm:mb-0"
                             />
                             <div className="flex flex-row space-x-2">
@@ -161,15 +160,15 @@ const PickOrder = () => {
                                     onClick={() => {
                                     }}
                                 >
-                                    Manual Scan
+                                    <PencilSquareIcon className="w-5 h-5" />
                                 </button>
                                 <button 
-                                    className="border border-gray-400 bg-white p-2 px-4 rounded-md hover:bg-blue-400"
+                                    className="border border-gray-500 bg-white p-2 px-4 rounded-md hover:bg-gray-600"
                                     onClick={() => {
                                         setIsScanningPreview(true);
                                     }}
                                 >
-                                    Scan
+                                    <CameraIcon className="w-5 h-5" />
                                 </button>
                             </div>
                         </div>
@@ -200,12 +199,12 @@ const PickOrder = () => {
                                     {isScanning.current ? "Stop Scanner" : "Start Scanner"}
                                 </button>
                                 <button 
-                                    className="border border-gray-400 px-4 rounded-md hover:bg-blue-400"
+                                    className="border border-gray-500 px-4 rounded-md hover:bg-gray-600"
                                     onClick={() => {
                                         setIsScanningPreview(false);
                                     }}
                                 >
-                                    Manual Entry
+                                    <PencilSquareIcon className="w-5 h-5" />
                                 </button>
                             </div>
                         </>

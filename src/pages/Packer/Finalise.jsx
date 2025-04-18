@@ -33,15 +33,6 @@ export default function Finalise() {
         fetchOrder();
     }, [id]);
 
-    const handleScan = (err, result) => {
-        if (isScanning.current) {
-            if (result) setBarcode(result.text);
-            else setBarcode("Not Found");
-        } else {
-            setBarcode("Not Found");
-        }
-    };
-
     const handleStartCamera = () => {
         setCameraStarted(true);
         setCapturedImage(null);
@@ -126,6 +117,18 @@ export default function Finalise() {
         }
     };
 
+    const handleScan = async (err, result)=> {
+        if (isScanning.current) {
+            if (result) {
+                setBarcode(result.text);
+                handlePickPlus(result.text);
+            }
+            else setBarcode("Not Found");
+        } else {
+            setBarcode("Not Found");
+        }
+    };
+    
     return (
         <Layout headerTitle={"Packing"}>
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
