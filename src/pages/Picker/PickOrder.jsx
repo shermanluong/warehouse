@@ -9,6 +9,7 @@ import {
     CameraIcon,
     PencilSquareIcon
 } from '@heroicons/react/24/outline'
+import FlagDialog from '../../components/FlagDialog'
 import axios from 'axios';
 import Layout from '../../layouts/layout';
 
@@ -22,6 +23,9 @@ const PickOrder = () => {
     const isScanning = useRef(false);
     const [isButtonScanning, setIsButtonScanning] = useState(false);
     const [allPicked, setAllPicked] = useState(false);
+    const [showDialog, setShowDialog] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
+
     const token = localStorage.getItem("token");
 
     useEffect(() => {
@@ -37,7 +41,9 @@ const PickOrder = () => {
     }, [id]);
 
     useEffect(() => {
-        setAllPicked(lineItems.every(item => item.picked));
+        setAllPicked(lineItems.every(
+            item => item.picked || (item.flags && item.flags.length > 0)
+        ));
     }, [lineItems]);
 
     const handlePick = async (productId) => {
@@ -101,6 +107,28 @@ const PickOrder = () => {
         }
     };
 
+    const handleFlagSubmit = async ({ productId, flag }) => {
+        console.log(productId);
+        console.log(flag);
+        const res = await axios.patch(
+            `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-flag`,
+            { 
+                productId   : productId,
+                reason      : flag 
+            },
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+        
+        const updatedItem = res.data.item;
+        setLineItems(prevItems =>
+            prevItems.map(item =>
+                item.productId === productId
+                    ? { ...item, flags: updatedItem?.flags}
+                    : item
+            )
+        );
+    };
+
     const handleScan = async (err, result)=> {
         if (isScanning.current) {
             if (result) {
@@ -115,11 +143,20 @@ const PickOrder = () => {
 
     const handleCompletePicking = async () => {
         try {
-            await axios.post(`${import.meta.env.VITE_API_URL}/picker/order/${order._id}/complete-picking`, { status: 'picked' }, { headers: { Authorization: `Bearer ${token}` } });
+            await axios.post(
+                `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/complete-picking`, 
+                { status: 'picked' }, 
+                { headers: { Authorization: `Bearer ${token}` } 
+            });
             navigate(`/picker/orders`);
         } catch (err) {
-          console.error('Failed to complete picking', err);
+          console.error(err?.response?.data?.message);
         }
+    };
+
+    const openFlagDialog = (item) => {
+        setSelectedItem(item);
+        setShowDialog(true);
     };
 
     if (!order) return <div>Loading...</div>;
@@ -129,7 +166,7 @@ const PickOrder = () => {
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                 <div className="bg-white p-4 rounded-sm shadow-md">
                     <div className="flex flex-row mb-4 justify-between">
-                        <h3 className="font-semibold text-xl">Order #{order?.shopifyOrderId}</h3>
+                        <h3 className="font-semibold text-xl">Order: #{order?.shopifyOrderId}</h3>
                         <button 
                             onClick={() => navigate(`/picker/orders`)}
                             className="px-4 rounded-md hover:bg-blue-300"
@@ -139,7 +176,7 @@ const PickOrder = () => {
                     </div>
                     <div className="flex flex-row mb-4 justify-between">
                         <p>Customer: 
-                            <span className="font-mono text-sm text-gray-500">
+                            <span className="font-mono text-sm text-gray-500 ml-2">
                                 {order?.customer?.first_name} {order?.customer?.last_name}
                             </span>
                         </p>
@@ -252,38 +289,47 @@ const PickOrder = () => {
                                 </div>
                           
                                 {/* Right side: picked info + buttons */}
-                                {lineItem.picked ? (
+                                {lineItem.flags.length > 0 && !lineItem.picked  && (
+                                    <span className="text-sm text-red-500 mt-2 sm:mt-0">⚠ {lineItem.flags.join(', ')}</span>
+                                )}
+                                
+                                {lineItem.picked && (
                                 <span className="text-green-600 mt-2 sm:mt-0">✅ Verified</span>
-                                ) : (
-                                <div className="flex mt-4 space-x-3 sm:flex-col sm:items-start sm:mt-0 sm:space-x-0 sm:space-y-2 ">
-                                    {lineItem.quantity <= 1 ? (
-                                        <button
-                                            onClick={() => handlePickPlus(lineItem.productId)}
-                                            className="bg-blue-500 hover:bg-blue-600 text-white w-10 h-10 rounded flex items-center justify-center"
-                                        >
-                                            <CheckIcon className="w-5 h-5" />
-                                        </button>
-                                        ) : (
-                                        <>
+                                )}
+
+                                {!lineItem.picked && !lineItem.flags.length >  0 && (
+                                    <div className="flex mt-4 space-x-3 sm:flex-col sm:items-start sm:mt-0 sm:space-x-0 sm:space-y-2 ">
+                                        {lineItem.quantity <= 1 ? (
                                             <button
                                                 onClick={() => handlePickPlus(lineItem.productId)}
                                                 className="bg-blue-500 hover:bg-blue-600 text-white w-10 h-10 rounded flex items-center justify-center"
                                             >
-                                                <PlusIcon className="w-5 h-5" />
+                                                <CheckIcon className="w-5 h-5" />
                                             </button>
-                                            <button
-                                                onClick={() => handlePickMinus(lineItem.productId)}
-                                                className="bg-green-500 hover:bg-green-600 text-white w-10 h-10 rounded flex items-center justify-center"
-                                            >
-                                                <MinusIcon className="w-5 h-5" />
-                                            </button>
-                                        </>
-                                    )}
-                                    
-                                    <button className="bg-gray-500 hover:bg-gray-600 text-white w-10 h-10 rounded flex items-center justify-center">
-                                        <XMarkIcon className="w-5 h-5" />
-                                    </button>
-                                </div>
+                                            ) : (
+                                            <>
+                                                <button
+                                                    onClick={() => handlePickPlus(lineItem.productId)}
+                                                    className="bg-blue-500 hover:bg-blue-600 text-white w-10 h-10 rounded flex items-center justify-center"
+                                                >
+                                                    <PlusIcon className="w-5 h-5" />
+                                                </button>
+                                                <button
+                                                    onClick={() => handlePickMinus(lineItem.productId)}
+                                                    className="bg-green-500 hover:bg-green-600 text-white w-10 h-10 rounded flex items-center justify-center"
+                                                >
+                                                    <MinusIcon className="w-5 h-5" />
+                                                </button>
+                                            </>
+                                        )}
+                                        
+                                        <button 
+                                            onClick={() => openFlagDialog(lineItem)}
+                                            className="bg-gray-500 hover:bg-gray-600 text-white w-10 h-10 rounded flex items-center justify-center"
+                                        >
+                                            <XMarkIcon className="w-5 h-5" />
+                                        </button>
+                                    </div>
                                 )}
                             </div>
                         ))}
@@ -302,6 +348,14 @@ const PickOrder = () => {
                     </button>
                 </div>
             </div>
+            {showDialog && selectedItem && (
+                <FlagDialog
+                    isOpen={showDialog}
+                    onClose={() => setShowDialog(false)}
+                    lineItem={selectedItem}
+                    onSubmit={handleFlagSubmit}
+                />
+            )}
         </Layout>
     )
 }

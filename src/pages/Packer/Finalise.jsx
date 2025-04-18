@@ -1,7 +1,14 @@
 import Layout from '../../layouts/layout';
 import { useParams, useNavigate } from 'react-router-dom';
 import React, { useEffect, useState, useRef } from "react";
-import { PlusIcon, MinusIcon, XMarkIcon, CheckIcon} from '@heroicons/react/24/outline'
+import { 
+    PlusIcon, 
+    MinusIcon, 
+    XMarkIcon, 
+    CheckIcon,
+    CameraIcon,
+    PencilSquareIcon
+} from '@heroicons/react/24/outline'
 import axios from 'axios';
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import Webcam from "react-webcam";
@@ -128,7 +135,7 @@ export default function Finalise() {
             setBarcode("Not Found");
         }
     };
-    
+
     return (
         <Layout headerTitle={"Packing"}>
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -136,7 +143,7 @@ export default function Finalise() {
                 <div className="bg-white p-4 rounded-sm shadow-md">
                     {/* Header */}
                     <div className="flex flex-row mb-4 justify-between">
-                        <h3 className="font-semibold text-xl">Order #{order?.shopifyOrderId}</h3>
+                        <h3 className="font-semibold text-xl">Order: #{order?.shopifyOrderId}</h3>
                         <button 
                             onClick={() => navigate(`/packer/orders`)}
                             className="px-4 rounded-md hover:bg-blue-300"
@@ -146,8 +153,8 @@ export default function Finalise() {
                     </div>
 
                     <div className="flex flex-row mb-4 justify-between">
-                        <p>Customer: 
-                            <span className="font-mono text-sm text-gray-500">
+                        <p>Customer:  
+                            <span className="font-mono text-sm text-gray-500 ml-2">
                                 {order?.customer?.first_name} {order?.customer?.last_name}
                             </span>
                         </p>
@@ -164,13 +171,13 @@ export default function Finalise() {
                             />
                             <div className="flex flex-row space-x-2">
                                 <button className="flex-1 bg-blue-500 text-white p-2 px-4 rounded-md hover:bg-blue-600">
-                                    Manual Scan
+                                <PencilSquareIcon className="w-5 h-5" />
                                 </button>
                                 <button
-                                    className="border border-gray-400 bg-white p-2 px-4 rounded-md hover:bg-blue-400"
+                                    className="border border-gray-500 bg-white p-2 px-4 rounded-md hover:bg-gray-600"
                                     onClick={() => setIsScanningPreview(true)}
                                 >
-                                    Scan
+                                    <CameraIcon className="w-5 h-5" />
                                 </button>
                             </div>
                         </div>
@@ -197,10 +204,10 @@ export default function Finalise() {
                                     {isScanning.current ? "Stop Scanner" : "Start Scanner"}
                                 </button>
                                 <button
-                                    className="border border-gray-400 px-4 rounded-md hover:bg-blue-400"
+                                    className="border border-gray-500 px-4 rounded-md hover:bg-gray-600"
                                     onClick={() => setIsScanningPreview(false)}
                                 >
-                                    Manual Entry
+                                    <PencilSquareIcon className="w-5 h-5" />
                                 </button>
                             </div>
                         </>
@@ -251,9 +258,15 @@ export default function Finalise() {
                             </div>
                           
                             {/* Right side: picked info + buttons */}
-                            {lineItem.packed ? (
+                            {lineItem.flags.length > 0 && !lineItem.picked  && (
+                                <span className="text-sm text-red-500 mt-2 sm:mt-0">⚠ {lineItem.flags.join(', ')}</span>
+                            )}
+
+                            {lineItem.packed && (
                                 <span className="text-green-600 mt-2 sm:mt-0">✅ Verified</span>
-                                ) : (
+                            )}
+
+                            {!lineItem.packed && !lineItem.flags.length >  0 && (
                                 <div className="flex mt-4 sm:flex-col space-x-3 sm:items-start sm:mt-0 sm:space-x-0 sm:space-y-2 ">
                                     {lineItem.quantity <= 1 ? (
                                         <button
