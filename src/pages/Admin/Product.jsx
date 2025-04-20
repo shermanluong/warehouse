@@ -2,6 +2,15 @@ import { useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Layout from '../../layouts/layout';
+import { 
+    ArrowLeftIcon, 
+    ArrowRightIcon, 
+    MinusIcon, 
+    XMarkIcon, 
+    CheckIcon,
+    CameraIcon,
+    PencilSquareIcon
+} from '@heroicons/react/24/outline'
 
 const Product = () => {
   const [products, setProducts] = useState([]);
@@ -58,41 +67,10 @@ const Product = () => {
         <div className="bg-white p-4 rounded-sm shadow-md">
           <div className="flex flex-col gap-4">
             {/* Sort and Pagination Controls */}
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center">
               <div className="flex space-x-4">
-                {/* Sort Options */}
-                <button
-                  className={`p-2 ${sortOption === 'title' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-                  onClick={() => setSortOption('title')}
-                >
-                  Sort by Title
-                </button>
-                <button
-                  className={`p-2 ${sortOption === 'price' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-                  onClick={() => setSortOption('price')}
-                >
-                  Sort by Price
-                </button>
-                <button
-                  className={`p-2 ${sortOption === 'sku' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-                  onClick={() => setSortOption('sku')}
-                >
-                  Sort by SKU
-                </button>
-                {/* Sort Order Toggle */}
-                <button
-                  className={`p-2 ${sortOrder === 'asc' ? 'bg-green-500 text-white' : 'bg-gray-200'}`}
-                  onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                >
-                  {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
-                </button>
-              </div>
-
-              {/* Page Size Selector and Pagination */}
-              <div className="flex items-center space-x-4">
-                {/* Page Size Dropdown */}
                 <select
-                  className="p-2 border rounded-md"
+                  className="px-4 py-2 border rounded-md"
                   value={pageSize}
                   onChange={handlePageSizeChange}
                 >
@@ -101,22 +79,52 @@ const Product = () => {
                   <option value={30}>30</option>
                   <option value={50}>50</option>
                 </select>
-
+                {false && 
+                <>
+                    <button
+                    className={`p-2 ${sortOption === 'title' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                    onClick={() => setSortOption('title')}
+                    >
+                    Sort by Title
+                    </button>
+                    <button
+                    className={`p-2 ${sortOption === 'price' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                    onClick={() => setSortOption('price')}
+                    >
+                    Sort by Price
+                    </button>
+                    <button
+                    className={`p-2 ${sortOption === 'sku' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                    onClick={() => setSortOption('sku')}
+                    >
+                    Sort by SKU
+                    </button>
+                    <button
+                    className={`p-2 ${sortOrder === 'asc' ? 'bg-green-500 text-white' : 'bg-gray-200'}`}
+                    onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                    >
+                    {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
+                    </button>
+                </>
+                }
+              </div>
+              {/* Page Size Selector and Pagination */}
+              <div className="flex items-center space-x-4">
                 {/* Pagination Buttons */}
+                <span className="mx-4">{`Page ${currentPage} of ${totalPages}`}</span>
                 <button
-                  className="px-4 py-2 bg-gray-200 rounded-md"
+                  className="px-4 py-2 bg-gray-200 rounded-lg"
                   disabled={currentPage === 1}
                   onClick={() => handlePageChange(currentPage - 1)}
                 >
-                  Previous
+                  <ArrowLeftIcon className='w-5 h-5'/>
                 </button>
-                <span className="mx-4">{`Page ${currentPage} of ${totalPages}`}</span>
                 <button
                   className="px-4 py-2 bg-gray-200 rounded-md"
                   disabled={currentPage === totalPages}
                   onClick={() => handlePageChange(currentPage + 1)}
                 >
-                  Next
+                  <ArrowRightIcon className='w-5 h-5'/>
                 </button>
               </div>
             </div>
@@ -124,7 +132,7 @@ const Product = () => {
             {/* Search Bar */}
             <input
               type="text"
-              className="p-2 border rounded-md mb-4"
+              className="p-2 border rounded-md"
               placeholder="Search products by title, SKU..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}

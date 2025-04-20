@@ -294,7 +294,7 @@ const PickOrder = () => {
                                 )}
                                 
                                 {lineItem.picked && (
-                                <span className="text-green-600 mt-2 sm:mt-0">✅ Verified</span>
+                                    <span className="text-green-600 mt-2 sm:mt-0">✅ Verified</span>
                                 )}
 
                                 {!lineItem.picked && !lineItem.flags.length >  0 && (

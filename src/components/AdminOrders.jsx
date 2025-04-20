@@ -4,17 +4,15 @@ import statusColorMap from '../utils/statusColorMap';
 
 const AdminOrders = () => {
     const [orders, setOrders] = useState([]);
+    const token = localStorage.getItem("token");
 
     useEffect(() => {
         // Function to fetch orders from API
-        const token = localStorage.getItem("token");
-        
-        console.log(`${import.meta.env.VITE_API_URL}/admin/getOrders`);
         const fetchOrders = async () => {
           try {
             const res = await axios.get(`${import.meta.env.VITE_API_URL}/admin/getOrders`, { headers: { Authorization: `Bearer ${token}` } });
             console.log(res?.data);
-            setOrders(res?.data || []);
+            setOrders(res?.data?.orders || []);
           } catch (err) {
             console.error('Failed to fetch orders:', err);
           }

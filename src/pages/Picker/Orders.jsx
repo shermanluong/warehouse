@@ -56,14 +56,14 @@ export default function Orders() {
                     <span>Progress</span>
                     <span>{Math.round(order.pickedCount * 100 / order.totalQuantity)}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div ssName="w-full bg-gray-200 rounded-full h-2">
                     <div 
                       className="bg-green-500 h-2 rounded-full transition-all duration-300" 
                       style={{ width: `${Math.round(order.pickedCount * 100 / order.totalQuantity)}%` }}
                     ></div>
                   </div>
                 </div>
-                {/* Action Buttons */}
+                {/* Action Butclatons */}
                 <div className="mt-4 flex space-x-2">
                   <button
                     onClick={() => navigate(`/picker/order/${order._id}`)}
