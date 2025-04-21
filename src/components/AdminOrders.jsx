@@ -1,14 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import statusColorMap from '../utils/statusColorMap';
 import { 
     ArrowLeftIcon, 
     ArrowRightIcon, 
-    MinusIcon, 
-    XMarkIcon, 
-    CheckIcon,
-    CameraIcon,
-    PencilSquareIcon
+    EllipsisVerticalIcon,
 } from '@heroicons/react/24/outline'
 
 const AdminOrders = () => {
@@ -20,6 +16,9 @@ const AdminOrders = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [pageSize, setPageSize] = useState(20); // Default to 20 products per page
+    const [open, setOpen] = useState(false);
+    const [openDropdownId, setOpenDropdownId] = useState(null);
+    const dropdownRef = useRef(null);
 
     useEffect(() => {
         // Function to fetch orders from API
@@ -58,6 +57,22 @@ const AdminOrders = () => {
         setPageSize(Number(e.target.value));
         setCurrentPage(1); // Reset to the first page when the page size changes
     };
+
+    const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+          setOpen(false);
+        }
+    };
+    
+    const toggleDropdown = (id) => {
+        setOpenDropdownId(openDropdownId === id ? null : id);
+    };
+
+    useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
     return (
         <>
             {/* Second line: Search input and button */}
@@ -139,13 +154,47 @@ const AdminOrders = () => {
                 <div className="grid grid-cols-1 gap-4">
                     {orders?.map(order => (
                         <div key={order._id} className="bg-white p-4 rounded-lg shadow-md">
-                            <div className="flex justify-between items-start">
-                                <h3 className="font-bold text-gray-900">Order #{order.shopifyOrderId}</h3>
-                                <span
-                                className={`text-xs px-2 py-1 rounded-full ${statusColorMap[order.status] || 'bg-gray-100 text-gray-800'}`}
-                                >
+                            <div className="flex justify-between items-start relative" ref={dropdownRef}>
+                                <div className="flex">
+                                    <h3 className="font-bold text-gray-900 mr-2">Order #{order.shopifyOrderId}</h3>
+                                    <span
+                                    className={`text-xs px-2 py-1 rounded-full ${statusColorMap[order.status] || 'bg-gray-100 text-gray-800'}`}
+                                    >
                                     {order.status}
-                                </span>
+                                    </span>
+                                </div>
+
+                                <div className="relative">
+                                    <button onClick={() => {
+                                        setOpen(!open);
+                                        toggleDropdown(order._id);
+                                    }} >
+                                    <EllipsisVerticalIcon className="w-5 h-5 text-gray-600" />
+                                    </button>
+
+                                    {open && openDropdownId === order._id && (
+                                    <div className="absolute right-0 mt-2 w-36 bg-gray-100 border border-gray-300 rounded-md shadow-lg z-10">
+                                        <button
+                                        onClick={() => {
+                                            setOpen(false);
+                                            // Handle "Add note"
+                                        }}
+                                        className="w-full px-4 py-2 text-left text-sm hover:bg-gray-200"
+                                        >
+                                        Add note
+                                        </button>
+                                        <button
+                                        onClick={() => {
+                                            setOpen(false);
+                                            navigate(`/packer/order/${order._id}`);
+                                        }}
+                                        className="w-full px-4 py-2 text-left text-sm hover:bg-gray-200"
+                                        >
+                                        Detail
+                                        </button>
+                                    </div>
+                                    )}
+                                </div>
                             </div>
                             <div className="flex justify-between mt-3">
                                 <p className="text-sm text-gray-500">Customer: </p>
