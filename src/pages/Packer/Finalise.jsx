@@ -7,7 +7,8 @@ import {
     XMarkIcon, 
     CheckIcon,
     CameraIcon,
-    PencilSquareIcon
+    PencilSquareIcon,
+    BackspaceIcon
 } from '@heroicons/react/24/outline'
 import axios from 'axios';
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
@@ -193,7 +194,7 @@ export default function Finalise() {
                             </div>
                             <div className="flex flex-row mb-3 gap-1">
                                 <button
-                                    className={`flex-1 text-white rounded-md p-2 ${
+                                    className={`flex flex-1 items-center justify-center gap-2 text-white rounded-md p-2 ${
                                         isScanning.current ? "bg-red-500 hover:bg-red-600" : "bg-blue-500 hover:bg-blue-600"
                                     }`}
                                     onClick={() => {
@@ -201,7 +202,8 @@ export default function Finalise() {
                                         setIsButtonScanning(!isButtonScanning);
                                     }}
                                 >
-                                    {isScanning.current ? "Stop Scanner" : "Start Scanner"}
+                                <CameraIcon className="w-5 h-5" />
+                                {isScanning.current ? "Stop Scanning" : "Start Scanning"}
                                 </button>
                                 <button
                                     className="border border-gray-500 px-4 rounded-md hover:bg-gray-600"

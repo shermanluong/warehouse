@@ -6,13 +6,11 @@ import axios from 'axios';
 export default function Orders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     // Function to fetch orders from API
-    const token = localStorage.getItem("token");
-
     const fetchOrders = async () => {
       try {
         const res = await axios.get(`${import.meta.env.VITE_API_URL}/packer/orders`, { headers: { Authorization: `Bearer ${token}` } });
@@ -27,6 +25,20 @@ export default function Orders() {
 
     fetchOrders(); // Call the function on page load
   }, []); // Empty dependency array = run once on mount
+
+  const handleStart = async (order) => {
+      try {
+        await axios.post(
+          `${import.meta.env.VITE_API_URL}/packer/startPacking/${order._id}`,
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        navigate(`/packer/order/${order._id}`);
+      } catch (err) {
+        console.error("Failed to start packing:", err);
+        alert("Error: Unable to start packing.");
+      }
+  }
 
   if (loading) return <div>Loading orders...</div>;
 
@@ -58,7 +70,7 @@ export default function Orders() {
                 {/* Action Buttons */}
                 <div className="mt-4 flex space-x-2">
                   <button 
-                    onClick={() => navigate(`/packer/order/${order._id}`)}
+                    onClick={() =>handleStart(order)}
                     className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded-lg text-sm">
                     Start Packing
                   </button>
