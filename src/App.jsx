@@ -7,6 +7,7 @@ import Register from './pages/Auth/Register';
 import AdminDashboard from './pages/Admin/Dashboard';
 import Product from './pages/Admin/Product';
 import Users from './pages/Admin/Users';
+import AdminOrder from './pages/Admin/Order';
 import PickerOrders from './pages/Picker/Orders';
 import PickOrder from './pages/Picker/PickOrder';
 import PackerOrders from './pages/Packer/Orders';
@@ -32,6 +33,7 @@ function App() {
         <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles= {["admin"]}><AdminDashboard/></ProtectedRoute>} />
         <Route path="/admin/product" element={<ProtectedRoute allowedRoles= {["admin"]}><Product/></ProtectedRoute>} />
         <Route path="/admin/users" element={<ProtectedRoute allowedRoles= {["admin"]}><Users/></ProtectedRoute>} />
+        <Route path="/admin/order/:id" element={<ProtectedRoute allowedRoles= {["admin"]}><AdminOrder/></ProtectedRoute>} />
         <Route path="/picker/orders" element={<ProtectedRoute allowedRoles={["picker"]}><PickerOrders /></ProtectedRoute>} />
         <Route path="/picker/order/:id" element={<ProtectedRoute allowedRoles={["picker"]}><PickOrder /></ProtectedRoute>} />
         <Route path="/packer/orders" element={<ProtectedRoute allowedRoles={["packer"]}><PackerOrders /></ProtectedRoute>} />
