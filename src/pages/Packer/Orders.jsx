@@ -52,7 +52,12 @@ export default function Orders() {
             <div key = {order._id} className="bg-white border border-gray-200 rounded-x1 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
               <div className="p-4">
                 <div className="flex justify-between items-start">
-                  <h3 className="font-bold text-gray-900">Order #{order.shopifyOrderId}</h3>
+                <h3 className="font-bold text-gray-900">
+                    Order #{order.shopifyOrderId}
+                    {(order?.orderNote || order?.adminNote) && (
+                      <span title="This order has notes" className="text-yellow-500 ml-2">📌</span>
+                    )}
+                  </h3>
                   <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
                     {order.lineItemCount} items
                   </span>

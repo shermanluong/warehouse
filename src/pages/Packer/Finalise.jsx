@@ -162,6 +162,18 @@ export default function Finalise() {
                         <div className="bg-green-400 text-sm px-2 rounded-xl">{order?.lineItems.length} items</div>
                     </div>
 
+                    {order.adminNote && (
+                        <div className="my-3">
+                            <p className="text-sm font-semibold text-red-600">Admin Note: {order.adminNote}</p>
+                        </div>
+                    )}
+                        
+                    {order.orderNote && (
+                        <div className="my-3">
+                            <p className="text-sm font-semibold text-red-600">Customer Note: {order.orderNote}</p>
+                        </div>
+                    )}
+
                     {/* Scan input and buttons */}
                     {!isScanningPreview && (
                         <div className="flex flex-col sm:flex-row sm:space-x-2 mb-3">

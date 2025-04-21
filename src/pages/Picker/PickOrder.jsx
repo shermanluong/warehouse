@@ -106,28 +106,6 @@ const PickOrder = () => {
         }
     };
 
-    const handleFlagSubmit = async ({ productId, flag }) => {
-        console.log(productId);
-        console.log(flag);
-        const res = await axios.patch(
-            `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-flag`,
-            { 
-                productId   : productId,
-                reason      : flag 
-            },
-            { headers: { Authorization: `Bearer ${token}` } }
-        );
-        
-        const updatedItem = res.data.item;
-        setLineItems(prevItems =>
-            prevItems.map(item =>
-                item.productId === productId
-                    ? { ...item, flags: updatedItem?.flags}
-                    : item
-            )
-        );
-    };
-
     const handleScan = async (err, result)=> {
         if (isScanning.current) {
             if (result) {
@@ -155,10 +133,32 @@ const PickOrder = () => {
 
     const [showDialog, setShowDialog] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
-    
+
     const openFlagDialog = (item) => {
         setSelectedItem(item);
         setShowDialog(true);
+    };
+
+    const handleFlagSubmit = async ({ productId, flag }) => {
+        console.log(productId);
+        console.log(flag);
+        const res = await axios.patch(
+            `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-flag`,
+            { 
+                productId   : productId,
+                reason      : flag 
+            },
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+        
+        const updatedItem = res.data.item;
+        setLineItems(prevItems =>
+            prevItems.map(item =>
+                item.productId === productId
+                    ? { ...item, flags: updatedItem?.flags}
+                    : item
+            )
+        );
     };
 
     if (!order) return <div>Loading...</div>;
@@ -168,7 +168,11 @@ const PickOrder = () => {
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                 <div className="bg-white p-4 rounded-sm shadow-md">
                     <div className="flex flex-row mb-4 justify-between">
-                        <h3 className="font-semibold text-xl">Order: #{order?.shopifyOrderId}</h3>
+                        <h3 className="font-semibold text-xl">Order: #{order?.shopifyOrderId}
+                        {(order?.orderNote || order?.adminNote) && (
+                            <span title="This order has notes" className="text-yellow-500 ml-2">📌</span>
+                        )}
+                        </h3>
                         <button 
                             onClick={() => navigate(`/picker/orders`)}
                             className="px-4 rounded-md hover:bg-blue-300"
@@ -184,6 +188,18 @@ const PickOrder = () => {
                         </p>
                         <div className="bg-green-400 text-sm px-2 rounded-xl">{order.lineItems.length} items</div>
                     </div>
+
+                    {order.adminNote && (
+                        <div className="my-3">
+                            <p className="text-sm font-semibold text-red-600">Admin Note: {order.adminNote}</p>
+                        </div>
+                    )}
+                        
+                    {order.orderNote && (
+                        <div className="my-3">
+                            <p className="text-sm font-semibold text-red-600">Customer Note: {order.orderNote}</p>
+                        </div>
+                    )}
 
                     {/* Scan input and button */}
                     {!isScanningPreview && ( 
