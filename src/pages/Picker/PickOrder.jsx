@@ -23,8 +23,7 @@ const PickOrder = () => {
     const isScanning = useRef(false);
     const [isButtonScanning, setIsButtonScanning] = useState(false);
     const [allPicked, setAllPicked] = useState(false);
-    const [showDialog, setShowDialog] = useState(false);
-    const [selectedItem, setSelectedItem] = useState(null);
+   
 
     const token = localStorage.getItem("token");
 
@@ -154,6 +153,9 @@ const PickOrder = () => {
         }
     };
 
+    const [showDialog, setShowDialog] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
+    
     const openFlagDialog = (item) => {
         setSelectedItem(item);
         setShowDialog(true);

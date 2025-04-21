@@ -4,7 +4,7 @@ import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import { 
     PencilIcon
 } from '@heroicons/react/24/outline'
-import FlagDialog from '../../components/FlagDialog'
+import NoteDialog from '../../components/NoteDialog'
 import axios from 'axios';
 import Layout from '../../layouts/layout';
 
@@ -13,8 +13,6 @@ const Order = () => {
     const navigate = useNavigate();
     const [order, setOrder] = useState(null);
     const [lineItems, setLineItems] = useState([]);
-    const [showDialog, setShowDialog] = useState(false);
-    const [selectedItem, setSelectedItem] = useState(null);
 
     const token = localStorage.getItem("token");
 
@@ -28,31 +26,41 @@ const Order = () => {
         fetchOrder();
     }, [id]);
 
-    const handleNoteSubmit = async ({ productId, flag }) => {
-        console.log(productId);
-        console.log(flag);
-        const res = await axios.patch(
-            `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-flag`,
-            { 
-                productId   : productId,
-                reason      : flag 
-            },
-            { headers: { Authorization: `Bearer ${token}` } }
-        );
-        
-        const updatedItem = res.data.item;
-        setLineItems(prevItems =>
-            prevItems.map(item =>
-                item.productId === productId
-                    ? { ...item, flags: updatedItem?.flags}
-                    : item
-            )
-        );
-    };
+    const [showDialog, setShowDialog] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
 
     const openNoteDialog = (item) => {
         setSelectedItem(item);
         setShowDialog(true);
+    };
+
+    const handleNoteSubmit = async ({ note }) => {
+        try {
+          console.log(note);
+      
+          const res = await axios.patch(
+            `${import.meta.env.VITE_API_URL}/admin/order/${order._id}/add-item-note`,
+            {
+              productId: selectedItem.productId,
+              note: note,
+            },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+      
+          const updatedItem = res.data.item;
+      
+          // Update the matching line item by productId
+          setLineItems(prevItems =>
+            prevItems.map(item =>
+              item.productId === selectedItem.productId
+                ? { ...item, flags: updatedItem?.flags }
+                : item
+            )
+          );
+        } catch (error) {
+          console.error("Failed to submit product note:", error);
+          alert("Error submitting product note. Please try again.");
+        }
     };
 
     if (!order) return <div>Loading...</div>;
@@ -132,10 +140,9 @@ const Order = () => {
                 </div>
             </div>
             {showDialog && selectedItem && (
-                <FlagDialog
+                <NoteDialog
                     isOpen={showDialog}
                     onClose={() => setShowDialog(false)}
-                    lineItem={selectedItem}
                     onSubmit={handleNoteSubmit}
                 />
             )}

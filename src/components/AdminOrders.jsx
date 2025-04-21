@@ -7,6 +7,7 @@ import {
   ArrowRightIcon,
   EllipsisVerticalIcon,
 } from '@heroicons/react/24/outline';
+import NoteDialog from './NoteDialog';
 
 const AdminOrders = () => {
   const navigate = useNavigate();
@@ -36,6 +37,7 @@ const AdminOrders = () => {
             }
           }
         );
+        console.log(res?.data?.orders);
         setOrders(res?.data?.orders || []);
         setTotalPages(Math.ceil(res?.data?.total / pageSize));
       } catch (err) {
@@ -46,6 +48,7 @@ const AdminOrders = () => {
   }, [searchTerm, sortOption, sortOrder, currentPage, pageSize]);
 
   const handlePageChange = (page) => setCurrentPage(page);
+  
   const handlePageSizeChange = (e) => {
     setPageSize(Number(e.target.value));
     setCurrentPage(1);
@@ -65,124 +68,180 @@ const AdminOrders = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  return (
-    <>
-      <div className="flex flex-col sm:flex-row sm:space-x-2 mb-3">
-        <input
-          type="text"
-          placeholder="Search orders by number or customer name"
-          className="border rounded-md p-2 w-full mb-4 sm:mb-0"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
+    const [showDialog, setShowDialog] = useState(false);
+    const [selectedOrder, setSelectedOrder] = useState(null);
 
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex space-x-4">
-          <select
-            className="px-4 py-2 border rounded-md"
-            value={pageSize}
-            onChange={handlePageSizeChange}
-          >
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-            <option value={30}>30</option>
-            <option value={50}>50</option>
-          </select>
-        </div>
+    const openNoteDialog = (order) => {
+        setSelectedOrder(order);
+        setShowDialog(true);
+    };
 
-        <div className="flex items-center space-x-4">
-          <span className="mx-4">{`Page ${currentPage} of ${totalPages}`}</span>
-          <button
-            className="px-4 py-2 bg-gray-200 rounded-lg"
-            disabled={currentPage === 1}
-            onClick={() => handlePageChange(currentPage - 1)}
-          >
-            <ArrowLeftIcon className='w-5 h-5' />
-          </button>
-          <button
-            className="px-4 py-2 bg-gray-200 rounded-md"
-            disabled={currentPage === totalPages}
-            onClick={() => handlePageChange(currentPage + 1)}
-          >
-            <ArrowRightIcon className='w-5 h-5' />
-          </button>
-        </div>
-      </div>
-
-      {orders.length > 0 &&
-        <div className="grid grid-cols-1 gap-4">
-          {orders.map(order => (
-            <div key={order._id} className="bg-white p-4 rounded-lg shadow-md">
-              <div className="flex justify-between items-start relative">
-                <div className="flex">
-                  <h3 className="font-bold text-gray-900 mr-2">Order #{order.shopifyOrderId}</h3>
-                  <span className={`text-xs px-2 py-1 rounded-full ${statusColorMap[order.status] || 'bg-gray-100 text-gray-800'}`}>
-                    {order.status}
-                  </span>
-                </div>
-
-                <div className="relative dropdown-ref">
-                  <button onClick={() => {
-                    setOpenDropdownId(openDropdownId === order._id ? null : order._id);
-                  }}>
-                    <EllipsisVerticalIcon className="w-5 h-5 text-gray-600" />
-                  </button>
-
-                  {openDropdownId === order._id && (
-                    <div className="absolute right-0 mt-2 w-36 bg-gray-200 border border-gray-300 rounded-md shadow-lg z-10">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOpenDropdownId(null);
-                        }}
-                        className="w-full px-4 py-2 text-left text-sm hover:bg-gray-300"
-                      >
-                        Add note
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          navigate(`/admin/order/${order._id}`);
-                          setOpenDropdownId(null);
-                        }}
-                        className="w-full px-4 py-2 text-left text-sm hover:bg-gray-300"
-                      >
-                        Detail
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex justify-between mt-3">
-                <p className="text-sm text-gray-500">Customer:</p>
-                <span className="font-mono text-sm text-gray-500">
-                  {order.customer.first_name} {order.customer.last_name}
-                </span>
-              </div>
-              <div className="flex justify-between mt-3">
-                <p className="text-sm text-gray-500">Items:</p>
-                <span className="font-mono text-sm text-gray-500">{order.lineItemCount}</span>
-              </div>
-              <div className="flex justify-between mt-3">
-                <p className="text-sm text-gray-500">Picker:</p>
-                <span className="font-mono text-sm text-gray-500">{order?.picker?.name}</span>
-              </div>
-              <div className="flex justify-between mt-3">
-                <p className="text-sm text-gray-500">Packer:</p>
-                <span className="font-mono text-sm text-gray-500">{order?.packer?.name}</span>
-              </div>
-              <div className="flex justify-between mt-3">
-                <p className="text-sm text-gray-500">Routes:</p>
-                <span className="font-mono text-sm text-gray-500"></span>
-              </div>
+    const handleNoteSubmit = async ({ note }) => {
+        try {
+          // Send note to backend
+          const res = await axios.patch(
+            `${import.meta.env.VITE_API_URL}/admin/order/${selectedOrder._id}/add-order-note`,
+            { note },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+      
+          const updatedOrder = res.data.order;
+      
+          // Update the local orders state
+          setOrders(prevOrders =>
+            prevOrders.map(order =>
+              order._id === updatedOrder._id
+                ? { ...order, adminNote: updatedOrder.adminNote }
+                : order
+            )
+          );
+        } catch (error) {
+          console.error("Failed to submit note:", error);
+          alert("Error submitting note. Please try again.");
+        }
+    };
+      
+    return (
+        <>
+            <div className="flex flex-col sm:flex-row sm:space-x-2 mb-3">
+                <input
+                type="text"
+                placeholder="Search orders by number or customer name"
+                className="border rounded-md p-2 w-full mb-4 sm:mb-0"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                />
             </div>
-          ))}
-        </div>
-      }
-    </>
-  );
+
+            <div className="flex justify-between items-center mb-4">
+                <div className="flex space-x-4">
+                <select
+                    className="px-4 py-2 border rounded-md"
+                    value={pageSize}
+                    onChange={handlePageSizeChange}
+                >
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={30}>30</option>
+                    <option value={50}>50</option>
+                </select>
+                </div>
+
+                <div className="flex items-center space-x-4">
+                <span className="mx-4">{`Page ${currentPage} of ${totalPages}`}</span>
+                <button
+                    className="px-4 py-2 bg-gray-200 rounded-lg"
+                    disabled={currentPage === 1}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                >
+                    <ArrowLeftIcon className='w-5 h-5' />
+                </button>
+                <button
+                    className="px-4 py-2 bg-gray-200 rounded-md"
+                    disabled={currentPage === totalPages}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                >
+                    <ArrowRightIcon className='w-5 h-5' />
+                </button>
+                </div>
+            </div>
+
+            {orders.length > 0 &&
+                <div className="grid grid-cols-1 gap-4">
+                    {orders.map(order => (
+                        <div key={order._id} className="bg-white p-4 rounded-lg shadow-md">
+                            <div className="flex justify-between items-start relative">
+                            <div className="flex">
+                                <h3 className="font-bold text-gray-900 mr-2">Order #{order.shopifyOrderId}</h3>
+                                <span className={`text-xs px-2 py-1 rounded-full ${statusColorMap[order.status] || 'bg-gray-100 text-gray-800'}`}>
+                                {order.status}
+                                </span>
+                            </div>
+                        
+                            <div className="relative dropdown-ref">
+                                <button
+                                onClick={() => {
+                                    setOpenDropdownId(openDropdownId === order._id ? null : order._id);
+                                }}
+                                >
+                                <EllipsisVerticalIcon className="w-5 h-5 text-gray-600" />
+                                </button>
+                        
+                                {openDropdownId === order._id && (
+                                <div className="absolute right-0 mt-2 w-36 bg-gray-200 border border-gray-300 rounded-md shadow-lg z-10">
+                                    <button
+                                    type="button"
+                                    onClick={() => {
+                                        setOpenDropdownId(null);
+                                        openNoteDialog(order);
+                                    }}
+                                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-300"
+                                    >
+                                    Add note
+                                    </button>
+                                    <button
+                                    type="button"
+                                    onClick={() => {
+                                        navigate(`/admin/order/${order._id}`);
+                                        setOpenDropdownId(null);
+                                    }}
+                                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-300"
+                                    >
+                                    Detail
+                                    </button>
+                                </div>
+                                )}
+                            </div>
+                            </div>
+                        
+                            <div className="flex justify-between mt-3">
+                            <p className="text-sm text-gray-500">Customer:</p>
+                            <span className="font-mono text-sm text-gray-500">
+                                {order.customer.first_name} {order.customer.last_name}
+                            </span>
+                            </div>
+                            <div className="flex justify-between mt-3">
+                            <p className="text-sm text-gray-500">Items:</p>
+                            <span className="font-mono text-sm text-gray-500">{order.lineItemCount}</span>
+                            </div>
+                            <div className="flex justify-between mt-3">
+                            <p className="text-sm text-gray-500">Picker:</p>
+                            <span className="font-mono text-sm text-gray-500">{order?.picker?.name}</span>
+                            </div>
+                            <div className="flex justify-between mt-3">
+                            <p className="text-sm text-gray-500">Packer:</p>
+                            <span className="font-mono text-sm text-gray-500">{order?.packer?.name}</span>
+                            </div>
+                            <div className="flex justify-between mt-3">
+                            <p className="text-sm text-gray-500">Routes:</p>
+                            <span className="font-mono text-sm text-gray-500"></span>
+                            </div>
+                        
+                            {order.adminNote && (
+                            <div className="mt-3">
+                                <p className="text-sm font-semibold text-red-600">Admin Note: {order.adminNote}</p>
+                            </div>
+                            )}
+                        
+                            {order.orderNote && (
+                            <div className="mt-3">
+                                <p className="text-sm font-semibold text-red-600">Customer Note: {order.orderNote}</p>
+                            </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            }
+
+            {showDialog && selectedOrder && (
+                <NoteDialog
+                    isOpen={showDialog}
+                    onClose={() => setShowDialog(false)}
+                    onSubmit={handleNoteSubmit}
+                />
+            )}
+        </>
+    );
 };
 
 export default AdminOrders;
