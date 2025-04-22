@@ -28,15 +28,14 @@ const PickOrder = () => {
 
     const token = localStorage.getItem("token");
 
-    useEffect(() => {
-        const token = localStorage.getItem("token");
+    const fetchOrder = async () => {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/picker/order/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+        setOrder(res?.data || null);
+        setLineItems(res?.data?.lineItems);
+        console.log(res?.data);
+    };
 
-        const fetchOrder = async () => {
-          const res = await axios.get(`${import.meta.env.VITE_API_URL}/picker/order/${id}`, { headers: { Authorization: `Bearer ${token}` } });
-          setOrder(res?.data || null);
-          setLineItems(res?.data?.lineItems);
-          console.log(res?.data);
-        };
+    useEffect(() => {
         fetchOrder();
     }, [id]);
 
@@ -46,40 +45,15 @@ const PickOrder = () => {
         ));
     }, [lineItems]);
 
-    const handlePick = async (productId) => {
-        try {
-            await axios.patch(
-                `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-item`,  
-                { productId }, 
-                { headers: { Authorization: `Bearer ${token}` } 
-            });
-            setLineItems(lineItems =>
-                lineItems.map(item =>
-                item.productId === productId ? { ...item, picked: true } : item
-                )
-            );
-        } catch (err) {
-            console.error('Failed to pick item', err);
-        }
-    };
-
     const handlePickPlus = async (productId) => {
         try {
-            const res = await axios.patch(
+            await axios.patch(
                 `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-plus`,
                 { productId },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
     
-            const updatedItem = res.data.item;
-    
-            setLineItems(prevItems =>
-                prevItems.map(item =>
-                    item.productId === productId
-                        ? { ...item, picked: updatedItem.picked, pickedQuantity: updatedItem.pickedQuantity }
-                        : item
-                )
-            );
+            fetchOrder();
         } catch (err) {
             console.error('Failed to pick plus', err);
         }
@@ -87,21 +61,13 @@ const PickOrder = () => {
 
     const handlePickMinus = async (productId) => {
         try {
-            const res = await axios.patch(
+            await axios.patch(
                 `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-minus`,
                 { productId },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
     
-            const updatedItem = res.data.item;
-    
-            setLineItems(prevItems =>
-                prevItems.map(item =>
-                    item.productId === productId
-                        ? { ...item, picked: updatedItem.picked, pickedQuantity: updatedItem.pickedQuantity }
-                        : item
-                )
-            );
+            fetchOrder();
         } catch (err) {
             console.error('Failed to pick minus', err);
         }
@@ -141,9 +107,7 @@ const PickOrder = () => {
     };
 
     const handleFlagSubmit = async ({ productId, flag }) => {
-        console.log(productId);
-        console.log(flag);
-        const res = await axios.patch(
+        await axios.patch(
             `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-flag`,
             { 
                 productId   : productId,
@@ -152,14 +116,7 @@ const PickOrder = () => {
             { headers: { Authorization: `Bearer ${token}` } }
         );
         
-        const updatedItem = res.data.item;
-        setLineItems(prevItems =>
-            prevItems.map(item =>
-                item.productId === productId
-                    ? { ...item, flags: updatedItem?.flags}
-                    : item
-            )
-        );
+        fetchOrder();
     };
 
     const handleSubstitutionSelect = async ({
@@ -169,7 +126,7 @@ const PickOrder = () => {
         substituteProductId,
         substituteVariantId,
       }) => {
-        const res = await axios.patch(
+        await axios.patch(
           `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-flag`,
           {
             productId: originalProductId,
@@ -181,14 +138,7 @@ const PickOrder = () => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
       
-        const updatedItem = res.data.item;
-        setLineItems(prev =>
-          prev.map(item =>
-            item.productId === originalProductId
-              ? { ...item, flags: updatedItem.flags, substitution: updatedItem.substitution }
-              : item
-          )
-        );
+        fetchOrder();
     };
 
     if (!order) return <div>Loading...</div>;
@@ -302,102 +252,124 @@ const PickOrder = () => {
 
                     <div className="flex flex-col gap-4">
                         {lineItems.map((lineItem) => (
-                            <div
-                                key={lineItem.variantId}
-                                className="flex flex-col sm:flex-row justify-between border border-gray-200 rounded-lg p-4 shadow-md"
-                            >
-                                {/* Left side: image + name + SKU */}
-                                <div className="flex items-start">
-                                    <img
-                                        src={lineItem?.image}
-                                        alt={lineItem?.productTitle}
-                                        className="w-48 h-48 rounded object-cover"
-                                    />
-                                    <div className="ml-4">
-                                        <h3 className="font-semibold text-2xl text-gray-900">
-                                            {lineItem?.variantInfo?.title === "Default Title"
-                                                ? lineItem?.productTitle
-                                                : lineItem?.variantInfo?.title}
-                                            {(lineItem.adminNote || lineItem.customerNote) && (
-                                                <span title="This item has notes" className="text-yellow-500 text-2xl ml-2">📌</span>
-                                            )}
-                                        </h3>
+                            <div key={lineItem.variantId} className = "border border-gray-200 rounded-lg p-4 shadow-md">
+                                <div className="flex flex-col sm:flex-row justify-between">
+                                    {/* Left side: image + name + SKU */}
+                                    <div className="flex items-start">
+                                        <img
+                                            src={lineItem?.image}
+                                            alt={lineItem?.productTitle}
+                                            className="w-48 h-48 rounded object-cover"
+                                        />
+                                        <div className="ml-4">
+                                            <h3 className="font-semibold text-2xl text-gray-900">
+                                                {lineItem?.variantInfo?.title === "Default Title"
+                                                    ? lineItem?.productTitle
+                                                    : lineItem?.variantInfo?.title}
+                                                {(lineItem.adminNote || lineItem.customerNote) && (
+                                                    <span title="This item has notes" className="text-yellow-500 text-2xl ml-2">📌</span>
+                                                )}
+                                            </h3>
 
-                                        <div className="flex gap-2 mt-2 mb-2">
-                                            {lineItem.picked && (
-                                                <span className="text-lg text-white bg-green-500 rounded-2xl px-3 mt-2 sm:mt-0">Verified</span>
-                                            )}
+                                            <div className="flex gap-2 mt-2 mb-2">
+                                                {lineItem.picked && (
+                                                    <span className="text-lg text-white bg-green-500 rounded-2xl px-3 mt-2 sm:mt-0">Verified</span>
+                                                )}
 
-                                            {lineItem?.flags?.length > 0 && !lineItem?.picked  && (
-                                                <span className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">{lineItem.flags.join(', ')}</span>
+                                                {lineItem?.flags?.length > 0 && !lineItem?.picked  && (
+                                                    <span className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">{lineItem.flags.join(', ')}</span>
+                                                )}
+                                            </div>
+
+                                            <p className="font-semibold text-xl text-gray-900">SKU: {lineItem?.variantInfo?.sku}</p>
+                                            <span className="font-semibold text-xl text-gray-900">
+                                                {lineItem?.pickedQuantity} / {lineItem?.quantity} units
+                                            </span>
+                                            
+                                            {/* Notes Display */}
+                                            {lineItem.adminNote && (
+                                            <p className="text-xl text-red-600 mt-1">Admin: {lineItem.adminNote}</p>
+                                            )}
+                                            {lineItem.customerNote && (
+                                            <p className="text-xl text-blue-600 mt-1">Customer: {lineItem.customerNote}</p>
                                             )}
                                         </div>
+                                    </div>
 
-                                        <p className="font-semibold text-xl text-gray-900">SKU: {lineItem?.variantInfo?.sku}</p>
-                                        <span className="font-semibold text-xl text-gray-900">
-                                            {lineItem?.pickedQuantity} / {lineItem?.quantity} units
-                                        </span>
-                                        {lineItem.substitution?.variantInfo?.title && (
-                                        <p className="rounded-md bg-yellow-100 text-yellow-800 text-xl mt-1">
-                                            Subbed: {lineItem.substitution.variantInfo.title}
-                                        </p>
-                                        )}
-                                        {/* Notes Display */}
-                                        {lineItem.adminNote && (
-                                        <p className="text-xl text-red-600 mt-1">Admin: {lineItem.adminNote}</p>
-                                        )}
-                                        {lineItem.customerNote && (
-                                        <p className="text-xl text-blue-600 mt-1">Customer: {lineItem.customerNote}</p>
-                                        )}
+                                    <div className="flex justify-end mt-4 space-x-3 sm:flex-col sm:justify-start sm:mt-0 sm:space-x-0 sm:space-y-2 ">
+                                        
+                                        {!lineItem.picked && !lineItem?.flags?.length >  0 && lineItem.quantity <= 1 &&
+                                            <button
+                                                title = "Pick item"
+                                                onClick={() => handlePickPlus(lineItem.productId)}
+                                                className="bg-white text-green-600 border border-green-600 hover:bg-green-200 w-16 h-16 rounded flex items-center justify-center"
+                                            >
+                                                <CheckIcon className="w-10 h-10" />
+                                            </button>
+                                        }
+
+                                        {!lineItem.picked && !lineItem?.flags?.length >  0 && lineItem.quantity > 1 &&
+                                            <>
+                                                <button
+                                                    title = "Add one Item"
+                                                    onClick={() => handlePickPlus(lineItem.productId)}
+                                                    className="bg-white text-blue-400 border border-blue-400 hover:bg-blue-200 w-16 h-16 rounded flex items-center justify-center"
+                                                >
+                                                    <PlusIcon className="w-10 h-10" />
+                                                </button>
+                                                <button
+                                                    title = "Remove one Item"
+                                                    onClick={() => handlePickMinus(lineItem.productId)}
+                                                    className="bg-white text-stone-400 border border-stone-400 hover:bg-stone-200 w-16 h-16 rounded flex items-center justify-center"
+                                                >
+                                                    <MinusIcon className="w-10 h-10" />
+                                                </button>
+                                            </>
+                                        }
+
+                                        {!lineItem.picked && !lineItem?.flags?.length >  0 && 
+                                            <button 
+                                                title = "Flag Item"
+                                                onClick={() => openFlagDialog(lineItem)}
+                                                className="bg-white text-red-600 border border-red-600 hover:bg-red-200 w-16 h-16 rounded flex items-center justify-center"
+                                            >
+                                                <XMarkIcon className="w-10 h-10" />
+                                            </button>
+                                        }
+
+                                        {(lineItem.picked || lineItem?.flags?.length > 0) && 
+                                            <button
+                                                title = "Undo" 
+                                                onClick={() => openFlagDialog(lineItem)}
+                                                className="bg-white text-blue-400 border border-blue-400 hover:bg-blue-200 w-16 h-16 rounded flex items-center justify-center"
+                                            >
+                                                <ArrowPathIcon className="w-10 h-10" />
+                                            </button>
+                                        }
                                     </div>
                                 </div>
 
-                                <div className="flex justify-end mt-4 space-x-3 sm:flex-col sm:justify-start sm:mt-0 sm:space-x-0 sm:space-y-2 ">
-                                    
-                                    {!lineItem.picked && !lineItem?.flags?.length >  0 && lineItem.quantity <= 1 &&
-                                        <button
-                                            onClick={() => handlePickPlus(lineItem.productId)}
-                                            className="bg-white text-green-600 border border-green-600 hover:bg-green-200 w-16 h-16 rounded flex items-center justify-center"
-                                        >
-                                            <CheckIcon className="w-10 h-10" />
-                                        </button>
-                                    }
+                                {lineItem?.substitution?.substituteProductId && 
+                                    <div
+                                        className="flex flex-col sm:flex-row mt-4 justify-between border border-yellow-600 rounded-lg p-4"
+                                    >
+                                        {/* Left side: image + name + SKU */}
+                                        <div className="flex items-start">
+                                            <img
+                                                src={lineItem?.substitution?.variantInfo?.image}
+                                                alt={lineItem?.substitution?.variantInfo?.title}
+                                                className="w-36 h-36 rounded object-cover"
+                                            />
+                                            <div className="ml-4 mt-2 sm:mt-0">
+                                                <h3 className="font-semibold text-2xl text-yellow-600">
+                                                    Subbed: {lineItem?.substitution?.variantInfo?.title}
+                                                </h3>
 
-                                    {!lineItem.picked && !lineItem?.flags?.length >  0 && lineItem.quantity > 1 &&
-                                        <>
-                                            <button
-                                                onClick={() => handlePickPlus(lineItem.productId)}
-                                                className="bg-white text-blue-400 border border-blue-400 hover:bg-blue-200 w-16 h-16 rounded flex items-center justify-center"
-                                            >
-                                                <PlusIcon className="w-10 h-10" />
-                                            </button>
-                                            <button
-                                                onClick={() => handlePickMinus(lineItem.productId)}
-                                                className="bg-white text-stone-400 border border-stone-400 hover:bg-stone-200 w-16 h-16 rounded flex items-center justify-center"
-                                            >
-                                                <MinusIcon className="w-10 h-10" />
-                                            </button>
-                                        </>
-                                    }
-
-                                    {!lineItem.picked && !lineItem?.flags?.length >  0 && 
-                                        <button 
-                                            onClick={() => openFlagDialog(lineItem)}
-                                            className="bg-white text-red-600 border border-red-600 hover:bg-red-200 w-16 h-16 rounded flex items-center justify-center"
-                                        >
-                                            <XMarkIcon className="w-10 h-10" />
-                                        </button>
-                                    }
-
-                                    {(lineItem.picked || lineItem?.flags?.length > 0) && 
-                                        <button 
-                                            onClick={() => openFlagDialog(lineItem)}
-                                            className="bg-white text-blue-400 border border-blue-400 hover:bg-blue-200 w-16 h-16 rounded flex items-center justify-center"
-                                        >
-                                            <ArrowPathIcon className="w-10 h-10" />
-                                        </button>
-                                    }
-                                </div>
+                                                <p className="font-semibold text-xl text-gray-900">SKU: {lineItem?.substitution?.variantInfo?.sku}</p>
+                                            </div>
+                                        </div>
+                                    </div>  
+                                }
                             </div>
                         ))}
                     </div>
