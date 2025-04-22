@@ -110,6 +110,34 @@ export default function Finalise() {
         }
     };
 
+    const handleCancelSubstitution = async (productId, variantId) => {
+        try {
+            await axios.patch(
+                `${import.meta.env.VITE_API_URL}/packer/order/${order._id}/cancel-sub-item`,
+                { productId, variantId },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+    
+            fetchOrder();
+        } catch (err) {
+            console.error('Failed to cancel substitution item', err);
+        }
+    };
+
+    const handleConfirmSubstitution = async (productId, variantId) => {
+        try {
+            await axios.patch(
+                `${import.meta.env.VITE_API_URL}/packer/order/${order._id}/confirm-sub-item`,
+                { productId, variantId },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+    
+            fetchOrder();
+        } catch (err) {
+            console.error('Failed to confirm substitution item', err);
+        }
+    };
+
     const handleScan = async (err, result)=> {
         if (isScanning.current) {
             if (result) {
@@ -332,25 +360,35 @@ export default function Finalise() {
                                                     Subbed: {lineItem?.substitution?.variantInfo?.title}
                                                 </h3>
 
+                                                <div className="flex gap-2 mt-2 mb-2">
+                                                    {lineItem?.substitution?.used && (
+                                                        <span className="text-lg text-white bg-green-500 rounded-2xl px-3 mt-2 sm:mt-0">Verified</span>
+                                                    )}
+                                                </div>
+
                                                 <p className="font-semibold text-xl text-gray-900">SKU: {lineItem?.substitution?.variantInfo?.sku}</p>
                                             </div>
                                         </div>
                                         
                                         <div className="flex justify-end mt-4 space-x-3 sm:flex-col sm:justify-start sm:mt-0 sm:space-x-0 sm:space-y-2 ">
-                                            <button
-                                                title = "Confirm Substitution"
-                                                onClick={() => handlePackPlus(lineItem.productId)}
-                                                className="bg-white text-green-600 border border-green-600 hover:bg-green-200 w-16 h-16 rounded flex items-center justify-center"
-                                            >
-                                                <CheckIcon className="w-10 h-10" />
-                                            </button>
-                                            <button
-                                                title = "Cancel Substitution" 
-                                                onClick={() => openFlagDialog(lineItem)}
-                                                className="bg-white text-red-600 border border-red-600 hover:bg-red-200 w-16 h-16 rounded flex items-center justify-center"
-                                            >
-                                                <XMarkIcon className="w-10 h-10" />
-                                            </button>
+                                            {!lineItem?.substitution?.used && (
+                                                <>
+                                                    <button
+                                                        title = "Confirm Substitution"
+                                                        onClick={() => handleConfirmSubstitution(lineItem?.productId, lineItem?.variantId)}
+                                                        className="bg-white text-green-600 border border-green-600 hover:bg-green-200 w-16 h-16 rounded flex items-center justify-center"
+                                                    >
+                                                        <CheckIcon className="w-10 h-10" />
+                                                    </button>
+                                                    <button
+                                                        title = "Cancel Substitution" 
+                                                        onClick={() => handleCancelSubstitution(lineItem?.productId, lineItem?.variantId)}
+                                                        className="bg-white text-red-600 border border-red-600 hover:bg-red-200 w-16 h-16 rounded flex items-center justify-center"
+                                                    >
+                                                        <XMarkIcon className="w-10 h-10" />
+                                                    </button>
+                                                </>   
+                                            )}
                                         </div>
                                     </div>  
                                 }
