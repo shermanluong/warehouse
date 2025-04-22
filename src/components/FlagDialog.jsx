@@ -1,13 +1,5 @@
 import { Dialog } from '@headlessui/react';
 import { useState, useEffect } from 'react';
-import { 
-    PlusIcon, 
-    MinusIcon, 
-    XMarkIcon, 
-    CheckIcon,
-    CameraIcon,
-    PencilSquareIcon
-} from '@heroicons/react/24/outline'
 
 const FlagDialog = ({ isOpen, onClose, lineItem, onSubmit }) => {
   const [selectedFlag, setSelectedFlag] = useState('');

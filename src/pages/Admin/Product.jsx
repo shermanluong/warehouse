@@ -5,11 +5,6 @@ import Layout from '../../layouts/layout';
 import { 
     ArrowLeftIcon, 
     ArrowRightIcon, 
-    MinusIcon, 
-    XMarkIcon, 
-    CheckIcon,
-    CameraIcon,
-    PencilSquareIcon
 } from '@heroicons/react/24/outline'
 
 const Product = () => {
@@ -21,7 +16,6 @@ const Product = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(20); // Default to 20 products per page
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -79,34 +73,6 @@ const Product = () => {
                   <option value={30}>30</option>
                   <option value={50}>50</option>
                 </select>
-                {false && 
-                <>
-                    <button
-                    className={`p-2 ${sortOption === 'title' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-                    onClick={() => setSortOption('title')}
-                    >
-                    Sort by Title
-                    </button>
-                    <button
-                    className={`p-2 ${sortOption === 'price' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-                    onClick={() => setSortOption('price')}
-                    >
-                    Sort by Price
-                    </button>
-                    <button
-                    className={`p-2 ${sortOption === 'sku' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-                    onClick={() => setSortOption('sku')}
-                    >
-                    Sort by SKU
-                    </button>
-                    <button
-                    className={`p-2 ${sortOrder === 'asc' ? 'bg-green-500 text-white' : 'bg-gray-200'}`}
-                    onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                    >
-                    {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
-                    </button>
-                </>
-                }
               </div>
               {/* Page Size Selector and Pagination */}
               <div className="flex items-center space-x-4">
