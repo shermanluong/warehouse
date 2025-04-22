@@ -138,6 +138,25 @@ export default function Finalise() {
         }
     };
 
+    const refundItem = async (id, shopifyOrderId, shopifyLineItemId, quantity) => {
+        try {
+            await axios.post(
+                `${import.meta.env.VITE_API_URL}/packer/refund-item`,
+                { 
+                    id,
+                    shopifyOrderId,
+                    shopifyLineItemId,
+                    quantity 
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+    
+            fetchOrder();
+        } catch (err) {
+            console.error('Failed to confirm substitution item', err);
+        }
+    };
+
     const handleScan = async (err, result)=> {
         if (isScanning.current) {
             if (result) {
@@ -273,9 +292,17 @@ export default function Finalise() {
                                                     <span className="text-lg text-white bg-green-500 rounded-2xl px-3 mt-2 sm:mt-0">Verified</span>
                                                 )}
 
-                                                {lineItem?.flags?.length > 0 && !lineItem?.picked  && (
-                                                    <span className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">{lineItem.flags.join(', ')}</span>
-                                                )}
+                                                {lineItem?.flags?.includes("Out Of Stock") &&
+                                                    <span className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">Out Of Stock</span>
+                                                }
+
+                                                {lineItem?.flags?.includes("Damaged") &&
+                                                    <span className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">Damaged</span>
+                                                }
+
+                                                {lineItem?.flags?.includes("Refunded") &&
+                                                    <span className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">Refunded</span>
+                                                }
                                             </div>
 
                                             <p className="font-semibold text-xl text-gray-900">SKU: {lineItem?.variantInfo?.sku}</p>
@@ -333,9 +360,10 @@ export default function Finalise() {
                                             </button>
                                         }
 
-                                        { lineItem?.flags?.length > 0 && !lineItem?.substitution?.substituteProductId && 
-                                            <button 
-                                                onClick={() => openFlagDialog(lineItem)}
+                                        { lineItem?.flags?.length > 0 && !lineItem?.flags?.includes("Refunded") && !lineItem?.substitution?.substituteProductId && 
+                                            <button
+                                                title = "Refund" 
+                                                onClick={() => refundItem(order._id, order.shopifyOrderId, lineItem.shopifyLineItemId, lineItem.quantity)}
                                                 className="bg-white text-green-400 border border-green-400 hover:bg-green-200 w-16 h-16 rounded flex items-center justify-center"
                                             >
                                                 <CurrencyDollarIcon className="w-10 h-10" />
