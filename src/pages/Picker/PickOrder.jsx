@@ -73,6 +73,20 @@ const PickOrder = () => {
         }
     };
 
+    const handleUndo = async (productId, variantId) => {
+        try {
+            await axios.patch(
+                `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/undo-item`,
+                { productId, variantId },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+    
+            fetchOrder();
+        } catch (err) {
+            console.error('Failed to undo', err);
+        }
+    };
+
     const handleScan = async (err, result)=> {
         if (isScanning.current) {
             if (result) {
@@ -340,7 +354,7 @@ const PickOrder = () => {
                                         {(lineItem.picked || lineItem?.flags?.length > 0) && 
                                             <button
                                                 title = "Undo" 
-                                                onClick={() => openFlagDialog(lineItem)}
+                                                onClick={() => handleUndo(lineItem?.productId, lineItem?.variantId)}
                                                 className="bg-white text-blue-400 border border-blue-400 hover:bg-blue-200 w-16 h-16 rounded flex items-center justify-center"
                                             >
                                                 <ArrowPathIcon className="w-10 h-10" />
