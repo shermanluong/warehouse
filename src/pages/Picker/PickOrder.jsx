@@ -161,6 +161,35 @@ const PickOrder = () => {
         );
     };
 
+    const handleSubstitutionSelect = async ({
+        flag,
+        originalProductId,
+        originalVariantId,
+        substituteProductId,
+        substituteVariantId,
+      }) => {
+        const res = await axios.patch(
+          `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-flag`,
+          {
+            productId: originalProductId,
+            variantId: originalVariantId,
+            reason: flag,
+            substituteProductId,
+            substituteVariantId,
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      
+        const updatedItem = res.data.item;
+        setLineItems(prev =>
+          prev.map(item =>
+            item.productId === originalProductId
+              ? { ...item, flags: updatedItem.flags, substitution: updatedItem.substitution }
+              : item
+          )
+        );
+    };
+
     if (!order) return <div>Loading...</div>;
 
     return (
@@ -189,13 +218,13 @@ const PickOrder = () => {
                         <div className="bg-green-400 text-sm px-2 rounded-xl">{order.lineItems.length} items</div>
                     </div>
 
-                    {order.adminNote && (
+                    {order?.adminNote && (
                         <div className="my-3">
                             <p className="text-sm font-semibold text-red-600">Admin Note: {order.adminNote}</p>
                         </div>
                     )}
                         
-                    {order.orderNote && (
+                    {order?.orderNote && (
                         <div className="my-3">
                             <p className="text-sm font-semibold text-red-600">Customer Note: {order.orderNote}</p>
                         </div>
@@ -296,6 +325,11 @@ const PickOrder = () => {
                                         <span className="font-semibold text-sm text-gray-900">
                                             {lineItem?.pickedQuantity} / {lineItem?.quantity} units
                                         </span>
+                                        {lineItem.substitution?.variantInfo?.title && (
+                                        <p className="rounded-md bg-yellow-100 text-yellow-800 text-xs mt-1">
+                                            Subbed: {lineItem.substitution.variantInfo.title}
+                                        </p>
+                                        )}
                                         {/* Notes Display */}
                                         {lineItem.adminNote && (
                                         <p className="text-xs text-red-600 mt-1">Admin: {lineItem.adminNote}</p>
@@ -307,7 +341,7 @@ const PickOrder = () => {
                                 </div>
                           
                                 {/* Right side: picked info + buttons */}
-                                {lineItem.flags.length > 0 && !lineItem.picked  && (
+                                {lineItem?.flags?.length > 0 && !lineItem?.picked  && (
                                     <span className="text-sm text-red-500 mt-2 sm:mt-0">⚠ {lineItem.flags.join(', ')}</span>
                                 )}
                                 
@@ -315,7 +349,7 @@ const PickOrder = () => {
                                     <span className="text-green-600 mt-2 sm:mt-0">✅ Verified</span>
                                 )}
 
-                                {!lineItem.picked && !lineItem.flags.length >  0 && (
+                                {!lineItem.picked && !lineItem?.flags?.length >  0 && (
                                     <div className="flex mt-4 space-x-3 sm:flex-col sm:items-start sm:mt-0 sm:space-x-0 sm:space-y-2 ">
                                         {lineItem.quantity <= 1 ? (
                                             <button
@@ -372,6 +406,7 @@ const PickOrder = () => {
                     onClose={() => setShowDialog(false)}
                     lineItem={selectedItem}
                     onSubmit={handleFlagSubmit}
+                    onSelectSubstitution= {handleSubstitutionSelect}
                 />
             )}
         </Layout>

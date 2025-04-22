@@ -1,110 +1,158 @@
 import { Dialog } from '@headlessui/react';
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const FlagDialog = ({ isOpen, onClose, lineItem, onSubmit }) => {
-  const [selectedFlag, setSelectedFlag] = useState('');
-  const [selectedSubstitute, setSelectedSubstitute] = useState(null);
-
-  const handleConfirm = () => {
-    console.log(1);
-    onSubmit({
-      productId: lineItem.productId,
-      flag: selectedFlag
-    });
-    onClose();
-  };
-
-  const handleStatusChange = (event) => {
-    const selectedStatus = event.target.value;
-    console.log(selectedStatus);
-    setSelectedFlag(selectedStatus);
-};
-
-  return (
-    <Dialog open={isOpen} onClose={onClose} className="relative z-50">
-      <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+const FlagDialog = ({ isOpen, onClose, lineItem, onSubmit, onSelectSubstitution }) => {
+    const [selectedFlag, setSelectedFlag] = useState('');
+    const [selectedSubstitute, setSelectedSubstitute] = useState(null);
+    const [substitutions, setSubstitutions] = useState([]);
+    const token = localStorage.getItem("token");
+  
+    useEffect(() => {
+      if (isOpen && lineItem?.productId && lineItem?.variantId) {
+        setSelectedFlag('');
+        setSelectedSubstitute(null);
+        fetchSubstitutions();
+      }
+    }, [isOpen, lineItem]);
+  
+    const fetchSubstitutions = async () => {
+      try {
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_URL}/substitution/suggests?productId=${lineItem.productId}&variantId=${lineItem.variantId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        console.log(res.data);
+        setSubstitutions(res.data.substitutes || []);
+      } catch (err) {
+        console.error('Failed to fetch substitutions', err);
+        setSubstitutions([]);
+      }
+    };
+  
+    const handleConfirm = () => {
+      if (!selectedFlag) return;
+      onSubmit({
+        productId: lineItem.productId,
+        variantId: lineItem.variantId,
+        flag: selectedFlag,
+      });
+      onClose();
+    };
+  
+    const handleSelectSubstitute = (item) => {
+        console.log(lineItem);
+      if (!selectedFlag) return;
+      onSelectSubstitution({
+        flag: selectedFlag,
+        originalProductId: lineItem.productId,
+        originalVariantId: lineItem.variantId,
+        substituteProductId: item.shopifyProductId,
+        substituteVariantId: item.shopifyVariantId,
+      });
+      onClose();
+    };
+  
+    return (
+      <Dialog open={isOpen} onClose={onClose} className="relative z-50">
+        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-            <Dialog.Panel className="w-full max-w-2xl rounded-lg bg-white p-6 shadow-xl">
-                <Dialog.Title className="text-lg font-bold mb-4">
-                    Substitute Item
-                </Dialog.Title>
-                
-                <div
-                    key={lineItem.variantId}
-                    className="flex flex-col sm:flex-row justify-between border border-gray-200 rounded-lg p-4 shadow-md"
+          <Dialog.Panel className="w-full max-w-2xl rounded-lg bg-white p-6 shadow-xl">
+            <Dialog.Title className="text-lg font-bold mb-4">Substitute Item</Dialog.Title>
+  
+            <div className="flex flex-col sm:flex-row justify-between border border-gray-200 rounded-lg p-4 shadow-md">
+              <div className="flex items-start">
+                <img src={lineItem?.image} alt={lineItem?.productTitle} className="w-24 h-24 rounded object-cover" />
+                <div className="ml-4">
+                  <h3 className="font-semibold text-sm text-gray-900">
+                    {lineItem?.variantInfo?.title === "Default Title"
+                      ? lineItem?.productTitle
+                      : lineItem?.variantInfo?.title}
+                  </h3>
+                  <p className="font-semibold text-sm text-gray-900">
+                    SKU: {lineItem?.variantInfo?.sku}
+                  </p>
+                  <p className="font-semibold text-sm text-gray-900">
+                    Price: ${lineItem?.variantInfo?.price}
+                  </p>
+                </div>
+              </div>
+  
+              <div className="flex mt-4 space-x-2 justify-end sm:flex-col sm:justify-center sm:mt-0 sm:space-x-0 sm:space-y-2">
+                <select
+                  onChange={(e) => setSelectedFlag(e.target.value)}
+                  className="bg-red-500 text-white px-1 py-0 rounded-2xl"
+                  value={selectedFlag}
                 >
-                    <div className="flex items-start">
-                        <img
-                            src={lineItem?.image}
-                            alt={lineItem?.productTitle}
-                            className="w-16 h-16 rounded object-cover"
-                        />
-                        <div className="ml-4">
-                            <h3 className="font-semibold text-sm text-gray-900">
-                                {lineItem?.variantInfo?.title === "Default Title"
-                                    ? lineItem?.productTitle
-                                    : lineItem?.variantInfo?.title}
-                            </h3>
-                            <p className="font-semibold text-sm text-gray-900">
-                                ${lineItem?.variantInfo?.price} • SKU: {lineItem?.variantInfo?.sku}
-                            </p>
+                  <option className="bg-white text-gray-900" value="" disabled>
+                    Select Status
+                  </option>
+                  <option className="bg-white text-gray-900" value="Out Of Stock">
+                    Out of Stock
+                  </option>
+                  <option className="bg-white text-gray-900" value="Damaged">
+                    Damaged
+                  </option>
+                </select>
+              </div>
+            </div>
+  
+            <div className="mt-4">
+              <p className="font-medium text-gray-700 mb-2">Suggested Substitutions</p>
+              <ul className="space-y-2 max-h-60 overflow-y-auto">
+                {substitutions.length === 0 && (
+                  <li className="text-sm text-gray-500 italic">No substitutes available</li>
+                )}
+                {substitutions.map((item) => (
+                  <li
+                    key={item.shopifyVariantId}
+                    className={`border p-2 rounded flex justify-between items-center ${
+                      selectedSubstitute?.variantId === item.variantId ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+                    }`}
+                  > 
+                    <div className= "flex justity-start">
+                        <img src={item?.image} alt={item?.title} className="w-20 h-20 rounded object-cover" />
+                        <div className="ml-3">
+                            <p className="font-semibold text-sm">{item.title}</p>
+                            <p className="text-xs text-gray-500">SKU: {item.sku}</p>
+                            <p className="text-xs text-gray-500">Price: ${item.price}</p>
                         </div>
                     </div>
-
-                    <div className="flex mt-4 space-x-2 justify-end sm:flex-col sm:justify-center sm:mt-0 sm:space-x-0 sm:space-y-2">
-                        <select
-                            onChange={(e) => handleStatusChange(e)} // handle the change event
-                            className="bg-red-500 text-white px-1 py-0 rounded-2xl"
-                            defaultValue=""
-                        >
-                            <option className = "bg-white text-gray-900" value="" disabled>Select Status</option>
-                            <option className = "bg-white text-gray-900" value="Out Of Stock">Out of Stock</option>
-                            <option className = "bg-white text-gray-900" value="Damaged">Damaged</option>
-                        </select>
-                    </div>
-                </div>
-
-                {/* Substitution List */}
-                <div className='mt-4'>
-                    <p className="font-medium text-gray-700 mb-2">Suggested Substitutions</p>
-                    <ul className="space-y-2 max-h-40 overflow-y-auto">
-                    {lineItem.substitution?.options?.map((item) => (
-                        <li
-                        key={item.variantId}
-                        className={`border p-2 rounded cursor-pointer ${
-                            selectedSubstitute?.variantId === item.variantId
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-gray-200'
-                        }`}
-                        onClick={() => setSelectedSubstitute(item)}
-                        >
-                        <p className="font-semibold text-sm">{item.title}</p>
-                        <p className="text-xs text-gray-500">SKU: {item.sku}</p>
-                        </li>
-                    ))}
-                    </ul>
-                </div>
-
-                {/* Action buttons */}
-                <div className="flex justify-end mt-6 space-x-2">
+                    
                     <button
-                    onClick={onClose}
-                    className="px-4 py-2 text-sm bg-gray-200 rounded hover:bg-gray-300"
+                      onClick={() => handleSelectSubstitute(item)}
+                      disabled={!selectedFlag}
+                      className={`text-xs px-3 py-1 rounded ${
+                        selectedFlag ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-300 text-white'
+                      }`}
                     >
-                    Cancel
+                      Select
                     </button>
-                    <button
-                    onClick={handleConfirm}
-                    className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
-                    disabled={!selectedFlag}
-                    >
-                    Confirm
-                    </button>
-                </div>
-            </Dialog.Panel>
+                  </li>
+                ))}
+              </ul>
+            </div>
+  
+            <div className="flex justify-end mt-6 space-x-2">
+              <button
+                onClick={onClose}
+                className="px-4 py-2 text-sm bg-gray-200 rounded hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirm}
+                className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                disabled={!selectedFlag}
+              >
+                Confirm
+              </button>
+            </div>
+          </Dialog.Panel>
         </div>
-    </Dialog>
-  );
-}
+      </Dialog>
+    );
+  };
 
-export default FlagDialog;
+  export default FlagDialog
+  

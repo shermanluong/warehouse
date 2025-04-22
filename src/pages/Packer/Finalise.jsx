@@ -162,13 +162,13 @@ export default function Finalise() {
                         <div className="bg-green-400 text-sm px-2 rounded-xl">{order?.lineItems.length} items</div>
                     </div>
 
-                    {order.adminNote && (
+                    {order?.adminNote && (
                         <div className="my-3">
                             <p className="text-sm font-semibold text-red-600">Admin Note: {order.adminNote}</p>
                         </div>
                     )}
                         
-                    {order.orderNote && (
+                    {order?.orderNote && (
                         <div className="my-3">
                             <p className="text-sm font-semibold text-red-600">Customer Note: {order.orderNote}</p>
                         </div>
@@ -260,7 +260,11 @@ export default function Finalise() {
                                 <span className="font-semibold text-sm text-gray-900">
                                   {lineItem?.packedQuantity || 0} packed / {lineItem.quantity} units
                                 </span>
-                          
+                                {lineItem.substitution?.variantInfo?.title && (
+                                    <p className="rounded-md bg-yellow-100 text-yellow-800 text-xs mt-1">
+                                        Subbed: {lineItem.substitution.variantInfo.title}
+                                    </p>
+                                )}
                                 {/* Show notes if any */}
                                 {lineItem.adminNote && (
                                   <p className="text-xs text-red-600 mt-1">Admin note: {lineItem.adminNote}</p>
