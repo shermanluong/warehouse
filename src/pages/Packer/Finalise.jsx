@@ -63,9 +63,40 @@ export default function Finalise() {
         setPhotoCaptured(false);
     };
 
-    const handleAcceptImage = () => {
+    function dataURLToFile(dataurl, filename) {
+        const arr = dataurl.split(',');
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
+        }
+      
+        return new File([u8arr], filename, { type: mime });
+    }
+
+    const handleAcceptImage = async () => {
         setPhotoCaptured(true);
         setCameraStarted(false);
+
+        const file = dataURLToFile(capturedImage, `order-photo-${Date.now()}.jpg`);
+
+        const res = await axios.post(`${import.meta.env.VITE_API_URL}/upload/image`, {
+            fileBase64: capturedImage,
+            fileName: file.name
+          });
+        
+          const imageUrl = res.data.url;
+          
+          // Now save this URL in the order
+          /*await axios.patch(`${import.meta.env.VITE_API_URL}/order/${orderId}/save-photo`, {
+            photoUrl: imageUrl
+          });*/
+        
+          // Optionally show preview or confirm
+          console.log('Uploaded image URL:', imageUrl);
     };
 
     const handlePackPlus = async (productId) => {
