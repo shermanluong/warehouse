@@ -12,8 +12,9 @@ import {
     XMarkIcon
 } from '@heroicons/react/24/outline'
 import axios from 'axios';
+import dataURLToFile from '../../utils/dataURLToFile';
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
-import Webcam from "react-webcam";
+import CameraModal from '../../components/CameraModal';
 
 export default function Finalise() {
     const { id } = useParams();
@@ -24,80 +25,66 @@ export default function Finalise() {
     const [barcode, setBarcode] = useState("");
     const isScanning = useRef(false);
     const [isButtonScanning, setIsButtonScanning] = useState(false);
-    const [cameraStarted, setCameraStarted] = useState(false);
-    const [capturedImage, setCapturedImage] = useState(null);
-    const [photoCaptured, setPhotoCaptured] = useState(false);
-    const videoElement = useRef(null);
     const token = localStorage.getItem("token");
 
+    const [modalOpen, setModalOpen] = useState(false);
+    const [capturedPhotos, setCapturedPhotos] = useState([]);
+
+    const handleDeletePhoto = async (fileIdToDelete) => {
+        try {
+          await axios.delete(`${import.meta.env.VITE_API_URL}/packer/order/${order._id}/delete-photo`, {
+            headers: { Authorization: `Bearer ${token}` },
+            data: { fileId: fileIdToDelete },
+          });
+      
+          setCapturedPhotos(photos => 
+            photos.filter(photo => photo.fileId !== fileIdToDelete)
+          );
+      
+          console.log('Photo deleted successfully:', fileIdToDelete);
+        } catch (error) {
+          console.error('Error deleting photo:', error);
+          alert('Failed to delete photo. Please try again.');
+        }
+    };
+
+    const handleUpload = async (image) => {
+        const file = dataURLToFile(image, `order-photo-${Date.now()}.jpg`);
+
+        const res = await axios.post(`${import.meta.env.VITE_API_URL}/upload/image`, {
+            fileBase64: image,
+            fileName: file.name
+        });
+        
+        const imageUrl = res.data.url;
+        const fileId = res.data.fileId;
+
+        await axios.patch(
+            `${import.meta.env.VITE_API_URL}/packer/order/${order._id}/save-photo`, 
+            {
+                photoUrl: imageUrl,
+                fileId: fileId,
+            },
+            {headers:{Authorization:`Bearer ${token}`}}
+        );
+        
+        setCapturedPhotos(prev => [...prev, { photoUrl: imageUrl, fileId }]);
+    };
+
     const fetchOrder = async () => {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/packer/order/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+        const res = await axios.get(
+            `${import.meta.env.VITE_API_URL}/packer/order/${id}`, 
+            {headers:{Authorization:`Bearer ${token}`}}
+        );
         setOrder(res?.data || null);
         setLineItems(res?.data?.lineItems);
+        setCapturedPhotos(res?.data?.photos || []);
         console.log(res?.data);
     };
 
     useEffect(() => {
         fetchOrder();
     }, [id]);
-
-    const handleStartCamera = () => {
-        setCameraStarted(true);
-        setCapturedImage(null);
-        setPhotoCaptured(false);
-    };
-
-    const handleStopCamera = () => {
-        setCameraStarted(false);
-    };
-
-    const handleCapture = () => {
-        const imageSrc = videoElement.current.getScreenshot();
-        setCapturedImage(imageSrc);
-        setCameraStarted(false);
-    };
-
-    const handleRetake = () => {
-        setCapturedImage(null);
-        setCameraStarted(true);
-        setPhotoCaptured(false);
-    };
-
-    function dataURLToFile(dataurl, filename) {
-        const arr = dataurl.split(',');
-        const mime = arr[0].match(/:(.*?);/)[1];
-        const bstr = atob(arr[1]);
-        let n = bstr.length;
-        const u8arr = new Uint8Array(n);
-        
-        while (n--) {
-          u8arr[n] = bstr.charCodeAt(n);
-        }
-      
-        return new File([u8arr], filename, { type: mime });
-    }
-
-    const handleAcceptImage = async () => {
-        setPhotoCaptured(true);
-        setCameraStarted(false);
-
-        const file = dataURLToFile(capturedImage, `order-photo-${Date.now()}.jpg`);
-
-        const res = await axios.post(`${import.meta.env.VITE_API_URL}/upload/image`, {
-            fileBase64: capturedImage,
-            fileName: file.name
-          });
-        
-          const imageUrl = res.data.url;
-          
-          // Now save this URL in the order
-          /*await axios.patch(`${import.meta.env.VITE_API_URL}/order/${orderId}/save-photo`, {
-            photoUrl: imageUrl
-          });*/
-        
-          // Optionally show preview or confirm
-          console.log('Uploaded image URL:', imageUrl);
-    };
 
     const handlePackPlus = async (productId) => {
         try {
@@ -455,77 +442,58 @@ export default function Finalise() {
                         ))}
                     </div>
 
-                    {/* Capture Packing Photo Section */}
-                    <div className="mt-4 mb-4">
-                        <p className="font-semibold text-lg">
-                            {photoCaptured ? "Photo Captured" : "Capture Packing Photo"}
-                        </p>
+                    <div className="mt-6 p-4 bg-gray-100 rounded-lg">
+                        <p className="font-semibold text-lg mb-4">Packing Photos</p>
 
-                        <div className="relative mx-auto my-4" style={{ width: 400, aspectRatio: '4 / 3' }}>
-                            {!cameraStarted && !capturedImage && (
-                                <div className="bg-gray-200 flex justify-center items-center w-full h-full text-gray-500">
-                                    Camera preview will appear here
-                                </div>
-                            )}
-                            {cameraStarted && (
-                                <Webcam
-                                    className="bg-gray-200 w-full h-full object-contain"
-                                    audio={false}
-                                    ref={videoElement}
-                                    screenshotFormat="image/jpeg"
-                                />
-                            )}
-                            {!cameraStarted && capturedImage && (
-                                <img src={capturedImage} alt="Captured" className="w-full h-full object-contain" />
-                            )}
-                        </div>
+                        {/* If there are no photos */}
+                        {capturedPhotos.length === 0 ? (
+                            <div className="flex justify-center items-center h-48 text-gray-500 text-center">
+                            Please take a photo for the order
+                            </div>
+                        ) : (
+                            <div className="w-full bg-gray-100 p-4 rounded-md">
+                                {capturedPhotos.length > 0 ? (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 justify-items-center">
+                                    {capturedPhotos.map(({ photoUrl, fileId }, index) => (
+                                        <div key={fileId || index} className="relative w-full max-w-xs aspect-[4/3] bg-white rounded-md shadow-md overflow-hidden">
+                                        <img
+                                            src={photoUrl}
+                                            alt={`Captured ${index + 1}`}
+                                            className="w-full h-full object-cover"
+                                        />
+                                        <button
+                                            onClick={() => handleDeletePhoto(fileId)}
+                                            className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded-md hover:bg-red-700"
+                                        >
+                                            Delete
+                                        </button>
+                                        </div>
+                                    ))}
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center justify-center h-48">
+                                    <p className="text-gray-500 text-center">Please take a photo for the order</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
-                        {/* Start Camera Button */}
-                        {!cameraStarted && (!capturedImage || photoCaptured) && (
+                        <div className="flex justify-center mt-6">
                             <button
-                                className="bg-green-500 w-full text-white rounded-sm p-2 hover:bg-green-600"
-                                onClick={handleStartCamera}
+                            className="bg-green-500 text-white rounded-md px-4 py-2 hover:bg-green-600"
+                            onClick={() => setModalOpen(true)}
                             >
-                                Start Camera
+                            Take Photo
                             </button>
-                        )}
-
-                        {/* Capture + Stop Buttons */}
-                        {cameraStarted && (
-                            <div className="flex flex-row gap-2">
-                                <button
-                                    className="flex-1 bg-yellow-500 text-white rounded-sm p-2 hover:bg-yellow-600"
-                                    onClick={handleCapture}
-                                >
-                                    Capture Photo
-                                </button>
-                                <button
-                                    className="bg-red-500 text-white px-4 rounded-sm p-2 hover:bg-red-600"
-                                    onClick={handleStopCamera}
-                                >
-                                    Stop Camera
-                                </button>
-                            </div>
-                        )}
-
-                        {/* Retake + Accept Buttons */}
-                        {!cameraStarted && capturedImage && !photoCaptured && (
-                            <div className="flex flex-row gap-2 mt-2">
-                                <button
-                                    className="flex-1 bg-gray-300 text-black rounded-sm p-2 hover:bg-gray-400"
-                                    onClick={handleRetake}
-                                >
-                                    Retake
-                                </button>
-                                <button
-                                    className="bg-blue-500 text-white px-4 rounded-sm p-2 hover:bg-blue-600"
-                                    onClick={handleAcceptImage}
-                                >
-                                    Accept Image
-                                </button>
-                            </div>
-                        )}
+                        </div>
                     </div>
+
+
+                    <CameraModal
+                        isOpen={modalOpen}
+                        onClose={() => setModalOpen(false)}
+                        onCaptureComplete={handleUpload}
+                    />
 
                     {/* Submit Button */}
                     <button className="bg-blue-500 w-full mt-4 text-white rounded-sm p-2 hover:bg-blue-600">
