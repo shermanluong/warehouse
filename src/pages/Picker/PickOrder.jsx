@@ -162,7 +162,7 @@ const PickOrder = () => {
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                 <div className="bg-white p-4 rounded-sm shadow-md">
                     <div className="flex flex-row mb-4 justify-between">
-                        <h3 className="font-semibold text-xl">Order: #{order?.shopifyOrderId}
+                        <h3 className="font-semibold text-3xl">Order: {order?.name}
                         {(order?.orderNote || order?.adminNote) && (
                             <span title="This order has notes" className="text-yellow-500 ml-2">📌</span>
                         )}
@@ -174,13 +174,13 @@ const PickOrder = () => {
                             Back to list
                         </button>
                     </div>
-                    <div className="flex flex-row mb-4 justify-between">
+                    <div className="flex flex-row mb-4 justify-between text-xl">
                         <p>Customer: 
-                            <span className="font-mono text-sm text-gray-500 ml-2">
+                            <span className="font-mono text-gray-700 ml-2">
                                 {order?.customer?.first_name} {order?.customer?.last_name}
                             </span>
                         </p>
-                        <div className="bg-green-400 text-sm px-2 rounded-xl">{order.lineItems.length} items</div>
+                        <div className="bg-green-400 px-3 rounded-2xl">{order.lineItems.length} items</div>
                     </div>
 
                     {order?.adminNote && (

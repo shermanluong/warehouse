@@ -40,7 +40,7 @@ export default function Orders() {
               <div className="p-4">
                 <div className="flex justify-between items-start">
                   <h3 className="font-bold text-gray-900">
-                    Order #{order.shopifyOrderId}
+                    Order {order.name}
                     {(order?.orderNote || order?.adminNote) && (
                       <span title="This order has notes" className="text-yellow-500 ml-2">📌</span>
                     )}
@@ -62,7 +62,7 @@ export default function Orders() {
                     <span>Progress</span>
                     <span>{Math.round(order.pickedCount * 100 / order.totalQuantity)}%</span>
                   </div>
-                  <div ssName="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-200 rounded-full h-2">
                     <div 
                       className="bg-green-500 h-2 rounded-full transition-all duration-300" 
                       style={{ width: `${Math.round(order.pickedCount * 100 / order.totalQuantity)}%` }}

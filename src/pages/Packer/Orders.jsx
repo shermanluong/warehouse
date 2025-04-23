@@ -53,7 +53,7 @@ export default function Orders() {
               <div className="p-4">
                 <div className="flex justify-between items-start">
                 <h3 className="font-bold text-gray-900">
-                    Order #{order.shopifyOrderId}
+                    Order {order?.name}
                     {(order?.orderNote || order?.adminNote) && (
                       <span title="This order has notes" className="text-yellow-500 ml-2">📌</span>
                     )}

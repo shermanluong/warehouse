@@ -194,7 +194,7 @@ export default function Finalise() {
                 <div className="bg-white p-4 rounded-sm shadow-md">
                     {/* Header */}
                     <div className="flex flex-row mb-4 justify-between">
-                        <h3 className="font-semibold text-xl">Order: #{order?.shopifyOrderId}</h3>
+                        <h3 className="font-semibold text-3xl">Order: {order?.name}</h3>
                         <button 
                             onClick={() => navigate(`/packer/orders`)}
                             className="px-4 rounded-md hover:bg-blue-300"
@@ -203,13 +203,13 @@ export default function Finalise() {
                         </button>
                     </div>
 
-                    <div className="flex flex-row mb-4 justify-between">
-                        <p>Customer:  
-                            <span className="font-mono text-sm text-gray-500 ml-2">
+                    <div className="flex flex-row mb-4 justify-between text-xl">
+                        <p>Customer: 
+                            <span className="font-mono text-gray-700 ml-2">
                                 {order?.customer?.first_name} {order?.customer?.last_name}
                             </span>
                         </p>
-                        <div className="bg-green-400 text-sm px-2 rounded-xl">{order?.lineItems.length} items</div>
+                        <div className="bg-green-400 px-3 rounded-2xl">{order.lineItems.length} items</div>
                     </div>
 
                     {order?.adminNote && (
