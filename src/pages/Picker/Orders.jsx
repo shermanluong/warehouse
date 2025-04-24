@@ -59,7 +59,7 @@ export default function Orders() {
                 {/* Progress Bar for Substitution */}
                 <div className="mt-4 mb-3">
                   <div className="flex justify-between text-xs text-gray-500 mb-1">
-                    <span>Progress</span>
+                    <span>{order?.pickedCount} / {order?.lineItemCount} items picked</span>
                     <span>{Math.round(order.pickedCount * 100 / order.totalQuantity)}%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">

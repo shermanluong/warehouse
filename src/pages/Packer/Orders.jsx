@@ -70,7 +70,7 @@ export default function Orders() {
                   </span>
                 </div>
                 <span className="bg-green-100 text-green-800 border border-green-600 text-xs px-2 py-1 rounded-full">
-                  ✓ 0
+                  {order?.packedCount} / {order?.lineItemCount} items packed
                 </span>
                 {/* Action Buttons */}
                 <div className="mt-4 flex space-x-2">
