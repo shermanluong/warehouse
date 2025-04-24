@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon, BellIcon,  BellAlertIcon, BellSlashIcon, BellSnoozeIcon } from '@heroicons/react/24/outline'
+import axios from "axios";
 
 
 const navigation = [
@@ -20,6 +21,7 @@ const Layout = ({children, headerTitle}) => {
     const [role, setRole] = useState(null);
     const [userName, setUserName] = useState('');
     const [filteredNav, setFilteredNav] = useState([]);
+    const token = localStorage.getItem("token");
 
     useEffect(() => {
         const currentUser = JSON.parse(localStorage.getItem('user'));
@@ -33,7 +35,28 @@ const Layout = ({children, headerTitle}) => {
         );
 
         setFilteredNav(filtered);
-    },[]) 
+    },[])
+    
+    const [notifications, setNotifications] = useState([]);
+    const [isOpen, setIsOpen] = useState(false);
+    
+    useEffect(() => {
+        const fetchNotifications = async () => {
+        try {
+            const res = await axios.get(
+            `${import.meta.env.VITE_API_URL}/notification/`,
+            {
+                headers: { Authorization: `Bearer ${token}` },
+            }
+            );
+            console.log(res);
+            setNotifications(res?.data || []);
+        } catch (err) {
+            console.error('Failed to fetch notifications:', err);
+        }
+        };
+        fetchNotifications();
+    }, []);
 
     const handleSignOut = () => {
         localStorage.removeItem("user");
@@ -75,25 +98,46 @@ const Layout = ({children, headerTitle}) => {
                     </div>
                     <div className="hidden md:block">
                         <div className="ml-4 flex items-center md:ml-6">
-                            <button
-                                type="button"
-                                className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden"
-                            >
-                                <span className="absolute -inset-1.5" />
-                                <span className="sr-only">View notifications</span>
-                                <BellIcon aria-hidden="true" className="size-6" />
-                            </button>
+                            <Menu as="div" className="relative">
+                                <MenuButton className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
+                                    <span className="sr-only">View notifications</span>
+                                    <BellIcon aria-hidden="true" className="size-6" />
+                                    {notifications.length > 0 && (
+                                    <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
+                                    )}
+                                </MenuButton>
+
+                                <MenuItems transition
+                                    className="absolute right-0 z-50 mt-2 w-80 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-hidden max-h-80 overflow-y-auto"
+                                >
+                                    <div className="py-2 px-4 text-sm font-medium border-b">Notifications</div>
+                                    {notifications.length === 0 ? (
+                                    <div className="px-4 py-2 text-sm text-gray-500">No notifications</div>
+                                    ) : (
+                                    notifications.map((n) => (
+                                        <MenuItem key={n._id}>
+                                        <a
+                                            href="#"
+                                            className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                                        >
+                                            {n.message}
+                                        </a>
+                                        </MenuItem>
+                                    ))
+                                    )}
+                                </MenuItems>
+                            </Menu>
 
                             {/* Profile dropdown */}
                             <Menu as="div" className="relative ml-3">
                                 <div>
-                                <MenuButton className="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
-                                    <span className="absolute -inset-1.5" />
-                                    <span className="sr-only">Open user menu</span>
-                                    <div className="size-8 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold uppercase">
-                                        {userName?.charAt(0) || "U"}
-                                    </div>
-                                </MenuButton>
+                                    <MenuButton className="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
+                                        <span className="absolute -inset-1.5" />
+                                        <span className="sr-only">Open user menu</span>
+                                        <div className="size-8 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold uppercase">
+                                            {userName?.charAt(0) || "U"}
+                                        </div>
+                                    </MenuButton>
                                 </div>
                                 <MenuItems
                                 transition
@@ -155,14 +199,37 @@ const Layout = ({children, headerTitle}) => {
                                 {userName?.charAt(0) || "U"}
                                 </div>
                             </div>
-                            <button
-                                type="button"
-                                className="relative ml-auto shrink-0 rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden"
+                            <Menu as="div" className="relative ml-auto shrink-0">
+                                <MenuButton
+                                    type="button"
+                                    className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden"
                                 >
-                                <span className="absolute -inset-1.5" />
-                                <span className="sr-only">View notifications</span>
-                                <BellIcon aria-hidden="true" className="size-6" />
-                            </button>
+                                    <span className="absolute -inset-1.5" />
+                                    <span className="sr-only">View notifications</span>
+                                    <BellIcon aria-hidden="true" className="size-6" />
+                                    {notifications.length > 0 && (
+                                    <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
+                                    )}
+                                </MenuButton>
+
+                                <MenuItems className="absolute right-0 z-50 mt-2 w-72 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none max-h-80 overflow-y-auto">
+                                    <div className="py-2 px-4 text-sm font-medium border-b">Notifications</div>
+                                    {notifications.length === 0 ? (
+                                    <div className="px-4 py-2 text-sm text-gray-500">No notifications</div>
+                                    ) : (
+                                    notifications.map((n) => (
+                                        <MenuItem key={n._id}>
+                                        <a
+                                            href="#"
+                                            className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                                        >
+                                            {n.message}
+                                        </a>
+                                        </MenuItem>
+                                    ))
+                                    )}
+                                </MenuItems>
+                            </Menu>
                         </div>
                         <div className="mt-3 space-y-1 px-2">
                             <DisclosureButton
