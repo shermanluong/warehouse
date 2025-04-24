@@ -120,11 +120,12 @@ const PickOrder = () => {
         setShowDialog(true);
     };
 
-    const handleFlagSubmit = async ({ productId, flag }) => {
+    const handleFlagSubmit = async ({ productId, variantId, flag }) => {
         await axios.patch(
             `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-flag`,
             { 
                 productId   : productId,
+                variantId   : variantId,
                 reason      : flag 
             },
             { headers: { Authorization: `Bearer ${token}` } }

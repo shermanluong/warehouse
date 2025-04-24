@@ -38,10 +38,9 @@ const Layout = ({children, headerTitle}) => {
     },[])
     
     const [notifications, setNotifications] = useState([]);
-    const [isOpen, setIsOpen] = useState(false);
+    const [hasUnread, setHasUnread] = useState(false);
     
-    useEffect(() => {
-        const fetchNotifications = async () => {
+    const fetchNotifications = async () => {
         try {
             const res = await axios.get(
             `${import.meta.env.VITE_API_URL}/notification/`,
@@ -50,11 +49,35 @@ const Layout = ({children, headerTitle}) => {
             }
             );
             console.log(res);
-            setNotifications(res?.data || []);
+            
+            const notifs = res?.data || [];
+            setNotifications(notifs);
+
+            const hasUnreadNotifs = notifs.some(n => !n.read);
+            setHasUnread(hasUnreadNotifs);
         } catch (err) {
             console.error('Failed to fetch notifications:', err);
         }
-        };
+    };
+
+    const handleMarkAllRead = async () => {
+        console.log(1);
+        try {
+            const res = await axios.patch(
+                `${import.meta.env.VITE_API_URL}/notification/read-all`,
+                {}, // request body is empty
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+    
+            fetchNotifications();
+        } catch (err) {
+            console.error('Failed to mark all read', err);
+        }
+    };
+
+    useEffect(() => {
         fetchNotifications();
     }, []);
 
@@ -99,21 +122,25 @@ const Layout = ({children, headerTitle}) => {
                     <div className="hidden md:block">
                         <div className="ml-4 flex items-center md:ml-6">
                             <Menu as="div" className="relative">
-                                <MenuButton className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
+                                <MenuButton
+                                    onClick={handleMarkAllRead} // ✅ FIXED: now it runs the function
+                                    className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden"
+                                >
                                     <span className="sr-only">View notifications</span>
                                     <BellIcon aria-hidden="true" className="size-6" />
-                                    {notifications.length > 0 && (
+                                    {hasUnread && (
                                     <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
                                     )}
                                 </MenuButton>
 
-                                <MenuItems transition
-                                    className="absolute right-0 z-50 mt-2 w-80 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-hidden max-h-80 overflow-y-auto"
+                                <MenuItems
+                                    className="absolute right-0 z-50 mt-2 w-80 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none max-h-80 overflow-y-auto"
                                 >
                                     <div className="py-2 px-4 text-sm font-medium border-b">Notifications</div>
-                                    {notifications.length === 0 ? (
+                                    {notifications.length === 0 && (
                                     <div className="px-4 py-2 text-sm text-gray-500">No notifications</div>
-                                    ) : (
+                                    )}
+                                    {notifications.length > 0 &&
                                     notifications.map((n) => (
                                         <MenuItem key={n._id}>
                                         <a
@@ -123,8 +150,7 @@ const Layout = ({children, headerTitle}) => {
                                             {n.message}
                                         </a>
                                         </MenuItem>
-                                    ))
-                                    )}
+                                    ))}
                                 </MenuItems>
                             </Menu>
 
@@ -204,16 +230,16 @@ const Layout = ({children, headerTitle}) => {
                                     type="button"
                                     className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden"
                                 >
-                                    <span className="absolute -inset-1.5" />
                                     <span className="sr-only">View notifications</span>
                                     <BellIcon aria-hidden="true" className="size-6" />
-                                    {notifications.length > 0 && (
+                                    {hasUnread && (
                                     <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
                                     )}
                                 </MenuButton>
 
                                 <MenuItems className="absolute right-0 z-50 mt-2 w-72 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none max-h-80 overflow-y-auto">
                                     <div className="py-2 px-4 text-sm font-medium border-b">Notifications</div>
+                                    
                                     {notifications.length === 0 ? (
                                     <div className="px-4 py-2 text-sm text-gray-500">No notifications</div>
                                     ) : (
@@ -221,7 +247,7 @@ const Layout = ({children, headerTitle}) => {
                                         <MenuItem key={n._id}>
                                         <a
                                             href="#"
-                                            className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none"
                                         >
                                             {n.message}
                                         </a>
@@ -230,6 +256,7 @@ const Layout = ({children, headerTitle}) => {
                                     )}
                                 </MenuItems>
                             </Menu>
+
                         </div>
                         <div className="mt-3 space-y-1 px-2">
                             <DisclosureButton
