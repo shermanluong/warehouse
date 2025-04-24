@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Bars3Icon, XMarkIcon, BellIcon,  BellAlertIcon, BellSlashIcon, BellSnoozeIcon } from '@heroicons/react/24/outline'
 
 
 const navigation = [
@@ -75,12 +75,14 @@ const Layout = ({children, headerTitle}) => {
                     </div>
                     <div className="hidden md:block">
                         <div className="ml-4 flex items-center md:ml-6">
-                            <p
+                            <button
                                 type="button"
-                                className="relative bg-gray-800 p-1 text-white"
+                                className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden"
                             >
-                                {role}
-                            </p>
+                                <span className="absolute -inset-1.5" />
+                                <span className="sr-only">View notifications</span>
+                                <BellIcon aria-hidden="true" className="size-6" />
+                            </button>
 
                             {/* Profile dropdown */}
                             <Menu as="div" className="relative ml-3">
@@ -154,10 +156,12 @@ const Layout = ({children, headerTitle}) => {
                                 </div>
                             </div>
                             <button
-                            type="button"
-                            className="relative ml-auto shrink-0 bg-gray-800 p-1 text-white"
-                            >
-                                {role}
+                                type="button"
+                                className="relative ml-auto shrink-0 rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden"
+                                >
+                                <span className="absolute -inset-1.5" />
+                                <span className="sr-only">View notifications</span>
+                                <BellIcon aria-hidden="true" className="size-6" />
                             </button>
                         </div>
                         <div className="mt-3 space-y-1 px-2">
@@ -182,8 +186,9 @@ const Layout = ({children, headerTitle}) => {
                 </Disclosure>
 
                 <header className="bg-white shadow-sm">
-                    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                    <div className="flex justify-between mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                         <h1 className="text-3xl font-bold tracking-tight text-gray-900">{headerTitle}</h1>
+                        <h1 className="text-3xl font-semibold tracking-tight text-gray-900">{role}</h1>
                     </div>
                 </header>
                 <main>
