@@ -17,10 +17,16 @@ const Product = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(20); // Default to 20 products per page
 
+  const [vendors, setVendors] = useState([]);
+  const [statuses, setStatuses] = useState([]);
+  const [selectedVendor, setSelectedVendor] = useState("Rita's Farm Produce");
+  const [selectedStatus, setSelectedStatus] = useState("ACTIVE");
+
+  const token = localStorage.getItem("token");
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const token = localStorage.getItem("token");
         const res = await axios.get(`${import.meta.env.VITE_API_URL}/admin/getProducts`, {
           headers: { Authorization: `Bearer ${token}` },
           params: {
@@ -29,20 +35,53 @@ const Product = () => {
             order: sortOrder,
             page: currentPage,
             limit: pageSize,
+            vendor: selectedVendor || undefined, // Only send if selected
+            status: selectedStatus || undefined,
           }
         });
+  
         setProducts(res?.data?.products || []);
-        setTotalPages(Math.ceil(res?.data?.total / pageSize)); // Calculate total pages based on total count
+        setTotalPages(Math.ceil(res?.data?.total / pageSize));
       } catch (err) {
         console.error('Failed to fetch products:', err);
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchProducts();
-  }, [searchTerm, sortOption, sortOrder, currentPage, pageSize]);
+  }, [searchTerm, sortOption, sortOrder, currentPage, pageSize, selectedVendor, selectedStatus]);
 
+
+
+  useEffect(() => {
+    const fetchFilters = async () => {
+      try {
+        const [vendorsRes, statusesRes] = await Promise.all([
+          axios.get(
+            `${import.meta.env.VITE_API_URL}/admin/getProductVendors`,
+            {
+              headers: { Authorization: `Bearer ${token}` }
+            }
+          ),
+          axios.get(
+            `${import.meta.env.VITE_API_URL}/admin/getProductStatuses`,
+            {
+              headers: { Authorization: `Bearer ${token}` }
+            }
+          )
+        ]);
+  
+        setVendors(vendorsRes.data.vendors);
+        setStatuses(statusesRes.data.statuses);
+      } catch (err) {
+        console.error('Error fetching filters:', err);
+      }
+    };
+  
+    fetchFilters();
+  }, []);
+  
   // Handle pagination
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -61,8 +100,32 @@ const Product = () => {
         <div className="bg-white p-4 rounded-sm shadow-md">
           <div className="flex flex-col gap-4">
             {/* Sort and Pagination Controls */}
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col justify-between gap-4 sm:flex-row">
               <div className="flex space-x-4">
+                <select
+                  className="px-4 py-2 border rounded-md"
+                  value={selectedVendor}
+                  onChange={(e) => setSelectedVendor(e.target.value)}
+                >
+                  <option value="">All Vendors</option>
+                  {vendors.map((v) => (
+                    <option key={v} value={v}>{v}</option>
+                  ))}
+                </select>
+
+                <select
+                  className="px-4 py-2 border rounded-md"
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                >
+                  <option value="">All Statuses</option>
+                  {statuses.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+              {/* Page Size Selector and Pagination */}
+              <div className="flex items-center space-x-4">
                 <select
                   className="px-4 py-2 border rounded-md"
                   value={pageSize}
@@ -73,9 +136,6 @@ const Product = () => {
                   <option value={30}>30</option>
                   <option value={50}>50</option>
                 </select>
-              </div>
-              {/* Page Size Selector and Pagination */}
-              <div className="flex items-center space-x-4">
                 {/* Pagination Buttons */}
                 <span className="mx-4">{`Page ${currentPage} of ${totalPages}`}</span>
                 <button
