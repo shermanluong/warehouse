@@ -146,13 +146,13 @@ const AdminOrders = () => {
                 </div>
             </div>
 
-            {orders.length > 0 &&
+            {orders?.length > 0 &&
                 <div className="grid grid-cols-1 gap-4">
                     {orders.map(order => (
-                        <div key={order._id} className="bg-white p-4 rounded-lg shadow-md">
+                        <div key={order?._id} className="bg-white p-4 rounded-lg shadow-md">
                             <div className="flex justify-between items-start relative">
                             <div className="flex">
-                                <h3 className="font-bold text-gray-900 mr-2">Order #{order.shopifyOrderId}</h3>
+                                <h3 className="font-bold text-gray-900 mr-2">Order {order?.name}</h3>
                                 <span className={`text-xs px-2 py-1 rounded-full ${statusColorMap[order.status] || 'bg-gray-100 text-gray-800'}`}>
                                 {order.status}
                                 </span>
@@ -161,13 +161,13 @@ const AdminOrders = () => {
                             <div className="relative dropdown-ref">
                                 <button
                                 onClick={() => {
-                                    setOpenDropdownId(openDropdownId === order._id ? null : order._id);
+                                    setOpenDropdownId(openDropdownId === order?._id ? null : order?._id);
                                 }}
                                 >
                                 <EllipsisVerticalIcon className="w-5 h-5 text-gray-600" />
                                 </button>
                         
-                                {openDropdownId === order._id && (
+                                {openDropdownId === order?._id && (
                                 <div className="absolute right-0 mt-2 w-36 bg-gray-200 border border-gray-300 rounded-md shadow-lg z-10">
                                     <button
                                     type="button"
