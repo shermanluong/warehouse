@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Dialog, Transition, TransitionChild, DialogPanel, DialogTitle } from '@headlessui/react';
-import { Fragment } from 'react';
 import Layout from '../../layouts/layout';
 import ProductPickerDialog from '../../components/ProductPickerDialog';
 
