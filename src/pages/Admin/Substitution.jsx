@@ -1,20 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Dialog, Transition } from '@headlessui/react';
+import { Dialog, Transition, TransitionChild, DialogPanel, DialogTitle } from '@headlessui/react';
 import { Fragment } from 'react';
 import Layout from '../../layouts/layout';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import ProductPickerDialog from '../../components/ProductPickerDialog';
 
 const Substitution = () => {
   const [rules, setRules] = useState([]);
   const [showAddRule, setShowAddRule] = useState(false);
   const [showAddSubstitute, setShowAddSubstitute] = useState(false);
-  const [products, setProducts] = useState([]);
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
   const [selectedRuleId, setSelectedRuleId] = useState(null);
-  const [totalPages, setTotalPages] = useState(1);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const fetchRules = async () => {
     const res = await axios.get(`${API_URL}/substitution/rules`, {
@@ -24,14 +20,7 @@ const Substitution = () => {
     setRules(res.data.rules);
   };
 
-  const fetchProducts = async () => {
-    const res = await axios.get(`${API_URL}/admin/getProducts`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      params: { search, page, limit: 20 },
-    });
-    setProducts(res.data.products);
-    setTotalPages(Math.ceil(res.data.total / 20));
-  };
+  useEffect(() => { fetchRules(); }, []);
 
   const handleAddRule = async (variant) => {
     await axios.post(`${API_URL}/substitution/rules`, {
@@ -57,6 +46,17 @@ const Substitution = () => {
     fetchRules();
   };
 
+  const handleSelectProduct = (variant) => {
+    if (showAddRule) handleAddRule(variant);
+    if (showAddSubstitute) handleAddSubstitute(variant);
+  }
+
+  const handleCloseDialog = () => {
+    setShowAddRule(false);
+    setShowAddSubstitute(false);
+    setSelectedRuleId(null);
+  }
+
   const deleteRule = async (ruleId) => {
     await axios.delete(`${API_URL}/substitution/rules/${ruleId}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
@@ -72,9 +72,6 @@ const Substitution = () => {
     });
     fetchRules();
   };
-
-  useEffect(() => { fetchRules(); }, []);
-  useEffect(() => { if (showAddRule || showAddSubstitute) fetchProducts(); }, [search, page, showAddRule, showAddSubstitute]);
 
   return (
     <Layout headerTitle="Substitution Rules">
@@ -136,71 +133,14 @@ const Substitution = () => {
           ))}
         </div>
         {/* Product Picker Dialog */}
-        <Transition appear show={showAddRule || showAddSubstitute} as={Fragment}>
-          <Dialog as="div" className="relative z-10" onClose={() => {
-            setShowAddRule(false);
-            setShowAddSubstitute(false);
-            setSelectedRuleId(null);
-          }}>
-            <Transition.Child
-              as={Fragment}
-              enter="ease-out duration-300"
-              enterFrom="opacity-0"
-              enterTo="opacity-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
-            >
-              <div className="fixed inset-0" />
-            </Transition.Child>
-
-            <div className="fixed inset-0 overflow-y-auto">
-              <div className="flex min-h-full items-center justify-center p-4">
-                <Dialog.Panel className="w-full max-w-3xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl">
-                  <Dialog.Title className="text-lg font-medium">Select Product Variant</Dialog.Title>
-                  <input
-                    className="mt-2 w-full border px-4 py-2 rounded"
-                    placeholder="Search..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                  />
-
-                  <div className="grid grid-cols-1 gap-4 mt-4 max-h-[400px] overflow-y-auto">
-                    {products.map(product => (
-                      product.variants?.map(variant => (
-                        <div key={variant.shopifyVariantId} className="border border-gray-200 p-2 rounded flex gap-4 items-center shadow-md">
-                          <img src={variant.image || product.image || '/placeholder.png'} className="w-20 h-20 rounded object-cover" />
-                          <div className="flex-1">
-                            <div>{variant.title === 'Default Title' ? product.title : variant.title}</div>
-                            <div className="text-sm text-gray-600">SKU: {variant.sku}</div>
-                            <div className="text-sm text-gray-600">Price: ${variant.price}</div>
-                          </div>
-                          <button
-                            className="text-sm text-blue-600 hover:underline"
-                            onClick={() => {
-                              const data = {
-                                productId: product.shopifyProductId,
-                                variantId: variant.shopifyVariantId,
-                              };
-                              if (showAddRule) handleAddRule(data);
-                              if (showAddSubstitute) handleAddSubstitute(data);
-                            }}
-                          >Select</button>
-                        </div>
-                      ))
-                    ))}
-                  </div>
-
-                  <div className="mt-6 flex justify-between">
-                    <button disabled={page === 1} onClick={() => setPage(page - 1)} className="text-sm text-gray-700">Previous</button>
-                    <span className="text-sm">Page {page} of {totalPages}</span>
-                    <button disabled={page === totalPages} onClick={() => setPage(page + 1)} className="text-sm text-gray-700">Next</button>
-                  </div>
-                </Dialog.Panel>
-              </div>
-            </div>
-          </Dialog>
-        </Transition>
+        <ProductPickerDialog
+          show={showAddRule || showAddSubstitute}
+          setShowAddRule={setShowAddRule}
+          setShowAddSubstitute={setShowAddSubstitute}
+          setSelectedRuleId={setSelectedRuleId}
+          handleSelectProduct={handleSelectProduct}
+          handleCloseDialog= {handleCloseDialog}
+        />
       </div>
     </Layout>
   );

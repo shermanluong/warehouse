@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon, BellIcon,  BellAlertIcon, BellSlashIcon, BellSnoozeIcon } from '@heroicons/react/24/outline'
+import { Bars3Icon, XMarkIcon, BellIcon } from '@heroicons/react/24/outline'
 import axios from "axios";
 
 
