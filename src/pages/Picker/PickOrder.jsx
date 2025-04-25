@@ -13,6 +13,7 @@ import {
 import FlagDialog from '../../components/FlagDialog'
 import axios from 'axios';
 import Layout from '../../layouts/layout';
+import ImageZoomModal from '../../components/ImageZoomModal';
 
 const PickOrder = () => {
     const { id } = useParams();
@@ -24,7 +25,8 @@ const PickOrder = () => {
     const isScanning = useRef(false);
     const [isButtonScanning, setIsButtonScanning] = useState(false);
     const [allPicked, setAllPicked] = useState(false);
-   
+    const [isImageOpen, setIsImageOpen] = useState(false);
+    const [enlargedImage, setEnlargedImage] = useState('');
 
     const token = localStorage.getItem("token");
 
@@ -274,7 +276,11 @@ const PickOrder = () => {
                                         <img
                                             src={lineItem?.image}
                                             alt={lineItem?.productTitle}
-                                            className="w-48 h-48 rounded object-cover"
+                                            className="w-48 h-48 rounded object-cover cursor-pointer"
+                                            onClick={() => {
+                                                setEnlargedImage(lineItem?.image);
+                                                setIsImageOpen(true);
+                                            }}
                                         />
                                         <div className="ml-4">
                                             <h3 className="font-semibold text-2xl text-gray-900">
@@ -374,6 +380,10 @@ const PickOrder = () => {
                                                 src={lineItem?.substitution?.variantInfo?.image}
                                                 alt={lineItem?.substitution?.variantInfo?.title}
                                                 className="w-36 h-36 rounded object-cover"
+                                                onClick={() => {
+                                                    setEnlargedImage(lineItem?.substitution?.variantInfo?.image);
+                                                    setIsImageOpen(true);
+                                                }}
                                             />
                                             <div className="ml-4 mt-2 sm:mt-0">
                                                 <h3 className="font-semibold text-2xl text-yellow-600">
@@ -411,6 +421,11 @@ const PickOrder = () => {
                     onSelectSubstitution= {handleSubstitutionSelect}
                 />
             )}
+            <ImageZoomModal
+                isOpen={isImageOpen}
+                onClose={() => setIsImageOpen(false)}
+                imageUrl={enlargedImage}
+            />
         </Layout>
     )
 }

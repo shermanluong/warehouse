@@ -15,6 +15,7 @@ import axios from 'axios';
 import dataURLToFile from '../../utils/dataURLToFile';
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import CameraModal from '../../components/CameraModal';
+import ImageZoomModal from '../../components/ImageZoomModal';
 
 export default function Finalise() {
     const { id } = useParams();
@@ -29,6 +30,8 @@ export default function Finalise() {
 
     const [modalOpen, setModalOpen] = useState(false);
     const [capturedPhotos, setCapturedPhotos] = useState([]);
+    const [isImageOpen, setIsImageOpen] = useState(false);
+    const [enlargedImage, setEnlargedImage] = useState('');
 
     const handleDeletePhoto = async (fileIdToDelete) => {
         try {
@@ -294,6 +297,10 @@ export default function Finalise() {
                                             src={lineItem?.image}
                                             alt={lineItem?.productTitle}
                                             className="w-48 h-48 rounded object-cover"
+                                            onClick = {() => {
+                                                setEnlargedImage(lineItem?.image);
+                                                setIsImageOpen(true);
+                                            }}
                                         />
                                         <div className="ml-4 mt-2 sm:mt-0">
                                             <h3 className="font-semibold text-2xl text-gray-900">
@@ -401,6 +408,10 @@ export default function Finalise() {
                                                 src={lineItem?.substitution?.variantInfo?.image}
                                                 alt={lineItem?.substitution?.variantInfo?.title}
                                                 className="w-36 h-36 rounded object-cover"
+                                                onClick = {() => {
+                                                    setEnlargedImage(lineItem?.substitution?.variantInfo?.image);
+                                                    setIsImageOpen(true);
+                                                }}
                                             />
                                             <div className="ml-4 mt-2 sm:mt-0">
                                                 <h3 className="font-semibold text-2xl text-yellow-600">
@@ -461,6 +472,10 @@ export default function Finalise() {
                                             src={photoUrl}
                                             alt={`Captured ${index + 1}`}
                                             className="w-full h-full object-cover"
+                                            onClick = {() => {
+                                                setEnlargedImage(photoUrl);
+                                                setIsImageOpen(true);
+                                            }}
                                         />
                                         <button
                                             onClick={() => handleDeletePhoto(fileId)}
@@ -489,7 +504,6 @@ export default function Finalise() {
                         </div>
                     </div>
 
-
                     <CameraModal
                         isOpen={modalOpen}
                         onClose={() => setModalOpen(false)}
@@ -502,6 +516,11 @@ export default function Finalise() {
                     </button>
                 </div>
             </div>
+            <ImageZoomModal
+                isOpen={isImageOpen}
+                onClose={() => setIsImageOpen(false)}
+                imageUrl={enlargedImage}
+            />
         </Layout>     
     )
 }
