@@ -1,0 +1,81 @@
+[
+    {
+        "tripId": 824716,
+        "driverName": "ethan phelps",
+        "tripDate": "2025-04-26",
+        "startTime": "05:30",
+        "endTime": "15:30",
+        "startAddress": "1204 Mamre Rd, Kemps Creek NSW 2178, Australia",
+        "endLocation": {
+            "latitude": -33.872662,
+            "longitude": 150.8002908
+        },
+        "endAddress": "1204 Mamre Rd, Kemps Creek NSW 2178, Australia",
+        "startLocation": {
+            "latitude": -33.872662,
+            "longitude": 150.8002908
+        },
+        "createdDate": "2025-04-24T20:33:21.370Z",
+        "lastModifiedDate": "2025-04-25T19:40:26.890Z",
+        "polyline": "",
+        "startFromCurrentLocation": false,
+        "status": "Started",
+        "actualStartTime": null,
+        "estimatedEndTime": "2025-04-26T13:29:00+10:00",
+        "teamRegionId": null,
+        "stops": [
+            {
+                "stopId": 12580177,
+                "driverBreakId": null,
+                "brandId": null,
+                "stopRef": "L20252404KERH2Y",
+                "status": "Complete",
+                "sourceReference": null,
+                "contact": {
+                    "name": "Anthony Reisin",
+                    "phone": "+61434287898",
+                    "email": "arianiad@hotmail.com",
+                    "phoneType": "mobile"
+                },
+                "name": "Locate2u",
+                "address": "26 Pipeclay Road, North Kellyville, New South Wales, 2155, Australia",
+                "location": {
+                    "latitude": -33.6802382,
+                    "longitude": 150.9569863
+                },
+                "tripDate": "2025-04-26",
+                "appointmentTime": null,
+                "timeWindowStart": null,
+                "timeWindowEnd": null,
+                "originalEta": "06:06",
+                "durationMinutes": 5,
+                "notes": "",
+                "lastModifiedDate": "2025-04-25T20:12:33.508Z",
+                "eta": "06:06",
+                "startLocation": null,
+                "customFields": {
+                    "orderid": "96475"
+                },
+                "type": null,
+                "shipmentId": null,
+                "arrivalDate": "2025-04-26T06:11:32+10:00",
+                "load": {},
+                "teamRegionId": null,
+                "lines": [],
+                "customerInvoiceId": null,
+                "customerId": null,
+                "oneTimePin": null,
+                "runNumber": null,
+                "driverInstructions": null,
+                "contents": null,
+                "skills": [],
+                "order": 1,
+                "brandLogoUrl": null
+            }
+        ],
+        "shipments": [],
+        "driverBreaks": null,
+        "isFixedStopOrder": false,
+        "customerDetails": null
+    }
+]
