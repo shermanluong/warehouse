@@ -17,6 +17,7 @@
     "jsbarcode": "^3.11.6",
     "jsqr": "^1.4.0",
     "react": "^18.2.0",
+    "react-datepicker": "^8.3.0",
     "react-dom": "^18.2.0",
     "react-qr-barcode-scanner": "^2.0.0",
     "react-router-dom": "^7.5.0",

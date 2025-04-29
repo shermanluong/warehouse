@@ -8,6 +8,8 @@ import {
   EllipsisVerticalIcon,
 } from '@heroicons/react/24/outline';
 import NoteDialog from './NoteDialog';
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css';
 
 const AdminOrders = () => {
   const navigate = useNavigate();
@@ -20,6 +22,9 @@ const AdminOrders = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [openDropdownId, setOpenDropdownId] = useState(null);
+  const [showDialog, setShowDialog] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedDate, setSelecteDate] = useState(null);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -68,53 +73,55 @@ const AdminOrders = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-    const [showDialog, setShowDialog] = useState(false);
-    const [selectedOrder, setSelectedOrder] = useState(null);
+  const openNoteDialog = (order) => {
+      setSelectedOrder(order);
+      setShowDialog(true);
+  };
 
-    const openNoteDialog = (order) => {
-        setSelectedOrder(order);
-        setShowDialog(true);
-    };
+  const handleNoteSubmit = async ({ note }) => {
+      try {
+        // Send note to backend
+        const res = await axios.patch(
+          `${import.meta.env.VITE_API_URL}/admin/order/${selectedOrder._id}/add-order-note`,
+          { note },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+    
+        const updatedOrder = res.data.order;
+    
+        // Update the local orders state
+        setOrders(prevOrders =>
+          prevOrders.map(order =>
+            order._id === updatedOrder._id
+              ? { ...order, adminNote: updatedOrder.adminNote }
+              : order
+          )
+        );
+      } catch (error) {
+        console.error("Failed to submit note:", error);
+        alert("Error submitting note. Please try again.");
+      }
+  };
 
-    const handleNoteSubmit = async ({ note }) => {
-        try {
-          // Send note to backend
-          const res = await axios.patch(
-            `${import.meta.env.VITE_API_URL}/admin/order/${selectedOrder._id}/add-order-note`,
-            { note },
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
+  const handleDatechange = (date) => {
+    setSelecteDate(date);
+  };
       
-          const updatedOrder = res.data.order;
-      
-          // Update the local orders state
-          setOrders(prevOrders =>
-            prevOrders.map(order =>
-              order._id === updatedOrder._id
-                ? { ...order, adminNote: updatedOrder.adminNote }
-                : order
-            )
-          );
-        } catch (error) {
-          console.error("Failed to submit note:", error);
-          alert("Error submitting note. Please try again.");
-        }
-    };
-      
-    return (
-        <>
-            <div className="flex flex-col sm:flex-row sm:space-x-2 mb-3">
-                <input
-                type="text"
-                placeholder="Search orders by number or customer name"
-                className="border rounded-md p-2 w-full mb-4 sm:mb-0"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                />
-            </div>
+  return (
+      <>
+          <div className="flex flex-col sm:flex-row sm:space-x-2 mb-3">
+              <input
+              type="text"
+              placeholder="Search orders by number or customer name"
+              className="border rounded-md p-2 w-full mb-4 sm:mb-0"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              />
+          </div>
 
-            <div className="flex justify-between items-center mb-4">
-                <div className="flex space-x-4">
+          <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 justify-between items-left mb-4">
+              {/*Left section*/}
+              <div className="flex items-center">
                 <select
                     className="px-4 py-2 border rounded-md"
                     value={pageSize}
@@ -125,32 +132,46 @@ const AdminOrders = () => {
                     <option value={30}>30</option>
                     <option value={50}>50</option>
                 </select>
-                </div>
-
-                <div className="flex items-center space-x-4">
                 <span className="mx-4">{`Page ${currentPage} of ${totalPages}`}</span>
                 <button
-                    className="px-4 py-2 bg-gray-200 rounded-lg"
+                    className="px-4 py-2 bg-gray-200 rounded-md"
                     disabled={currentPage === 1}
                     onClick={() => handlePageChange(currentPage - 1)}
                 >
                     <ArrowLeftIcon className='w-5 h-5' />
                 </button>
                 <button
-                    className="px-4 py-2 bg-gray-200 rounded-md"
+                    className="px-4 py-2 ml-2 bg-gray-200 rounded-md"
                     disabled={currentPage === totalPages}
                     onClick={() => handlePageChange(currentPage + 1)}
                 >
                     <ArrowRightIcon className='w-5 h-5' />
                 </button>
-                </div>
-            </div>
+              </div>
+              {/*Right section*/}
+              <div className="flex items-center">
+                {/*Date picker section*/}
+                <DatePicker
+                  selected={selectedDate}
+                  onChange={handleDatechange}
+                  className="px-4 py-2 border rounded-md"
+                  dateFormat="yyyy/MM/dd"
+                />
+                <button
+                      className="px-4 py-2 ml-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md"
+                      disabled={currentPage === totalPages}
+                      onClick={() => handlePageChange(currentPage + 1)}
+                  >
+                    Import
+                </button>
+              </div>
+          </div>
 
-            {orders?.length > 0 &&
-                <div className="grid grid-cols-1 gap-4">
-                    {orders.map(order => (
-                        <div key={order?._id} className="bg-white p-4 rounded-lg shadow-md">
-                            <div className="flex justify-between items-start relative">
+          {orders?.length > 0 &&
+              <div className="grid grid-cols-1 gap-4">
+                  {orders.map(order => (
+                      <div key={order?._id} className="bg-white p-4 rounded-lg shadow-md">
+                          <div className="flex justify-between items-start relative">
                             <div className="flex">
                                 <h3 className="text-2xl font-bold text-gray-900 mr-2">Order {order?.name}</h3>
                                 <span className={`text-lg px-2 rounded-full ${statusColorMap[order.status] || 'bg-gray-100 text-gray-800'}`}>
@@ -192,56 +213,56 @@ const AdminOrders = () => {
                                 </div>
                                 )}
                             </div>
-                            </div>
-                        
-                            <div className="flex justify-between mt-1">
-                              <p className="text-lg text-gray-900">Customer:</p>
-                            <span className="font-lg text-sm text-gray-900">
-                                {order.customer.first_name} {order.customer.last_name}
-                            </span>
-                            </div>
-                            <div className="flex justify-between mt-1">
-                            <p className="text-lg text-gray-900">Items:</p>
-                              <span className="font-lg text-sm text-gray-900">{order.lineItemCount}</span>
-                            </div>
-                            <div className="flex justify-between mt-1">
-                              <p className="text-lg text-gray-900">Picker:</p>
-                            <span className="font-lg text-sm text-gray-900">{order?.picker?.name}</span>
-                            </div>
-                            <div className="flex justify-between mt-1">
-                              <p className="text-lg text-gray-900">Packer:</p>
-                              <span className="font-lg text-sm text-gray-900">{order?.packer?.name}</span>
-                            </div>
-                            <div className="flex justify-between mt-1">
-                              <p className="text-lg text-gray-900">Routes:</p>
-                              <span className="font-lg text-sm text-gray-900">{order?.delivery?.tripId}({order?.delivery?.driverName})</span>
-                            </div>
-                        
-                            {order.adminNote && (
-                            <div className="mt-3">
-                                <p className="text-sm font-semibold text-red-600">Admin Note: {order.adminNote}</p>
-                            </div>
-                            )}
-                        
-                            {order.orderNote && (
-                            <div className="mt-3">
-                                <p className="text-sm font-semibold text-red-600">Customer Note: {order.orderNote}</p>
-                            </div>
-                            )}
-                        </div>
-                    ))}
-                </div>
-            }
+                          </div>
+                      
+                          <div className="flex justify-between mt-1">
+                            <p className="text-lg text-gray-900">Customer:</p>
+                          <span className="font-lg text-sm text-gray-900">
+                              {order.customer.first_name} {order.customer.last_name}
+                          </span>
+                          </div>
+                          <div className="flex justify-between mt-1">
+                          <p className="text-lg text-gray-900">Items:</p>
+                            <span className="font-lg text-sm text-gray-900">{order.lineItemCount}</span>
+                          </div>
+                          <div className="flex justify-between mt-1">
+                            <p className="text-lg text-gray-900">Picker:</p>
+                          <span className="font-lg text-sm text-gray-900">{order?.picker?.name}</span>
+                          </div>
+                          <div className="flex justify-between mt-1">
+                            <p className="text-lg text-gray-900">Packer:</p>
+                            <span className="font-lg text-sm text-gray-900">{order?.packer?.name}</span>
+                          </div>
+                          <div className="flex justify-between mt-1">
+                            <p className="text-lg text-gray-900">Routes:</p>
+                            <span className="font-lg text-sm text-gray-900">{order?.delivery?.tripId}({order?.delivery?.driverName})</span>
+                          </div>
+                      
+                          {order.adminNote && (
+                          <div className="mt-3">
+                              <p className="text-sm font-semibold text-red-600">Admin Note: {order.adminNote}</p>
+                          </div>
+                          )}
+                      
+                          {order.orderNote && (
+                          <div className="mt-3">
+                              <p className="text-sm font-semibold text-red-600">Customer Note: {order.orderNote}</p>
+                          </div>
+                          )}
+                      </div>
+                  ))}
+              </div>
+          }
 
-            {showDialog && selectedOrder && (
-                <NoteDialog
-                    isOpen={showDialog}
-                    onClose={() => setShowDialog(false)}
-                    onSubmit={handleNoteSubmit}
-                />
-            )}
-        </>
-    );
+          {showDialog && selectedOrder && (
+              <NoteDialog
+                  isOpen={showDialog}
+                  onClose={() => setShowDialog(false)}
+                  onSubmit={handleNoteSubmit}
+              />
+          )}
+      </>
+  );
 };
 
 export default AdminOrders;
