@@ -127,8 +127,8 @@ const AdminOrders = () => {
   };
 
   const handleImport = async () => {
-    console.log("OK");
     try {
+      console.log("OK");
       // Send note to backend
       const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/shopify/sync-orders`,
@@ -199,7 +199,6 @@ const AdminOrders = () => {
                 />
                 <button
                       className="px-4 py-2 ml-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md"
-                      disabled={currentPage === totalPages}
                       onClick={() => handleImport()}
                   >
                     Import
