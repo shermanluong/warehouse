@@ -152,9 +152,9 @@ const AdminOrders = () => {
                         <div key={order?._id} className="bg-white p-4 rounded-lg shadow-md">
                             <div className="flex justify-between items-start relative">
                             <div className="flex">
-                                <h3 className="font-bold text-gray-900 mr-2">Order {order?.name}</h3>
-                                <span className={`text-xs px-2 py-1 rounded-full ${statusColorMap[order.status] || 'bg-gray-100 text-gray-800'}`}>
-                                {order.status}
+                                <h3 className="text-2xl font-bold text-gray-900 mr-2">Order {order?.name}</h3>
+                                <span className={`text-lg px-2 rounded-full ${statusColorMap[order.status] || 'bg-gray-100 text-gray-800'}`}>
+                                  {order.status}
                                 </span>
                             </div>
                         
@@ -194,27 +194,27 @@ const AdminOrders = () => {
                             </div>
                             </div>
                         
-                            <div className="flex justify-between mt-3">
-                            <p className="text-sm text-gray-500">Customer:</p>
-                            <span className="font-mono text-sm text-gray-500">
+                            <div className="flex justify-between mt-1">
+                              <p className="text-lg text-gray-900">Customer:</p>
+                            <span className="font-lg text-sm text-gray-900">
                                 {order.customer.first_name} {order.customer.last_name}
                             </span>
                             </div>
-                            <div className="flex justify-between mt-3">
-                            <p className="text-sm text-gray-500">Items:</p>
-                            <span className="font-mono text-sm text-gray-500">{order.lineItemCount}</span>
+                            <div className="flex justify-between mt-1">
+                            <p className="text-lg text-gray-900">Items:</p>
+                              <span className="font-lg text-sm text-gray-900">{order.lineItemCount}</span>
                             </div>
-                            <div className="flex justify-between mt-3">
-                            <p className="text-sm text-gray-500">Picker:</p>
-                            <span className="font-mono text-sm text-gray-500">{order?.picker?.name}</span>
+                            <div className="flex justify-between mt-1">
+                              <p className="text-lg text-gray-900">Picker:</p>
+                            <span className="font-lg text-sm text-gray-900">{order?.picker?.name}</span>
                             </div>
-                            <div className="flex justify-between mt-3">
-                            <p className="text-sm text-gray-500">Packer:</p>
-                            <span className="font-mono text-sm text-gray-500">{order?.packer?.name}</span>
+                            <div className="flex justify-between mt-1">
+                              <p className="text-lg text-gray-900">Packer:</p>
+                              <span className="font-lg text-sm text-gray-900">{order?.packer?.name}</span>
                             </div>
-                            <div className="flex justify-between mt-3">
-                            <p className="text-sm text-gray-500">Routes:</p>
-                            <span className="font-mono text-sm text-gray-500">{order?.delivery?.tripId}({order?.delivery?.driverName})</span>
+                            <div className="flex justify-between mt-1">
+                              <p className="text-lg text-gray-900">Routes:</p>
+                              <span className="font-lg text-sm text-gray-900">{order?.delivery?.tripId}({order?.delivery?.driverName})</span>
                             </div>
                         
                             {order.adminNote && (
