@@ -37,30 +37,38 @@ const AdminOrders = () => {
   }, []);
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/admin/getOrders`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-            params: {
-              search: searchTerm,
-              sort: sortOption,
-              order: sortOrder,
-              page: currentPage,
-              limit: pageSize,
-              date: formattedDate,
-            }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const fetchOrders = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/admin/getOrders`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params: {
+            search: searchTerm,
+            sort: sortOption,
+            order: sortOrder,
+            page: currentPage,
+            limit: pageSize,
+            date: formattedDate,
           }
-        );
-        console.log(res?.data?.orders);
-        setOrders(res?.data?.orders || []);
-        setTotalPages(Math.ceil(res?.data?.total / pageSize));
-      } catch (err) {
-        console.error('Failed to fetch orders:', err);
-      }
-    };
-    fetchOrders();
+        }
+      );
+      console.log(res?.data?.orders);
+      setOrders(res?.data?.orders || []);
+      setTotalPages(Math.ceil(res?.data?.total / pageSize));
+    } catch (err) {
+      console.error('Failed to fetch orders:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (formattedDate) {
+      fetchOrders();
+    }
   }, [searchTerm, sortOption, sortOrder, currentPage, pageSize, formattedDate]);
 
   const handlePageChange = (page) => setCurrentPage(page);
@@ -78,11 +86,6 @@ const AdminOrders = () => {
     });
     if (!clickedInside) setOpenDropdownId(null);
   };
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const openNoteDialog = (order) => {
       setSelectedOrder(order);
@@ -121,6 +124,27 @@ const AdminOrders = () => {
     const tempDate = normalizedDate.toISOString().split('T')[0]; 
     setFormattedDate(tempDate)
     setSelecteDate(date); 
+  };
+
+  const handleImport = async () => {
+    console.log("OK");
+    try {
+      // Send note to backend
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/shopify/sync-orders`,
+        { 
+          headers: { Authorization: `Bearer ${token}`},
+          params: {
+            tripDate: formattedDate
+          }
+        }
+      );
+
+      fetchOrders();
+    } catch (error) {
+      console.error("Failed to import orders:", error);
+      alert("Error importing orders. Please try again.");
+    }
   };
   
   return (
@@ -176,7 +200,7 @@ const AdminOrders = () => {
                 <button
                       className="px-4 py-2 ml-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md"
                       disabled={currentPage === totalPages}
-                      onClick={() => handlePageChange(currentPage + 1)}
+                      onClick={() => handleImport()}
                   >
                     Import
                 </button>
@@ -232,38 +256,38 @@ const AdminOrders = () => {
                           </div>
                       
                           <div className="flex justify-between mt-1">
-                            <p className="text-lg text-gray-900">Customer:</p>
-                          <span className="font-lg text-sm text-gray-900">
+                            <p className="text-md text-gray-900">Customer:</p>
+                            <span className="text-md text-gray-900">
                               {order.customer.first_name} {order.customer.last_name}
-                          </span>
+                            </span>
                           </div>
                           <div className="flex justify-between mt-1">
-                          <p className="text-lg text-gray-900">Items:</p>
-                            <span className="font-lg text-sm text-gray-900">{order.lineItemCount}</span>
+                            <p className="text-md text-gray-900">Items:</p>
+                            <span className="text-sm text-gray-900">{order.lineItemCount}</span>
                           </div>
                           <div className="flex justify-between mt-1">
-                            <p className="text-lg text-gray-900">Picker:</p>
-                          <span className="font-lg text-sm text-gray-900">{order?.picker?.name}</span>
+                            <p className="text-md text-gray-900">Picker:</p>
+                            <span className="text-md text-gray-900">{order?.picker?.name}</span>
                           </div>
                           <div className="flex justify-between mt-1">
-                            <p className="text-lg text-gray-900">Packer:</p>
-                            <span className="font-lg text-sm text-gray-900">{order?.packer?.name}</span>
+                            <p className="text-md text-gray-900">Packer:</p>
+                            <span className="text-md text-gray-900">{order?.packer?.name}</span>
                           </div>
                           <div className="flex justify-between mt-1">
-                            <p className="text-lg text-gray-900">Routes:</p>
-                            <span className="font-lg text-sm text-gray-900">{order?.delivery?.tripId}({order?.delivery?.driverName})</span>
+                            <p className="text-md text-gray-900">Routes:</p>
+                            <span className="text-md text-gray-900">{order?.delivery?.tripId}({order?.delivery?.driverName})</span>
                           </div>
                       
                           {order.adminNote && (
-                          <div className="mt-3">
-                              <p className="text-sm font-semibold text-red-600">Admin Note: {order.adminNote}</p>
-                          </div>
+                            <div className="mt-1">
+                                <p className="text-md text-red-600">Admin Note: {order.adminNote}</p>
+                            </div>
                           )}
                       
                           {order.orderNote && (
-                          <div className="mt-3">
-                              <p className="text-sm font-semibold text-red-600">Customer Note: {order.orderNote}</p>
-                          </div>
+                            <div className="mt-1">
+                                <p className="text-md text-red-600">Customer Note: {order.orderNote}</p>
+                            </div>
                           )}
                       </div>
                   ))}
