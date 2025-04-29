@@ -25,6 +25,16 @@ const AdminOrders = () => {
   const [showDialog, setShowDialog] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedDate, setSelecteDate] = useState(null);
+  const [formattedDate, setFormattedDate] = useState(null);
+
+  useEffect(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); 
+    const formattedToday = today.toISOString().split('T')[0]; 
+    
+    setSelecteDate(today); 
+    setFormattedDate(formattedToday); 
+  }, []);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -39,6 +49,7 @@ const AdminOrders = () => {
               order: sortOrder,
               page: currentPage,
               limit: pageSize,
+              date: formattedDate,
             }
           }
         );
@@ -50,7 +61,7 @@ const AdminOrders = () => {
       }
     };
     fetchOrders();
-  }, [searchTerm, sortOption, sortOrder, currentPage, pageSize]);
+  }, [searchTerm, sortOption, sortOrder, currentPage, pageSize, formattedDate]);
 
   const handlePageChange = (page) => setCurrentPage(page);
   
@@ -102,11 +113,16 @@ const AdminOrders = () => {
         alert("Error submitting note. Please try again.");
       }
   };
-
+  
   const handleDatechange = (date) => {
-    setSelecteDate(date);
+    const normalizedDate = new Date(date);
+    normalizedDate.setHours(0, 0, 0, 0); 
+
+    const tempDate = normalizedDate.toISOString().split('T')[0]; 
+    setFormattedDate(tempDate)
+    setSelecteDate(date); 
   };
-      
+  
   return (
       <>
           <div className="flex flex-col sm:flex-row sm:space-x-2 mb-3">
