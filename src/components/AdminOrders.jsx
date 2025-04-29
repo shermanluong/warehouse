@@ -214,7 +214,7 @@ const AdminOrders = () => {
                             </div>
                             <div className="flex justify-between mt-3">
                             <p className="text-sm text-gray-500">Routes:</p>
-                            <span className="font-mono text-sm text-gray-500"></span>
+                            <span className="font-mono text-sm text-gray-500">{order?.delivery?.tripId}({order?.delivery?.driverName})</span>
                             </div>
                         
                             {order.adminNote && (
