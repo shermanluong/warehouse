@@ -6,6 +6,7 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
   EllipsisVerticalIcon,
+  ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import NoteDialog from './NoteDialog';
 import DatePicker from 'react-datepicker'
@@ -26,6 +27,7 @@ const AdminOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedDate, setSelecteDate] = useState(null);
   const [formattedDate, setFormattedDate] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const today = new Date();
@@ -127,13 +129,14 @@ const AdminOrders = () => {
   };
 
   const handleImport = async () => {
+    setLoading(true); // Set loading to true when the import process starts
     try {
       console.log("OK");
       // Send note to backend
       const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/shopify/sync-orders`,
         { 
-          headers: { Authorization: `Bearer ${token}`},
+          headers: { Authorization: `Bearer ${token}` },
           params: {
             tripDate: formattedDate
           }
@@ -144,6 +147,8 @@ const AdminOrders = () => {
     } catch (error) {
       console.error("Failed to import orders:", error);
       alert("Error importing orders. Please try again.");
+    } finally {
+      setLoading(false); // Set loading to false once the import is finished
     }
   };
   
@@ -198,10 +203,15 @@ const AdminOrders = () => {
                   dateFormat="yyyy/MM/dd"
                 />
                 <button
-                      className="px-4 py-2 ml-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md"
-                      onClick={() => handleImport()}
-                  >
-                    Import
+                  className="px-4 py-2 ml-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md disabled:opacity-50"
+                  onClick={handleImport}
+                  disabled={loading} // Disable button when loading is true
+                >
+                  {loading ? (
+                    <ArrowPathIcon className="animate-spin h-5 w-5 text-white" /> // Heroicon spinner
+                  ) : (
+                    'Import'
+                  )}
                 </button>
               </div>
           </div>
@@ -305,6 +315,12 @@ const AdminOrders = () => {
                       </div>
                   ))}
               </div>
+          }
+
+          {orders?.length == 0 && 
+            <div className="bg-white p-4 rounded-lg shadow-md">
+              No data.
+            </div>
           }
 
           {showDialog && selectedOrder && (
