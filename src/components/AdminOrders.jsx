@@ -59,7 +59,7 @@ const AdminOrders = () => {
       );
       console.log(res?.data?.orders);
       setOrders(res?.data?.orders || []);
-      setTotalPages(Math.ceil(res?.data?.total / pageSize));
+      setTotalPages(Math.ceil((res?.data?.total || 0) / pageSize));
     } catch (err) {
       console.error('Failed to fetch orders:', err);
     }
@@ -276,7 +276,21 @@ const AdminOrders = () => {
                             <p className="text-md text-gray-900">Routes:</p>
                             <span className="text-md text-gray-900">{order?.delivery?.tripId}({order?.delivery?.driverName})</span>
                           </div>
-                      
+
+                          { false && 
+                            <>
+                              <div className="flex justify-between mt-1">
+                                <p className="text-md text-gray-900">Start Time: </p>
+                                <span className="text-md text-gray-900">{order?.delivery?.startTime}</span>
+                              </div>
+
+                              <div className="flex justify-between mt-1">
+                                <p className="text-md text-gray-900">Stop Number</p>
+                                <span className="text-md text-gray-900">{order?.delivery?.stopNumber}</span>
+                              </div>
+                            </>
+                          }
+                          
                           {order.adminNote && (
                             <div className="mt-1">
                                 <p className="text-md text-red-600">Admin Note: {order.adminNote}</p>

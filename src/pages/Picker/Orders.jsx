@@ -39,7 +39,7 @@ export default function Orders() {
             <div key = {order._id} className="bg-white border border-gray-200 rounded-x1 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
               <div className="p-4">
                 <div className="flex justify-between items-start">
-                  <h3 className="font-bold text-gray-900">
+                  <h3 className="font-bold text-2xl text-gray-900">
                     Order {order.name}
                     {(order?.orderNote || order?.adminNote) && (
                       <span title="This order has notes" className="text-yellow-500 ml-2">📌</span>
