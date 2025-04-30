@@ -31,9 +31,7 @@ const AdminOrders = () => {
 
   useEffect(() => {
     const today = new Date();
-    today.setHours(0, 0, 0, 0); 
-    const formattedToday = today.toISOString().split('T')[0]; 
-    
+    const formattedToday = today.toLocaleDateString('en-CA');
     setSelecteDate(today); 
     setFormattedDate(formattedToday); 
   }, []);
@@ -120,10 +118,7 @@ const AdminOrders = () => {
   };
   
   const handleDatechange = (date) => {
-    const normalizedDate = new Date(date);
-    normalizedDate.setHours(0, 0, 0, 0); 
-
-    const tempDate = normalizedDate.toISOString().split('T')[0]; 
+    const tempDate = date.toLocaleDateString('en-CA');
     setFormattedDate(tempDate)
     setSelecteDate(date); 
   };
