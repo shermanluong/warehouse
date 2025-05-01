@@ -292,13 +292,23 @@ const PickOrder = () => {
                                                 )}
                                             </h3>
 
-                                            <div className="flex gap-2 mt-2 mb-2">
+                                            <div className="flex gap-1 mt-2 mb-2 flex-wrap">
                                                 {lineItem?.pickedStatus?.verifiedQuantity > 0 && (
-                                                    <span className="text-lg text-white bg-green-500 rounded-2xl px-3 mt-2 sm:mt-0"> {lineItem?.pickedStatus?.verifiedQuantity}/{lineItem?.quantity} verified</span>
+                                                    <p className="text-lg text-white bg-green-500 rounded-2xl px-3 mt-2 sm:mt-0">
+                                                        {lineItem?.pickedStatus?.verifiedQuantity}/{lineItem?.quantity} verified
+                                                    </p>
                                                 )}
 
-                                                {lineItem?.flags?.length > 0 && !lineItem?.picked  && (
-                                                    <span className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">{lineItem.flags.join(', ')}</span>
+                                                {lineItem?.pickedStatus?.outOfStockQuantity > 0 && (
+                                                    <p className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">
+                                                        {lineItem?.pickedStatus?.outOfStockQuantity}/{lineItem?.quantity} Out Of Stock
+                                                    </p>
+                                                )}
+
+                                                {lineItem?.pickedStatus?.damagedQuantity > 0 && (
+                                                    <p className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">
+                                                        {lineItem?.pickedStatus?.damagedQuantity}/{lineItem?.quantity} Damaged
+                                                    </p>
                                                 )}
                                             </div>
 
