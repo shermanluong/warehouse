@@ -47,11 +47,11 @@ const PickOrder = () => {
         ));
     }, [lineItems]);
 
-    const handlePickPlus = async (productId) => {
+    const handlePickPlus = async (shopifyLineItemId) => {
         try {
             await axios.patch(
                 `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-plus`,
-                { productId },
+                { shopifyLineItemId },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
     
@@ -61,11 +61,11 @@ const PickOrder = () => {
         }
     };
 
-    const handlePickMinus = async (productId) => {
+    const handlePickMinus = async (shopifyLineItemId) => {
         try {
             await axios.patch(
                 `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-minus`,
-                { productId },
+                { shopifyLineItemId },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
     
@@ -75,11 +75,11 @@ const PickOrder = () => {
         }
     };
 
-    const handleUndo = async (productId, variantId) => {
+    const handleUndo = async (shopifyLineItemId) => {
         try {
             await axios.patch(
                 `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/undo-item`,
-                { productId, variantId },
+                { shopifyLineItemId },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
     
@@ -293,8 +293,8 @@ const PickOrder = () => {
                                             </h3>
 
                                             <div className="flex gap-2 mt-2 mb-2">
-                                                {lineItem.picked && (
-                                                    <span className="text-lg text-white bg-green-500 rounded-2xl px-3 mt-2 sm:mt-0">Verified</span>
+                                                {lineItem?.pickedStatus?.verifiedQuantity > 0 && (
+                                                    <span className="text-lg text-white bg-green-500 rounded-2xl px-3 mt-2 sm:mt-0"> {lineItem?.pickedStatus?.verifiedQuantity}/{lineItem?.quantity} verified</span>
                                                 )}
 
                                                 {lineItem?.flags?.length > 0 && !lineItem?.picked  && (
@@ -304,7 +304,13 @@ const PickOrder = () => {
 
                                             <p className="font-semibold text-xl text-gray-900">SKU: {lineItem?.variantInfo?.sku}</p>
                                             <span className="font-semibold text-xl text-gray-900">
-                                                {lineItem?.pickedQuantity} / {lineItem?.quantity} units
+                                                { 
+                                                    lineItem?.pickedStatus?.verifiedQuantity 
+                                                    +
+                                                    lineItem?.pickedStatus?.damagedQuantity 
+                                                    +
+                                                    lineItem?.pickedStatus?.outOfStockQuantity 
+                                                } / {lineItem?.quantity} units
                                             </span>
                                             
                                             {/* Notes Display */}
@@ -322,7 +328,7 @@ const PickOrder = () => {
                                         {!lineItem.picked && !lineItem?.flags?.length >  0 && lineItem.quantity <= 1 &&
                                             <button
                                                 title = "Pick item"
-                                                onClick={() => handlePickPlus(lineItem.productId)}
+                                                onClick={() => handlePickPlus(lineItem.shopifyLineItemId)}
                                                 className="bg-white text-green-600 border border-green-600 hover:bg-green-200 w-16 h-16 rounded flex items-center justify-center"
                                             >
                                                 <CheckIcon className="w-10 h-10" />
@@ -333,14 +339,14 @@ const PickOrder = () => {
                                             <>
                                                 <button
                                                     title = "Add one Item"
-                                                    onClick={() => handlePickPlus(lineItem.productId)}
+                                                    onClick={() => handlePickPlus(lineItem.shopifyLineItemId)}
                                                     className="bg-white text-blue-400 border border-blue-400 hover:bg-blue-200 w-16 h-16 rounded flex items-center justify-center"
                                                 >
                                                     <PlusIcon className="w-10 h-10" />
                                                 </button>
                                                 <button
                                                     title = "Remove one Item"
-                                                    onClick={() => handlePickMinus(lineItem.productId)}
+                                                    onClick={() => handlePickMinus(lineItem.shopifyLineItemId)}
                                                     className="bg-white text-stone-400 border border-stone-400 hover:bg-stone-200 w-16 h-16 rounded flex items-center justify-center"
                                                 >
                                                     <MinusIcon className="w-10 h-10" />
@@ -361,7 +367,7 @@ const PickOrder = () => {
                                         {(lineItem.picked || lineItem?.flags?.length > 0) && 
                                             <button
                                                 title = "Undo" 
-                                                onClick={() => handleUndo(lineItem?.productId, lineItem?.variantId)}
+                                                onClick={() => handleUndo(lineItem.shopifyLineItemId)}
                                                 className="bg-white text-blue-400 border border-blue-400 hover:bg-blue-200 w-16 h-16 rounded flex items-center justify-center"
                                             >
                                                 <ArrowPathIcon className="w-10 h-10" />
