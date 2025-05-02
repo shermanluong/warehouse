@@ -27,7 +27,6 @@ const PickOrder = () => {
     const [allPicked, setAllPicked] = useState(false);
     const [isImageOpen, setIsImageOpen] = useState(false);
     const [enlargedImage, setEnlargedImage] = useState('');
-
     const token = localStorage.getItem("token");
 
     const fetchOrder = async () => {
@@ -43,7 +42,7 @@ const PickOrder = () => {
 
     useEffect(() => {
         setAllPicked(lineItems.every(
-            item => item.picked || (item.flags && item.flags.length > 0)
+            item => item.picked
         ));
     }, [lineItems]);
 
@@ -102,10 +101,11 @@ const PickOrder = () => {
     };
 
     const handleCompletePicking = async () => {
+        console.log(token);
         try {
             await axios.post(
                 `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/complete-picking`, 
-                { status: 'picked' }, 
+                {},
                 { headers: { Authorization: `Bearer ${token}` } 
             });
             navigate(`/picker/orders`);
@@ -294,21 +294,21 @@ const PickOrder = () => {
                                             </h3>
 
                                             <div className="flex gap-1 mt-2 mb-2 flex-wrap">
-                                                {lineItem?.pickedStatus?.verifiedQuantity > 0 && (
+                                                {lineItem?.pickedStatus?.verified.quantity > 0 && (
                                                     <p className="text-lg text-white bg-green-500 rounded-2xl px-3 mt-2 sm:mt-0">
-                                                        {lineItem?.pickedStatus?.verifiedQuantity}/{lineItem?.quantity} verified
+                                                        {lineItem?.pickedStatus?.verified.quantity} picked
                                                     </p>
                                                 )}
 
-                                                {lineItem?.pickedStatus?.outOfStockQuantity > 0 && (
+                                                {lineItem?.pickedStatus?.outOfStock.quantity > 0 && (
                                                     <p className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">
-                                                        {lineItem?.pickedStatus?.outOfStockQuantity}/{lineItem?.quantity} Out Of Stock
+                                                        {lineItem?.pickedStatus?.outOfStock.quantity} Out Of Stock
                                                     </p>
                                                 )}
 
-                                                {lineItem?.pickedStatus?.damagedQuantity > 0 && (
+                                                {lineItem?.pickedStatus?.damaged.quantity > 0 && (
                                                     <p className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">
-                                                        {lineItem?.pickedStatus?.damagedQuantity}/{lineItem?.quantity} Damaged
+                                                        {lineItem?.pickedStatus?.damaged.quantity} Damaged
                                                     </p>
                                                 )}
                                             </div>
@@ -316,11 +316,11 @@ const PickOrder = () => {
                                             <p className="font-semibold text-xl text-gray-900">SKU: {lineItem?.variantInfo?.sku}</p>
                                             <span className="font-semibold text-xl text-gray-900">
                                                 { 
-                                                    lineItem?.pickedStatus?.verifiedQuantity 
+                                                    lineItem?.pickedStatus?.verified.quantity 
                                                     +
-                                                    lineItem?.pickedStatus?.damagedQuantity 
+                                                    lineItem?.pickedStatus?.damaged.quantity 
                                                     +
-                                                    lineItem?.pickedStatus?.outOfStockQuantity 
+                                                    lineItem?.pickedStatus?.outOfStock.quantity 
                                                 } / {lineItem?.quantity} units
                                             </span>
                                             

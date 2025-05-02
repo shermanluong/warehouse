@@ -52,8 +52,6 @@ const Product = () => {
     fetchProducts();
   }, [searchTerm, sortOption, sortOrder, currentPage, pageSize, selectedVendor, selectedStatus]);
 
-
-
   useEffect(() => {
     const fetchFilters = async () => {
       try {
@@ -112,7 +110,6 @@ const Product = () => {
                     <option key={v} value={v}>{v}</option>
                   ))}
                 </select>
-
                 <select
                   className="px-4 py-2 border rounded-md"
                   value={selectedStatus}

@@ -15,7 +15,7 @@ const FlagDialog = ({ isOpen, onClose, lineItem, onSubmit, onSelectSubstitution 
     if (isOpen && lineItem?.productId && lineItem?.variantId) {
       setSelectedFlag('Out Of Stock');
       setSelectedSubstitute(null);
-      const restQuantity = lineItem.quantity - (lineItem.pickedStatus.verifiedQuantity + lineItem.pickedStatus.outOfStockQuantity + lineItem.pickedStatus.damagedQuantity);
+      const restQuantity = lineItem.quantity - (lineItem.pickedStatus.verified.quantity + lineItem.pickedStatus.outOfStock.quantity + lineItem.pickedStatus.damaged.quantity);
       setFlagQuantity(restQuantity);
       setMaxValue(restQuantity);
       fetchSubstitutions();
@@ -98,7 +98,7 @@ const FlagDialog = ({ isOpen, onClose, lineItem, onSubmit, onSelectSubstitution 
               </div>
             </div>
 
-            <div className="flex mt-4 space-x-2 justify-between sm:flex-col sm:justify-between sm:mt-0 sm:space-x-0 sm:space-y-2">
+            <div className="flex mt-4 space-x-2 justify-between items-center sm:flex-col sm:mt-0 sm:space-x-0 sm:space-y-2">
               <select
                 onChange={(e) => setSelectedFlag(e.target.value)}
                 className="bg-red-500 text-white px-1 py-0 rounded-2xl"
@@ -112,7 +112,7 @@ const FlagDialog = ({ isOpen, onClose, lineItem, onSubmit, onSelectSubstitution 
                 </option>
               </select>
 
-              <div className="flex justify-end mt-6 space-x-2">
+              <div className="flex justify-end">
                 <button
                   onClick={handleConfirm}
                   className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"

@@ -17,6 +17,7 @@ import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import CameraModal from '../../components/CameraModal';
 import ImageZoomModal from '../../components/ImageZoomModal';
 import Spinbox from '../../components/Spinbox';
+import SwitchButton from '../../components/SwitchButton';
 
 export default function Finalise() {
     const { id } = useParams();
@@ -32,7 +33,20 @@ export default function Finalise() {
     const [isImageOpen, setIsImageOpen] = useState(false);
     const [enlargedImage, setEnlargedImage] = useState('');
     const [boxCount, setBoxCount] = useState(0);
+    const [allPacked, setAllPacked] = useState(false);
     const token = localStorage.getItem("token");
+
+    
+    useEffect(() => {
+        console.log('test');
+        fetchOrder();
+    }, [id]);
+
+    useEffect(() => {
+        setAllPacked(lineItems.every(
+            item => item.packed
+        ));
+    }, [lineItems]);
 
     const handleDeletePhoto = async (fileIdToDelete) => {
         try {
@@ -85,11 +99,6 @@ export default function Finalise() {
         setCapturedPhotos(res?.data?.photos || []);
         console.log(res?.data);
     };
-
-    useEffect(() => {
-        console.log('test');
-        fetchOrder();
-    }, [id]);
 
     const handlePackPlus = async (productId) => {
         try {
@@ -191,9 +200,22 @@ export default function Finalise() {
             setBarcode("Not Found");
         }
     };
+
     const handBoxCountChange = (newValue) => {
         setBoxCount(newValue);
     }
+
+    const handleCompletePacking = async () => {
+        try {
+            await axios.post(
+                `${import.meta.env.VITE_API_URL}/packer/order/${order._id}/complete-packing`, 
+                { headers: { Authorization: `Bearer ${token}` } 
+            });
+            navigate(`/packer/orders`);
+        } catch (err) {
+          console.error(err?.response?.data?.message);
+        }
+    };
 
     return (
         <Layout headerTitle={"Packing"}>
@@ -316,28 +338,27 @@ export default function Finalise() {
                                                 <span title="This item has notes" className="text-yellow-500 text-2xl ml-2">📌</span>
                                             )}
                                             </h3>
-
-                                            <div className="flex gap-1 mt-2 mb-2 flex-wrap">
-                                                {lineItem?.pickedStatus?.verifiedQuantity > 0 && (
+                                            
+                                            <div className="flex flex-col gap-1 mt-2 mb-2 items-start">
+                                                {lineItem?.pickedStatus?.verified.quantity > 0 && (
                                                     <p className="text-lg text-white bg-green-500 rounded-2xl px-3 mt-2 sm:mt-0">
-                                                        {lineItem?.pickedStatus?.verifiedQuantity}/{lineItem?.quantity} verified
+                                                        {lineItem?.pickedStatus?.verified.quantity} picked
                                                     </p>
                                                 )}
 
-                                                {lineItem?.pickedStatus?.outOfStockQuantity > 0 && (
+                                                {lineItem?.pickedStatus?.outOfStock.quantity > 0 && (
                                                     <p className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">
-                                                        {lineItem?.pickedStatus?.outOfStockQuantity}/{lineItem?.quantity} Out Of Stock
+                                                        {lineItem?.pickedStatus?.outOfStock.quantity} Out Of Stock
                                                     </p>
                                                 )}
 
-                                                {lineItem?.pickedStatus?.damagedQuantity > 0 && (
+                                                {lineItem?.pickedStatus?.damaged.quantity > 0 && (
                                                     <p className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">
-                                                        {lineItem?.pickedStatus?.damagedQuantity}/{lineItem?.quantity} Damaged
+                                                        {lineItem?.pickedStatus?.damaged.quantity} Damaged
                                                     </p>
                                                 )}
                                             </div>
 
-                                            <p className="font-semibold text-xl text-gray-900">SKU: {lineItem?.variantInfo?.sku}</p>
                                             <span className="font-semibold text-xl text-gray-900">
                                                 {lineItem?.packedQuantity || 0} packed / {lineItem.quantity} units
                                             </span>
@@ -352,8 +373,9 @@ export default function Finalise() {
                                         </div>
                                     </div>
                                     
-                                    <div className="flex justify-end mt-4 space-x-3 sm:flex-col sm:justify-start sm:mt-0 sm:space-x-0 sm:space-y-2 ">
-                                        {!lineItem.packed && !lineItem.flags.length >  0 && lineItem.quantity <= 1 &&  
+                                    <div className="flex justify-end mt-4 space-x-3 sm:flex-col sm:justify-start sm:items-end sm:mt-0 sm:space-x-0 sm:space-y-2 ">
+                                        <SwitchButton />
+                                        {!lineItem.packed && lineItem.quantity <= 1 &&  
                                             <button
                                                 title="Pack Item"
                                                 onClick={() => handlePackPlus(lineItem.productId)}
@@ -363,7 +385,7 @@ export default function Finalise() {
                                             </button>
                                         }
 
-                                        {!lineItem.packed && !lineItem.flags.length >  0 && lineItem.quantity > 1 && 
+                                        {!lineItem.packed && lineItem.quantity > 1 && 
                                             <>
                                                 <button
                                                     title="Add one Item"
@@ -514,13 +536,21 @@ export default function Finalise() {
                         <p className='text-md font-semibold mr-2'>Box Count : </p>
                         <Spinbox
                             value = {boxCount}
-                            max={10}
+                            max= {10}
                             OnValueChange={handBoxCountChange}
                         />
                     </div>
                     
                     {/* Submit Button */}
-                    <button className="bg-blue-500 w-full mt-4 text-white rounded-sm p-2 hover:bg-blue-600">
+                    <button
+                        disabled={!allPacked} 
+                        className={`w-full mt-4 rounded-sm p-2 
+                            ${allPacked 
+                                ? 'bg-blue-500 hover:bg-blue-600 text-white' 
+                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
+                        `}
+                        onClick={handleCompletePacking}
+                    >
                         Complete Packing
                     </button>
                 </div>
