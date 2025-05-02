@@ -313,22 +313,24 @@ export default function Finalise() {
                                             )}
                                             </h3>
 
-                                            <div className="flex gap-2 mt-2 mb-2">
-                                                {lineItem.packed && (
-                                                    <span className="text-lg text-white bg-green-500 rounded-2xl px-3 mt-2 sm:mt-0">Verified</span>
+                                            <div className="flex gap-1 mt-2 mb-2 flex-wrap">
+                                                {lineItem?.pickedStatus?.verifiedQuantity > 0 && (
+                                                    <p className="text-lg text-white bg-green-500 rounded-2xl px-3 mt-2 sm:mt-0">
+                                                        {lineItem?.pickedStatus?.verifiedQuantity}/{lineItem?.quantity} verified
+                                                    </p>
                                                 )}
 
-                                                {lineItem?.flags?.includes("Out Of Stock") &&
-                                                    <span className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">Out Of Stock</span>
-                                                }
+                                                {lineItem?.pickedStatus?.outOfStockQuantity > 0 && (
+                                                    <p className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">
+                                                        {lineItem?.pickedStatus?.outOfStockQuantity}/{lineItem?.quantity} Out Of Stock
+                                                    </p>
+                                                )}
 
-                                                {lineItem?.flags?.includes("Damaged") &&
-                                                    <span className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">Damaged</span>
-                                                }
-
-                                                {lineItem?.flags?.includes("Refunded") &&
-                                                    <span className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">Refunded</span>
-                                                }
+                                                {lineItem?.pickedStatus?.damagedQuantity > 0 && (
+                                                    <p className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">
+                                                        {lineItem?.pickedStatus?.damagedQuantity}/{lineItem?.quantity} Damaged
+                                                    </p>
+                                                )}
                                             </div>
 
                                             <p className="font-semibold text-xl text-gray-900">SKU: {lineItem?.variantInfo?.sku}</p>
