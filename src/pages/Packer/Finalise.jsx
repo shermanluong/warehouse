@@ -18,6 +18,7 @@ import CameraModal from '../../components/CameraModal';
 import ImageZoomModal from '../../components/ImageZoomModal';
 import Spinbox from '../../components/Spinbox';
 import SwitchButton from '../../components/SwitchButton';
+import FlagDialog from '../../components/FlagDialog'
 
 export default function Finalise() {
     const { id } = useParams();
@@ -34,6 +35,7 @@ export default function Finalise() {
     const [enlargedImage, setEnlargedImage] = useState('');
     const [boxCount, setBoxCount] = useState(0);
     const [allPacked, setAllPacked] = useState(false);
+    const [isPickingMode, setIsPickingMode] = useState(false);
     const token = localStorage.getItem("token");
 
     
@@ -100,11 +102,11 @@ export default function Finalise() {
         console.log(res?.data);
     };
 
-    const handlePackPlus = async (productId) => {
+    const handlePackPlus = async (shopifyLineItemId) => {
         try {
             await axios.patch(
                 `${import.meta.env.VITE_API_URL}/packer/order/${order._id}/pack-plus`,
-                { productId },
+                { shopifyLineItemId },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
     
@@ -114,11 +116,11 @@ export default function Finalise() {
         }
     };
 
-    const handlePackMinus = async (productId) => {
+    const handlePackMinus = async (shopifyLineItemId) => {
         try {
             await axios.patch(
                 `${import.meta.env.VITE_API_URL}/packer/order/${order._id}/pack-minus`,
-                { productId },
+                { shopifyLineItemId },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
     
@@ -128,11 +130,11 @@ export default function Finalise() {
         }
     };
 
-    const handleUndo = async (productId, variantId) => {
+    const handleUndo = async (shopifyLineItemId) => {
         try {
             await axios.patch(
                 `${import.meta.env.VITE_API_URL}/packer/order/${order._id}/undo-item`,
-                { productId, variantId },
+                { shopifyLineItemId },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
     
@@ -215,6 +217,97 @@ export default function Finalise() {
         } catch (err) {
           console.error(err?.response?.data?.message);
         }
+    };
+
+    const handleChangeMode = () => {
+        setIsPickingMode(!isPickingMode);
+    }
+
+    const handlePickUndo = async (shopifyLineItemId) => {
+        try {
+            await axios.patch(
+                `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/undo-item`,
+                { shopifyLineItemId },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+    
+            fetchOrder();
+        } catch (err) {
+            console.error('Failed to undo', err);
+        }
+    };
+
+    const handlePickPlus = async (shopifyLineItemId) => {
+        try {
+            await axios.patch(
+                `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-plus`,
+                { shopifyLineItemId },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+    
+            fetchOrder();
+        } catch (err) {
+            console.error('Failed to pick plus', err);
+        }
+    };
+
+    const handlePickMinus = async (shopifyLineItemId) => {
+        try {
+            await axios.patch(
+                `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-minus`,
+                { shopifyLineItemId },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+    
+            fetchOrder();
+        } catch (err) {
+            console.error('Failed to pick minus', err);
+        }
+    };
+
+    const [showDialog, setShowDialog] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
+
+    const openFlagDialog = (item) => {
+        setSelectedItem(item);
+        setShowDialog(true);
+    };
+
+    const handleFlagSubmit = async ({ shopifyLineItemId, reason, quantity }) => {
+        console.log(quantity);
+        await axios.patch(
+            `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-flag`,
+            { 
+                shopifyLineItemId   : shopifyLineItemId,
+                reason   : reason,
+                quantity  : quantity 
+            },
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+        
+        fetchOrder();
+    };
+
+    const handleSubstitutionSelect = async ({
+        flag,
+        originalProductId,
+        originalVariantId,
+        substituteProductId,
+        substituteVariantId,
+      }) => {
+        await axios.patch(
+          `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-flag`,
+          {
+            productId: originalProductId,
+            variantId: originalVariantId,
+            reason: flag,
+            substituteProductId,
+            substituteVariantId,
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      
+        fetchOrder();
     };
 
     return (
@@ -341,20 +434,57 @@ export default function Finalise() {
                                             
                                             <div className="flex flex-col gap-1 mt-2 mb-2 items-start">
                                                 {lineItem?.pickedStatus?.verified.quantity > 0 && (
-                                                    <p className="text-lg text-white bg-green-500 rounded-2xl px-3 mt-2 sm:mt-0">
-                                                        {lineItem?.pickedStatus?.verified.quantity} picked
-                                                    </p>
+                                                    <div className='flex flex-col items-start gap-5 sm:flex-row sm:items-center'>
+                                                        <p className="text-xl text-white bg-green-500 rounded-2xl px-3 mt-2 sm:mt-0">
+                                                            {lineItem?.packedStatus?.verified.quantity} packed / {lineItem?.pickedStatus?.verified.quantity} picked
+                                                        </p>
+                                                        <div className='flex gap-2'>
+                                                            {lineItem?.packedStatus?.verified.quantity < lineItem?.pickedStatus?.verified.quantity && lineItem?.pickedStatus?.verified.quantity == 1 &&
+                                                                <button
+                                                                    title = "Pick item"
+                                                                    onClick={() => handlePackPlus(lineItem.shopifyLineItemId)}
+                                                                    className="bg-white text-green-600 border border-green-600 hover:bg-green-200 w-8 h-8 rounded flex items-center justify-center"
+                                                                >
+                                                                    <CheckIcon className="w-10 h-10" />
+                                                                </button>
+                                                            }
+                                                            {lineItem?.packedStatus?.verified.quantity < lineItem?.pickedStatus?.verified.quantity && lineItem?.pickedStatus?.verified.quantity != 1 &&
+                                                                <>
+                                                                    <button
+                                                                        title="Add one Item"
+                                                                        onClick={() => handlePackPlus(lineItem.shopifyLineItemId)}
+                                                                        className="bg-white text-blue-400 border border-blue-400 hover:bg-blue-200 w-8 h-8 rounded flex items-center justify-center"
+                                                                    >
+                                                                        <PlusIcon className="w-10 h-10" />
+                                                                    </button>
+                                                                    <button
+                                                                        title="remove one Item"
+                                                                        onClick={() => handlePackMinus(lineItem.shopifyLineItemId)}
+                                                                        className="bg-white text-stone-400 border border-stone-400 hover:bg-stone-200 w-8 h-8 rounded flex items-center justify-center"
+                                                                    >
+                                                                        <MinusIcon className="w-10 h-10" />
+                                                                    </button>
+                                                                </>
+                                                            }
+                                                        </div>
+                                                    </div>
                                                 )}
 
-                                                {lineItem?.pickedStatus?.outOfStock.quantity > 0 && (
+                                                {!lineItem?.refund && lineItem?.pickedStatus?.outOfStock.quantity > 0 && (
                                                     <p className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">
                                                         {lineItem?.pickedStatus?.outOfStock.quantity} Out Of Stock
                                                     </p>
                                                 )}
 
-                                                {lineItem?.pickedStatus?.damaged.quantity > 0 && (
+                                                {!lineItem?.refund && lineItem?.pickedStatus?.damaged.quantity > 0 && (
                                                     <p className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">
                                                         {lineItem?.pickedStatus?.damaged.quantity} Damaged
+                                                    </p>
+                                                )}
+
+                                                {lineItem?.refund && (
+                                                    <p className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">
+                                                        {lineItem?.pickedStatus?.outOfStock.quantity + lineItem?.pickedStatus?.damaged.quantity} items Refunded
                                                     </p>
                                                 )}
                                             </div>
@@ -372,56 +502,86 @@ export default function Finalise() {
                                             )}
                                         </div>
                                     </div>
-                                    
                                     <div className="flex justify-end mt-4 space-x-3 sm:flex-col sm:justify-start sm:items-end sm:mt-0 sm:space-x-0 sm:space-y-2 ">
-                                        <SwitchButton />
-                                        {!lineItem.packed && lineItem.quantity <= 1 &&  
-                                            <button
-                                                title="Pack Item"
-                                                onClick={() => handlePackPlus(lineItem.productId)}
-                                                className="bg-white text-green-600 border border-green-600 hover:bg-green-200 w-16 h-16 rounded flex items-center justify-center"
-                                            >
-                                                <CheckIcon className="w-10 h-10" />
-                                            </button>
-                                        }
-
-                                        {!lineItem.packed && lineItem.quantity > 1 && 
+                                        <SwitchButton 
+                                            isChecked = {isPickingMode}
+                                            OnValueChange = {handleChangeMode}
+                                        />
+                                        {/*Packing Mode */}
+                                        { !isPickingMode && 
                                             <>
                                                 <button
-                                                    title="Add one Item"
-                                                    onClick={() => handlePackPlus(lineItem.productId)}
+                                                    title="Undo" 
+                                                    onClick={() => handleUndo(lineItem.shopifyLineItemId)}
                                                     className="bg-white text-blue-400 border border-blue-400 hover:bg-blue-200 w-16 h-16 rounded flex items-center justify-center"
                                                 >
-                                                    <PlusIcon className="w-10 h-10" />
+                                                    <ArrowPathIcon className="w-10 h-10" />
                                                 </button>
-                                                <button
-                                                    title="remove one Item"
-                                                    onClick={() => handlePackMinus(lineItem.productId)}
-                                                    className="bg-white text-stone-400 border border-stone-400 hover:bg-stone-200 w-16 h-16 rounded flex items-center justify-center"
-                                                >
-                                                    <MinusIcon className="w-10 h-10" />
-                                                </button>
+                                                
+                                                {  ((lineItem.pickedStatus.damaged.quantity > 0 && !lineItem.pickedStatus.damaged?.subbed) ||
+                                                    (lineItem.pickedStatus.outOfStock.quantity > 0 && !lineItem.pickedStatus.outOfStock?.subbed)) && 
+                                                    <button
+                                                        title = "Refund" 
+                                                        onClick={() => refundItem(order._id, order.shopifyOrderId, lineItem.shopifyLineItemId, lineItem.quantity)}
+                                                        className="bg-white text-green-400 border border-green-400 hover:bg-green-200 w-16 h-16 rounded flex items-center justify-center"
+                                                    >
+                                                        <CurrencyDollarIcon className="w-10 h-10" />
+                                                    </button>
+                                                }
                                             </>
                                         }
+                                        {/*Picking Mode */}
+                                        {isPickingMode && 
+                                            <>
+                                                {!lineItem.picked && lineItem.quantity <= 1 &&
+                                                    <button
+                                                        title = "Pick item"
+                                                        onClick={() => handlePickPlus(lineItem.shopifyLineItemId)}
+                                                        className="bg-white text-green-600 border border-green-600 hover:bg-green-200 w-16 h-16 rounded flex items-center justify-center"
+                                                    >
+                                                        <CheckIcon className="w-10 h-10" />
+                                                    </button>
+                                                }
 
-                                        { lineItem.packed  && 
-                                            <button
-                                                title="Undo" 
-                                                onClick={() => handleUndo(lineItem?.productId, lineItem?.variantId)}
-                                                className="bg-white text-blue-400 border border-blue-400 hover:bg-blue-200 w-16 h-16 rounded flex items-center justify-center"
-                                            >
-                                                <ArrowPathIcon className="w-10 h-10" />
-                                            </button>
-                                        }
+                                                {!lineItem.picked && lineItem.quantity > 1 &&
+                                                    <>
+                                                        <button
+                                                            title = "Add one Item"
+                                                            onClick={() => handlePickPlus(lineItem.shopifyLineItemId)}
+                                                            className="bg-white text-blue-400 border border-blue-400 hover:bg-blue-200 w-16 h-16 rounded flex items-center justify-center"
+                                                        >
+                                                            <PlusIcon className="w-10 h-10" />
+                                                        </button>
+                                                        <button
+                                                            title = "Remove one Item"
+                                                            onClick={() => handlePickMinus(lineItem.shopifyLineItemId)}
+                                                            className="bg-white text-stone-400 border border-stone-400 hover:bg-stone-200 w-16 h-16 rounded flex items-center justify-center"
+                                                        >
+                                                            <MinusIcon className="w-10 h-10" />
+                                                        </button>
+                                                    </>
+                                                }
 
-                                        { lineItem?.flags?.length > 0 && !lineItem?.flags?.includes("Refunded") && !lineItem?.substitution?.substituteProductId && 
-                                            <button
-                                                title = "Refund" 
-                                                onClick={() => refundItem(order._id, order.shopifyOrderId, lineItem.shopifyLineItemId, lineItem.quantity)}
-                                                className="bg-white text-green-400 border border-green-400 hover:bg-green-200 w-16 h-16 rounded flex items-center justify-center"
-                                            >
-                                                <CurrencyDollarIcon className="w-10 h-10" />
-                                            </button>
+                                                {!lineItem.picked && 
+                                                    <button 
+                                                        title = "Flag Item"
+                                                        onClick={() => openFlagDialog(lineItem)}
+                                                        className="bg-white text-red-600 border border-red-600 hover:bg-red-200 w-16 h-16 rounded flex items-center justify-center"
+                                                    >
+                                                        <XMarkIcon className="w-10 h-10" />
+                                                    </button>
+                                                }
+
+                                                {lineItem.picked && 
+                                                    <button
+                                                        title = "Undo" 
+                                                        onClick={() => handlePickUndo(lineItem.shopifyLineItemId)}
+                                                        className="bg-white text-blue-400 border border-blue-400 hover:bg-blue-200 w-16 h-16 rounded flex items-center justify-center"
+                                                    >
+                                                        <ArrowPathIcon className="w-10 h-10" />
+                                                    </button>
+                                                }
+                                            </>
                                         }
                                     </div>
                                 </div>
@@ -555,6 +715,15 @@ export default function Finalise() {
                     </button>
                 </div>
             </div>
+            {showDialog && selectedItem && (
+                <FlagDialog
+                    isOpen={showDialog}
+                    onClose={() => setShowDialog(false)}
+                    lineItem={selectedItem}
+                    onSubmit={handleFlagSubmit}
+                    onSelectSubstitution= {handleSubstitutionSelect}
+                />
+            )}
             <ImageZoomModal
                 isOpen={isImageOpen}
                 onClose={() => setIsImageOpen(false)}

@@ -1,9 +1,7 @@
 import { useState } from 'react';
 
-const SwitchButton = ({ initialState = false }) => {
-  const [isChecked, setIsChecked] = useState(initialState);
-
-  const toggleSwitch = () => setIsChecked(!isChecked);
+const SwitchButton = ({ isChecked = false, OnValueChange }) => {
+  const toggleSwitch = () => OnValueChange(!isChecked);
 
   return (
     <div className="flex items-center space-x-3">

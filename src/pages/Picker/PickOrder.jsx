@@ -293,6 +293,17 @@ const PickOrder = () => {
                                                 )}
                                             </h3>
 
+                                            <p className="font-semibold text-xl text-gray-900">SKU: {lineItem?.variantInfo?.sku}</p>
+                                            <span className="font-semibold text-xl text-gray-900">
+                                                { 
+                                                    lineItem?.pickedStatus?.verified.quantity 
+                                                    +
+                                                    lineItem?.pickedStatus?.damaged.quantity 
+                                                    +
+                                                    lineItem?.pickedStatus?.outOfStock.quantity 
+                                                } / {lineItem?.quantity} units
+                                            </span>
+
                                             <div className="flex gap-1 mt-2 mb-2 flex-wrap">
                                                 {lineItem?.pickedStatus?.verified.quantity > 0 && (
                                                     <p className="text-lg text-white bg-green-500 rounded-2xl px-3 mt-2 sm:mt-0">
@@ -312,17 +323,6 @@ const PickOrder = () => {
                                                     </p>
                                                 )}
                                             </div>
-
-                                            <p className="font-semibold text-xl text-gray-900">SKU: {lineItem?.variantInfo?.sku}</p>
-                                            <span className="font-semibold text-xl text-gray-900">
-                                                { 
-                                                    lineItem?.pickedStatus?.verified.quantity 
-                                                    +
-                                                    lineItem?.pickedStatus?.damaged.quantity 
-                                                    +
-                                                    lineItem?.pickedStatus?.outOfStock.quantity 
-                                                } / {lineItem?.quantity} units
-                                            </span>
                                             
                                             {/* Notes Display */}
                                             {lineItem.adminNote && (
@@ -336,7 +336,7 @@ const PickOrder = () => {
 
                                     <div className="flex justify-end mt-4 space-x-3 sm:flex-col sm:justify-start sm:mt-0 sm:space-x-0 sm:space-y-2 ">
                                         
-                                        {!lineItem.picked && !lineItem?.flags?.length >  0 && lineItem.quantity <= 1 &&
+                                        {!lineItem.picked && lineItem.quantity <= 1 &&
                                             <button
                                                 title = "Pick item"
                                                 onClick={() => handlePickPlus(lineItem.shopifyLineItemId)}
@@ -346,7 +346,7 @@ const PickOrder = () => {
                                             </button>
                                         }
 
-                                        {!lineItem.picked && !lineItem?.flags?.length >  0 && lineItem.quantity > 1 &&
+                                        {!lineItem.picked && lineItem.quantity > 1 &&
                                             <>
                                                 <button
                                                     title = "Add one Item"
@@ -365,7 +365,7 @@ const PickOrder = () => {
                                             </>
                                         }
 
-                                        {!lineItem.picked && !lineItem?.flags?.length >  0 && 
+                                        {!lineItem.picked && 
                                             <button 
                                                 title = "Flag Item"
                                                 onClick={() => openFlagDialog(lineItem)}
@@ -375,7 +375,7 @@ const PickOrder = () => {
                                             </button>
                                         }
 
-                                        {(lineItem.picked || lineItem?.flags?.length > 0) && 
+                                        {lineItem.picked && 
                                             <button
                                                 title = "Undo" 
                                                 onClick={() => handleUndo(lineItem.shopifyLineItemId)}
