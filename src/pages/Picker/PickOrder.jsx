@@ -122,13 +122,14 @@ const PickOrder = () => {
         setShowDialog(true);
     };
 
-    const handleFlagSubmit = async ({ productId, variantId, flag }) => {
+    const handleFlagSubmit = async ({ shopifyLineItemId, reason, quantity }) => {
+        console.log(quantity);
         await axios.patch(
             `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-flag`,
             { 
-                productId   : productId,
-                variantId   : variantId,
-                reason      : flag 
+                shopifyLineItemId   : shopifyLineItemId,
+                reason   : reason,
+                quantity  : quantity 
             },
             { headers: { Authorization: `Bearer ${token}` } }
         );

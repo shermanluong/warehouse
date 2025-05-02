@@ -1,17 +1,24 @@
 import { Dialog } from '@headlessui/react';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import Spinbox from './Spinbox';
+import { max } from 'date-fns';
 
 const FlagDialog = ({ isOpen, onClose, lineItem, onSubmit, onSelectSubstitution }) => {
-    const [selectedFlag, setSelectedFlag] = useState('');
+    const [selectedFlag, setSelectedFlag] = useState('Out Of Stock');
     const [selectedSubstitute, setSelectedSubstitute] = useState(null);
     const [substitutions, setSubstitutions] = useState([]);
+    const [flagQuantity, setFlagQuantity] = useState(0);
+    const [maxValue, setMaxValue] = useState(0);
     const token = localStorage.getItem("token");
   
     useEffect(() => {
       if (isOpen && lineItem?.productId && lineItem?.variantId) {
-        setSelectedFlag('');
+        setSelectedFlag('Out Of Stock');
         setSelectedSubstitute(null);
+        const restQunatity = lineItem.quantity - (lineItem.pickedStatus.verifiedQuantity + lineItem.pickedStatus.outOfStockQuantity + lineItem.pickedStatus.damagedQuantity);
+        setFlagQuantity(restQunatity);
+        setMaxValue(restQunatity);
         fetchSubstitutions();
       }
     }, [isOpen, lineItem]);
@@ -31,18 +38,16 @@ const FlagDialog = ({ isOpen, onClose, lineItem, onSubmit, onSelectSubstitution 
     };
   
     const handleConfirm = () => {
-      if (!selectedFlag) return;
+      console.log(flagQuantity);
       onSubmit({
-        productId: lineItem.productId,
-        variantId: lineItem.variantId,
-        flag: selectedFlag,
+        shopifyLineItemId: lineItem.shopifyLineItemId,
+        reason: selectedFlag,
+        quantity: flagQuantity
       });
       onClose();
     };
   
     const handleSelectSubstitute = (item) => {
-        console.log(lineItem);
-      if (!selectedFlag) return;
       onSelectSubstitution({
         flag: selectedFlag,
         originalProductId: lineItem.productId,
@@ -51,6 +56,11 @@ const FlagDialog = ({ isOpen, onClose, lineItem, onSubmit, onSelectSubstitution 
         substituteVariantId: item.shopifyVariantId,
       });
       onClose();
+    };
+
+    const handleValueChange = (newValue) => {
+      console.log(newValue);
+      setFlagQuantity(newValue);
     };
   
     return (
@@ -64,29 +74,31 @@ const FlagDialog = ({ isOpen, onClose, lineItem, onSubmit, onSelectSubstitution 
               <div className="flex items-start">
                 <img src={lineItem?.image} alt={lineItem?.productTitle} className="w-24 h-24 rounded object-cover" />
                 <div className="ml-4">
-                  <h3 className="font-semibold text-sm text-gray-900">
+                  <h3 className="font-semibold text-xl text-gray-900">
                     {lineItem?.variantInfo?.title === "Default Title"
                       ? lineItem?.productTitle
                       : lineItem?.variantInfo?.title}
                   </h3>
-                  <p className="font-semibold text-sm text-gray-900">
+                  <p className="font-semibold text-md text-gray-900">
                     SKU: {lineItem?.variantInfo?.sku}
                   </p>
-                  <p className="font-semibold text-sm text-gray-900">
+                  <p className="font-semibold text-md text-gray-900 mb-2">
                     Price: ${lineItem?.variantInfo?.price}
                   </p>
+                  <Spinbox
+                    value = { flagQuantity }
+                    max = { maxValue }
+                    OnValueChange={handleValueChange}
+                  />
                 </div>
               </div>
   
-              <div className="flex mt-4 space-x-2 justify-end sm:flex-col sm:justify-center sm:mt-0 sm:space-x-0 sm:space-y-2">
+              <div className="flex mt-4 space-x-2 justify-end sm:flex-col sm:justify-start sm:mt-0 sm:space-x-0 sm:space-y-2">
                 <select
                   onChange={(e) => setSelectedFlag(e.target.value)}
                   className="bg-red-500 text-white px-1 py-0 rounded-2xl"
                   value={selectedFlag}
                 >
-                  <option className="bg-white text-gray-900" value="" disabled>
-                    Select Status
-                  </option>
                   <option className="bg-white text-gray-900" value="Out Of Stock">
                     Out of Stock
                   </option>
@@ -143,7 +155,6 @@ const FlagDialog = ({ isOpen, onClose, lineItem, onSubmit, onSelectSubstitution 
               <button
                 onClick={handleConfirm}
                 className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
-                disabled={!selectedFlag}
               >
                 Confirm
               </button>
