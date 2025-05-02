@@ -16,6 +16,7 @@ import dataURLToFile from '../../utils/dataURLToFile';
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import CameraModal from '../../components/CameraModal';
 import ImageZoomModal from '../../components/ImageZoomModal';
+import Spinbox from '../../components/Spinbox';
 
 export default function Finalise() {
     const { id } = useParams();
@@ -26,12 +27,12 @@ export default function Finalise() {
     const [barcode, setBarcode] = useState("");
     const isScanning = useRef(false);
     const [isButtonScanning, setIsButtonScanning] = useState(false);
-    const token = localStorage.getItem("token");
-
     const [modalOpen, setModalOpen] = useState(false);
     const [capturedPhotos, setCapturedPhotos] = useState([]);
     const [isImageOpen, setIsImageOpen] = useState(false);
     const [enlargedImage, setEnlargedImage] = useState('');
+    const [boxCount, setBoxCount] = useState(0);
+    const token = localStorage.getItem("token");
 
     const handleDeletePhoto = async (fileIdToDelete) => {
         try {
@@ -190,6 +191,9 @@ export default function Finalise() {
             setBarcode("Not Found");
         }
     };
+    const handBoxCountChange = (newValue) => {
+        setBoxCount(newValue);
+    }
 
     return (
         <Layout headerTitle={"Packing"}>
@@ -506,12 +510,15 @@ export default function Finalise() {
                         </div>
                     </div>
 
-                    <CameraModal
-                        isOpen={modalOpen}
-                        onClose={() => setModalOpen(false)}
-                        onCaptureComplete={handleUpload}
-                    />
-
+                    <div className='flex justify-start items-center mt-3'>
+                        <p className='text-md font-semibold mr-2'>Box Count : </p>
+                        <Spinbox
+                            value = {boxCount}
+                            max={10}
+                            OnValueChange={handBoxCountChange}
+                        />
+                    </div>
+                    
                     {/* Submit Button */}
                     <button className="bg-blue-500 w-full mt-4 text-white rounded-sm p-2 hover:bg-blue-600">
                         Complete Packing
@@ -522,6 +529,11 @@ export default function Finalise() {
                 isOpen={isImageOpen}
                 onClose={() => setIsImageOpen(false)}
                 imageUrl={enlargedImage}
+            />
+            <CameraModal
+                isOpen={modalOpen}
+                onClose={() => setModalOpen(false)}
+                onCaptureComplete={handleUpload}
             />
         </Layout>     
     )
