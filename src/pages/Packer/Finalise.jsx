@@ -402,7 +402,10 @@ export default function Finalise() {
 
                     {/* Display Scanned Barcode */}
                     <div className="mb-4">
-                        <p>Scanned Barcode: {barcode}</p>
+                        <SwitchButton 
+                            isChecked = {isPickingMode}
+                            OnValueChange = {handleChangeMode}
+                        />
                     </div>
 
                     {/* Cards */}
@@ -431,67 +434,105 @@ export default function Finalise() {
                                                 <span title="This item has notes" className="text-yellow-500 text-2xl ml-2">📌</span>
                                             )}
                                             </h3>
-                                            
-                                            <div className="flex flex-col gap-1 mt-2 mb-2 items-start">
-                                                {lineItem?.pickedStatus?.verified.quantity > 0 && (
-                                                    <div className='flex flex-col items-start gap-5 sm:flex-row sm:items-center'>
-                                                        <p className="text-xl text-white bg-green-500 rounded-2xl px-3 mt-2 sm:mt-0">
-                                                            {lineItem?.packedStatus?.verified.quantity} packed / {lineItem?.pickedStatus?.verified.quantity} picked
-                                                        </p>
-                                                        <div className='flex gap-2'>
-                                                            {lineItem?.packedStatus?.verified.quantity < lineItem?.pickedStatus?.verified.quantity && lineItem?.pickedStatus?.verified.quantity == 1 &&
-                                                                <button
-                                                                    title = "Pick item"
-                                                                    onClick={() => handlePackPlus(lineItem.shopifyLineItemId)}
-                                                                    className="bg-white text-green-600 border border-green-600 hover:bg-green-200 w-8 h-8 rounded flex items-center justify-center"
-                                                                >
-                                                                    <CheckIcon className="w-10 h-10" />
-                                                                </button>
-                                                            }
-                                                            {lineItem?.packedStatus?.verified.quantity < lineItem?.pickedStatus?.verified.quantity && lineItem?.pickedStatus?.verified.quantity != 1 &&
-                                                                <>
-                                                                    <button
-                                                                        title="Add one Item"
-                                                                        onClick={() => handlePackPlus(lineItem.shopifyLineItemId)}
-                                                                        className="bg-white text-blue-400 border border-blue-400 hover:bg-blue-200 w-8 h-8 rounded flex items-center justify-center"
-                                                                    >
-                                                                        <PlusIcon className="w-10 h-10" />
-                                                                    </button>
-                                                                    <button
-                                                                        title="remove one Item"
-                                                                        onClick={() => handlePackMinus(lineItem.shopifyLineItemId)}
-                                                                        className="bg-white text-stone-400 border border-stone-400 hover:bg-stone-200 w-8 h-8 rounded flex items-center justify-center"
-                                                                    >
-                                                                        <MinusIcon className="w-10 h-10" />
-                                                                    </button>
-                                                                </>
-                                                            }
-                                                        </div>
+                                            {/*Packing mode */}
+                                            {!isPickingMode && 
+                                                <>
+                                                    <div className="flex flex-col gap-1 mt-2 mb-2 items-start">
+                                                        {lineItem?.pickedStatus?.verified.quantity > 0 && (
+                                                            <div className='flex flex-col items-start gap-5 sm:flex-row sm:items-center'>
+                                                                <p className="text-xl text-white bg-green-500 rounded-2xl px-3 mt-2 sm:mt-0">
+                                                                    {lineItem?.packedStatus?.verified.quantity} packed / {lineItem?.pickedStatus?.verified.quantity} picked
+                                                                </p>
+                                                                <div className='flex gap-2'>
+                                                                    {lineItem?.packedStatus?.verified.quantity < lineItem?.pickedStatus?.verified.quantity && lineItem?.pickedStatus?.verified.quantity == 1 &&
+                                                                        <button
+                                                                            title = "Pick item"
+                                                                            onClick={() => handlePackPlus(lineItem.shopifyLineItemId)}
+                                                                            className="bg-white text-green-600 border border-green-600 hover:bg-green-200 w-8 h-8 rounded flex items-center justify-center"
+                                                                        >
+                                                                            <CheckIcon className="w-10 h-10" />
+                                                                        </button>
+                                                                    }
+                                                                    {lineItem?.packedStatus?.verified.quantity < lineItem?.pickedStatus?.verified.quantity && lineItem?.pickedStatus?.verified.quantity != 1 &&
+                                                                        <>
+                                                                            <button
+                                                                                title="Add one Item"
+                                                                                onClick={() => handlePackPlus(lineItem.shopifyLineItemId)}
+                                                                                className="bg-white text-blue-400 border border-blue-400 hover:bg-blue-200 w-8 h-8 rounded flex items-center justify-center"
+                                                                            >
+                                                                                <PlusIcon className="w-10 h-10" />
+                                                                            </button>
+                                                                            <button
+                                                                                title="remove one Item"
+                                                                                onClick={() => handlePackMinus(lineItem.shopifyLineItemId)}
+                                                                                className="bg-white text-stone-400 border border-stone-400 hover:bg-stone-200 w-8 h-8 rounded flex items-center justify-center"
+                                                                            >
+                                                                                <MinusIcon className="w-10 h-10" />
+                                                                            </button>
+                                                                        </>
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {!lineItem?.refund && lineItem?.pickedStatus?.outOfStock.quantity > 0 && (
+                                                            <p className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">
+                                                                {lineItem?.pickedStatus?.outOfStock.quantity} Out Of Stock
+                                                            </p>
+                                                        )}
+
+                                                        {!lineItem?.refund && lineItem?.pickedStatus?.damaged.quantity > 0 && (
+                                                            <p className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">
+                                                                {lineItem?.pickedStatus?.damaged.quantity} Damaged
+                                                            </p>
+                                                        )}
+
+                                                        {lineItem?.refund && (
+                                                            <p className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">
+                                                                {lineItem?.pickedStatus?.outOfStock.quantity + lineItem?.pickedStatus?.damaged.quantity} Refunded
+                                                            </p>
+                                                        )}
                                                     </div>
-                                                )}
 
-                                                {!lineItem?.refund && lineItem?.pickedStatus?.outOfStock.quantity > 0 && (
-                                                    <p className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">
-                                                        {lineItem?.pickedStatus?.outOfStock.quantity} Out Of Stock
-                                                    </p>
-                                                )}
+                                                    <span className="font-semibold text-xl text-gray-900">
+                                                        {lineItem?.packedQuantity || 0} packed / {lineItem.quantity} units
+                                                    </span>
+                                                </>
+                                            }
+                                            {/*Picking mode */}
+                                            {isPickingMode && 
+                                                <>
+                                                    <div className="flex gap-1 mt-2 mb-2 flex-wrap">
+                                                        {lineItem?.pickedStatus?.verified.quantity > 0 && (
+                                                            <p className="text-lg text-white bg-green-500 rounded-2xl px-3 mt-2 sm:mt-0">
+                                                                {lineItem?.pickedStatus?.verified.quantity} picked
+                                                            </p>
+                                                        )}
 
-                                                {!lineItem?.refund && lineItem?.pickedStatus?.damaged.quantity > 0 && (
-                                                    <p className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">
-                                                        {lineItem?.pickedStatus?.damaged.quantity} Damaged
-                                                    </p>
-                                                )}
+                                                        {lineItem?.pickedStatus?.outOfStock.quantity > 0 && (
+                                                            <p className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">
+                                                                {lineItem?.pickedStatus?.outOfStock.quantity} Out Of Stock
+                                                            </p>
+                                                        )}
 
-                                                {lineItem?.refund && (
-                                                    <p className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">
-                                                        {lineItem?.pickedStatus?.outOfStock.quantity + lineItem?.pickedStatus?.damaged.quantity} items Refunded
-                                                    </p>
-                                                )}
-                                            </div>
-
-                                            <span className="font-semibold text-xl text-gray-900">
-                                                {lineItem?.packedQuantity || 0} packed / {lineItem.quantity} units
-                                            </span>
+                                                        {lineItem?.pickedStatus?.damaged.quantity > 0 && (
+                                                            <p className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">
+                                                                {lineItem?.pickedStatus?.damaged.quantity} Damaged
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <span className="font-semibold text-xl text-gray-900">
+                                                        { 
+                                                            lineItem?.pickedStatus?.verified.quantity 
+                                                            +
+                                                            lineItem?.pickedStatus?.damaged.quantity 
+                                                            +
+                                                            lineItem?.pickedStatus?.outOfStock.quantity 
+                                                        } / {lineItem?.quantity} units
+                                                    </span>
+                                                    <p className="font-semibold text-xl text-gray-900">SKU: {lineItem?.variantInfo?.sku}</p>
+                                                </>
+                                            }
 
                                             {/* Show notes if any */}
                                             {lineItem.adminNote && (
@@ -503,10 +544,7 @@ export default function Finalise() {
                                         </div>
                                     </div>
                                     <div className="flex justify-end mt-4 space-x-3 sm:flex-col sm:justify-start sm:items-end sm:mt-0 sm:space-x-0 sm:space-y-2 ">
-                                        <SwitchButton 
-                                            isChecked = {isPickingMode}
-                                            OnValueChange = {handleChangeMode}
-                                        />
+                                        
                                         {/*Packing Mode */}
                                         { !isPickingMode && 
                                             <>
@@ -530,6 +568,7 @@ export default function Finalise() {
                                                 }
                                             </>
                                         }
+
                                         {/*Picking Mode */}
                                         {isPickingMode && 
                                             <>
