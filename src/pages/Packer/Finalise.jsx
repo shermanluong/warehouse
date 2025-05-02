@@ -444,9 +444,6 @@ export default function Finalise() {
                                                                 <p className="text-xl text-white bg-green-500 rounded-2xl px-3 mt-2 sm:mt-0">
                                                                     {lineItem?.packedStatus?.verified.quantity} packed / {lineItem?.pickedStatus?.verified.quantity} picked
                                                                 </p>
-                                                                <div className='flex gap-2'>
-                                                                    
-                                                                </div>
                                                             </div>
                                                         )}
 
