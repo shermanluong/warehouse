@@ -211,6 +211,7 @@ export default function Finalise() {
         try {
             await axios.post(
                 `${import.meta.env.VITE_API_URL}/packer/order/${order._id}/complete-packing`, 
+                {},
                 { headers: { Authorization: `Bearer ${token}` } 
             });
             navigate(`/packer/orders`);
@@ -444,33 +445,7 @@ export default function Finalise() {
                                                                     {lineItem?.packedStatus?.verified.quantity} packed / {lineItem?.pickedStatus?.verified.quantity} picked
                                                                 </p>
                                                                 <div className='flex gap-2'>
-                                                                    {lineItem?.packedStatus?.verified.quantity < lineItem?.pickedStatus?.verified.quantity && lineItem?.pickedStatus?.verified.quantity == 1 &&
-                                                                        <button
-                                                                            title = "Pick item"
-                                                                            onClick={() => handlePackPlus(lineItem.shopifyLineItemId)}
-                                                                            className="bg-white text-green-600 border border-green-600 hover:bg-green-200 w-8 h-8 rounded flex items-center justify-center"
-                                                                        >
-                                                                            <CheckIcon className="w-10 h-10" />
-                                                                        </button>
-                                                                    }
-                                                                    {lineItem?.packedStatus?.verified.quantity < lineItem?.pickedStatus?.verified.quantity && lineItem?.pickedStatus?.verified.quantity != 1 &&
-                                                                        <>
-                                                                            <button
-                                                                                title="Add one Item"
-                                                                                onClick={() => handlePackPlus(lineItem.shopifyLineItemId)}
-                                                                                className="bg-white text-blue-400 border border-blue-400 hover:bg-blue-200 w-8 h-8 rounded flex items-center justify-center"
-                                                                            >
-                                                                                <PlusIcon className="w-10 h-10" />
-                                                                            </button>
-                                                                            <button
-                                                                                title="remove one Item"
-                                                                                onClick={() => handlePackMinus(lineItem.shopifyLineItemId)}
-                                                                                className="bg-white text-stone-400 border border-stone-400 hover:bg-stone-200 w-8 h-8 rounded flex items-center justify-center"
-                                                                            >
-                                                                                <MinusIcon className="w-10 h-10" />
-                                                                            </button>
-                                                                        </>
-                                                                    }
+                                                                    
                                                                 </div>
                                                             </div>
                                                         )}
@@ -489,18 +464,24 @@ export default function Finalise() {
 
                                                         {lineItem?.refund && (
                                                             <p className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">
-                                                                {lineItem?.pickedStatus?.outOfStock.quantity + lineItem?.pickedStatus?.damaged.quantity} Refunded
+                                                                {lineItem?.pickedStatus?.outOfStock.quantity + lineItem?.pickedStatus?.damaged.quantity} refunded
                                                             </p>
                                                         )}
                                                     </div>
 
                                                     <span className="font-semibold text-xl text-gray-900">
-                                                        {lineItem?.packedQuantity || 0} packed / {lineItem.quantity} units
+                                                        { 
+                                                            lineItem?.packedStatus?.verified.quantity 
+                                                            +
+                                                            lineItem?.packedStatus?.damaged.quantity 
+                                                            +
+                                                            lineItem?.packedStatus?.outOfStock.quantity 
+                                                        } packed / {lineItem?.quantity} units
                                                     </span>
                                                 </>
                                             }
                                             {/*Picking mode */}
-                                            {isPickingMode && 
+                                            {isPickingMode && !lineItem.refund && 
                                                 <>
                                                     <div className="flex gap-1 mt-2 mb-2 flex-wrap">
                                                         {lineItem?.pickedStatus?.verified.quantity > 0 && (
@@ -528,7 +509,7 @@ export default function Finalise() {
                                                             lineItem?.pickedStatus?.damaged.quantity 
                                                             +
                                                             lineItem?.pickedStatus?.outOfStock.quantity 
-                                                        } / {lineItem?.quantity} units
+                                                        } picked / {lineItem?.quantity} units
                                                     </span>
                                                     <p className="font-semibold text-xl text-gray-900">SKU: {lineItem?.variantInfo?.sku}</p>
                                                 </>
@@ -546,16 +527,45 @@ export default function Finalise() {
                                     <div className="flex justify-end mt-4 space-x-3 sm:flex-col sm:justify-start sm:items-end sm:mt-0 sm:space-x-0 sm:space-y-2 ">
                                         
                                         {/*Packing Mode */}
-                                        { !isPickingMode && 
+                                        { !isPickingMode && !lineItem.refund && 
                                             <>
-                                                <button
-                                                    title="Undo" 
-                                                    onClick={() => handleUndo(lineItem.shopifyLineItemId)}
-                                                    className="bg-white text-blue-400 border border-blue-400 hover:bg-blue-200 w-16 h-16 rounded flex items-center justify-center"
-                                                >
-                                                    <ArrowPathIcon className="w-10 h-10" />
-                                                </button>
+                                                {lineItem?.packedStatus?.verified.quantity === lineItem?.pickedStatus?.verified.quantity &&
+                                                    <button
+                                                        title="Undo" 
+                                                        onClick={() => handleUndo(lineItem.shopifyLineItemId)}
+                                                        className="bg-white text-blue-400 border border-blue-400 hover:bg-blue-200 w-16 h-16 rounded flex items-center justify-center"
+                                                    >
+                                                        <ArrowPathIcon className="w-10 h-10" />
+                                                    </button>
+                                                }
                                                 
+                                                {lineItem?.packedStatus?.verified.quantity < lineItem?.pickedStatus?.verified.quantity && lineItem?.pickedStatus?.verified.quantity == 1 &&
+                                                    <button
+                                                        title = "Pick item"
+                                                        onClick={() => handlePackPlus(lineItem.shopifyLineItemId)}
+                                                        className="bg-white text-green-600 border border-green-600 hover:bg-green-200 w-16 h-16 rounded flex items-center justify-center"
+                                                    >
+                                                        <CheckIcon className="w-10 h-10" />
+                                                    </button>
+                                                }
+                                                {lineItem?.packedStatus?.verified.quantity < lineItem?.pickedStatus?.verified.quantity && lineItem?.pickedStatus?.verified.quantity != 1 &&
+                                                    <>
+                                                        <button
+                                                            title="Add one Item"
+                                                            onClick={() => handlePackPlus(lineItem.shopifyLineItemId)}
+                                                            className="bg-white text-blue-400 border border-blue-400 hover:bg-blue-200 w-16 h-16 rounded flex items-center justify-center"
+                                                        >
+                                                            <PlusIcon className="w-10 h-10" />
+                                                        </button>
+                                                        <button
+                                                            title="remove one Item"
+                                                            onClick={() => handlePackMinus(lineItem.shopifyLineItemId)}
+                                                            className="bg-white text-stone-400 border border-stone-400 hover:bg-stone-200 w-16 h-16 rounded flex items-center justify-center"
+                                                        >
+                                                            <MinusIcon className="w-10 h-10" />
+                                                        </button>
+                                                    </>
+                                                }
                                                 {  ((lineItem.pickedStatus.damaged.quantity > 0 && !lineItem.pickedStatus.damaged?.subbed) ||
                                                     (lineItem.pickedStatus.outOfStock.quantity > 0 && !lineItem.pickedStatus.outOfStock?.subbed)) && 
                                                     <button
@@ -570,7 +580,7 @@ export default function Finalise() {
                                         }
 
                                         {/*Picking Mode */}
-                                        {isPickingMode && 
+                                        {isPickingMode && !lineItem.refund  && 
                                             <>
                                                 {!lineItem.picked && lineItem.quantity <= 1 &&
                                                     <button
