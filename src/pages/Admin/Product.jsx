@@ -16,11 +16,11 @@ const Product = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(20); // Default to 20 products per page
-
   const [vendors, setVendors] = useState([]);
   const [statuses, setStatuses] = useState([]);
   const [selectedVendor, setSelectedVendor] = useState("Rita's Farm Produce");
   const [selectedStatus, setSelectedStatus] = useState("ACTIVE");
+  const [syncLoading, setSyncLoading] = useState(false);
 
   const token = localStorage.getItem("token");
 
@@ -90,6 +90,10 @@ const Product = () => {
     setCurrentPage(1); // Reset to the first page when the page size changes
   };
 
+  const handleSync = () => {
+
+  }
+
   if (loading) return <div className="p-4 text-center">Loading products...</div>;
 
   return (
@@ -99,9 +103,16 @@ const Product = () => {
           <div className="flex flex-col gap-4">
             {/* Sort and Pagination Controls */}
             <div className="flex flex-col justify-between gap-4 sm:flex-row">
-              <div className="flex space-x-4">
+              <div className="flex space-x-2">
+                <button
+                  className='px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md disabled:opacity-50'
+                  onClick={handleSync}
+                  disabled={syncLoading}
+                >
+                  Sync
+                </button>
                 <select
-                  className="px-4 py-2 border rounded-md"
+                  className="px-4 py-2 max-w-50 border rounded-md"
                   value={selectedVendor}
                   onChange={(e) => setSelectedVendor(e.target.value)}
                 >
