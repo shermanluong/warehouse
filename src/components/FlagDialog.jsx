@@ -90,11 +90,9 @@ const FlagDialog = ({ isOpen, onClose, lineItem, onSubmit, onSelectSubstitution 
                 <p className="font-semibold text-md text-gray-900 mb-2">
                   Price: ${lineItem?.variantInfo?.price}
                 </p>
-                <Spinbox
-                  value={flagQuantity}
-                  max={maxValue}
-                  OnValueChange={handleValueChange}
-                />
+                <p className="font-semibold text-md text-gray-900 mb-2">
+                  {flagQuantity} units
+                </p>
               </div>
             </div>
 
