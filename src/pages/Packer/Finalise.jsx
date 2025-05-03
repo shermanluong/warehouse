@@ -525,7 +525,7 @@ export default function Finalise() {
                                         {/*Packing Mode */}
                                         { !isPickingMode && !lineItem.refund && 
                                             <>
-                                                {lineItem.pickedStatus.verified.quantity === lineItem.packedStatus.verified.quantity &&
+                                                {lineItem.pickedStatus.verified.quantity === lineItem.packedStatus.verified.quantity && lineItem?.packedStatus?.verified.quantity !== 0 && 
                                                     <button
                                                         title="Undo" 
                                                         onClick={() => handleUndo(lineItem.shopifyLineItemId)}
