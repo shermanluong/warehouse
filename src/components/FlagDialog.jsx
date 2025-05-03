@@ -46,11 +46,11 @@ const FlagDialog = ({ isOpen, onClose, lineItem, onSubmit, onSelectSubstitution 
 
   const handleSelectSubstitute = (item) => {
     onSelectSubstitution({
-      flag: selectedFlag,
-      originalProductId: lineItem.productId,
-      originalVariantId: lineItem.variantId,
-      substituteProductId: item.shopifyProductId,
-      substituteVariantId: item.shopifyVariantId,
+      shopifyLineItemId: lineItem.shopifyLineItemId,
+      reason: selectedFlag,
+      quantity: flagQuantity,
+      subbedProductId: item.shopifyProductId,
+      subbedVariantId: item.shopifyVariantId,
     });
     onClose();
   };

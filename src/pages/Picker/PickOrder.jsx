@@ -138,20 +138,20 @@ const PickOrder = () => {
     };
 
     const handleSubstitutionSelect = async ({
-        flag,
-        originalProductId,
-        originalVariantId,
-        substituteProductId,
-        substituteVariantId,
+        shopifyLineItemId,
+        reason,
+        quantity,
+        subbedProductId,
+        subbedVariantId,
       }) => {
         await axios.patch(
-          `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-flag`,
+          `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-substitute`,
           {
-            productId: originalProductId,
-            variantId: originalVariantId,
-            reason: flag,
-            substituteProductId,
-            substituteVariantId,
+            shopifyLineItemId, 
+            reason,
+            quantity,
+            subbedProductId,
+            subbedVariantId,
           },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -387,27 +387,27 @@ const PickOrder = () => {
                                     </div>
                                 </div>
 
-                                {lineItem?.substitution?.substituteProductId && 
+                                {lineItem?.substitution?.shopifyVariantId && 
                                     <div
                                         className="flex flex-col sm:flex-row mt-4 justify-between border border-yellow-600 rounded-lg p-4"
                                     >
                                         {/* Left side: image + name + SKU */}
                                         <div className="flex items-start">
                                             <img
-                                                src={lineItem?.substitution?.variantInfo?.image}
-                                                alt={lineItem?.substitution?.variantInfo?.title}
+                                                src={lineItem?.substitution?.image}
+                                                alt={lineItem?.substitution?.title}
                                                 className="w-36 h-36 rounded object-cover"
                                                 onClick={() => {
-                                                    setEnlargedImage(lineItem?.substitution?.variantInfo?.image);
+                                                    setEnlargedImage(lineItem?.substitution?.image);
                                                     setIsImageOpen(true);
                                                 }}
                                             />
                                             <div className="ml-4 mt-2 sm:mt-0">
                                                 <h3 className="font-semibold text-2xl text-yellow-600">
-                                                    Subbed: {lineItem?.substitution?.variantInfo?.title}
+                                                    Subbed: {lineItem?.substitution?.title}
                                                 </h3>
 
-                                                <p className="font-semibold text-xl text-gray-900">SKU: {lineItem?.substitution?.variantInfo?.sku}</p>
+                                                <p className="font-semibold text-xl text-gray-900">SKU: {lineItem?.substitution?.sku}</p>
                                             </div>
                                         </div>
                                     </div>  
