@@ -144,11 +144,11 @@ export default function Finalise() {
         }
     };
 
-    const handleCancelSubstitution = async (productId, variantId) => {
+    const handleCancelSubstitution = async (shopifyLineItemId) => {
         try {
             await axios.patch(
                 `${import.meta.env.VITE_API_URL}/packer/order/${order._id}/cancel-sub-item`,
-                { productId, variantId },
+                { shopifyLineItemId },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
     
@@ -158,11 +158,11 @@ export default function Finalise() {
         }
     };
 
-    const handleConfirmSubstitution = async (productId, variantId) => {
+    const handleConfirmSubstitution = async (shopifyLineItemId) => {
         try {
             await axios.patch(
                 `${import.meta.env.VITE_API_URL}/packer/order/${order._id}/confirm-sub-item`,
-                { productId, variantId },
+                { shopifyLineItemId },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
     
@@ -275,7 +275,6 @@ export default function Finalise() {
     };
 
     const handleFlagSubmit = async ({ shopifyLineItemId, reason, quantity }) => {
-        console.log(quantity);
         await axios.patch(
             `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-flag`,
             { 
@@ -290,20 +289,20 @@ export default function Finalise() {
     };
 
     const handleSubstitutionSelect = async ({
-        flag,
-        originalProductId,
-        originalVariantId,
-        substituteProductId,
-        substituteVariantId,
+        shopifyLineItemId,
+        reason,
+        quantity,
+        subbedProductId,
+        subbedVariantId,
       }) => {
         await axios.patch(
-          `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-flag`,
+          `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-substitute`,
           {
-            productId: originalProductId,
-            variantId: originalVariantId,
-            reason: flag,
-            substituteProductId,
-            substituteVariantId,
+            shopifyLineItemId, 
+            reason,
+            quantity,
+            subbedProductId,
+            subbedVariantId,
           },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -526,7 +525,7 @@ export default function Finalise() {
                                         {/*Packing Mode */}
                                         { !isPickingMode && !lineItem.refund && 
                                             <>
-                                                {lineItem?.packedStatus?.verified.quantity === lineItem?.pickedStatus?.verified.quantity &&
+                                                {lineItem.pickedStatus.verified.quantity === lineItem.packedStatus.verified.quantity &&
                                                     <button
                                                         title="Undo" 
                                                         onClick={() => handleUndo(lineItem.shopifyLineItemId)}
@@ -536,15 +535,16 @@ export default function Finalise() {
                                                     </button>
                                                 }
                                                 
-                                                {lineItem?.packedStatus?.verified.quantity < lineItem?.pickedStatus?.verified.quantity && lineItem?.pickedStatus?.verified.quantity == 1 &&
+                                                {lineItem?.packedStatus?.verified.quantity === 0 && lineItem?.pickedStatus?.verified.quantity === 1 &&
                                                     <button
-                                                        title = "Pick item"
+                                                        title = "Pack item"
                                                         onClick={() => handlePackPlus(lineItem.shopifyLineItemId)}
                                                         className="bg-white text-green-600 border border-green-600 hover:bg-green-200 w-16 h-16 rounded flex items-center justify-center"
                                                     >
                                                         <CheckIcon className="w-10 h-10" />
                                                     </button>
                                                 }
+
                                                 {lineItem?.packedStatus?.verified.quantity < lineItem?.pickedStatus?.verified.quantity && lineItem?.pickedStatus?.verified.quantity != 1 &&
                                                     <>
                                                         <button
@@ -632,24 +632,24 @@ export default function Finalise() {
                                     </div>
                                 </div>
 
-                                {lineItem?.substitution?.substituteProductId && 
+                                {lineItem?.substitution?.shopifyVariantId && 
                                     <div
-                                        className="flex flex-col sm:flex-row  justify-between border border-yellow-600 rounded-lg p-4"
+                                        className="flex flex-col sm:flex-row justify-between border border-yellow-600 rounded-lg p-4 mt-4"
                                     >
                                         {/* Left side: image + name + SKU */}
                                         <div className="flex items-start">
                                             <img
-                                                src={lineItem?.substitution?.variantInfo?.image}
-                                                alt={lineItem?.substitution?.variantInfo?.title}
+                                                src={lineItem?.substitution?.image}
+                                                alt={lineItem?.substitution?.title}
                                                 className="w-36 h-36 rounded object-cover"
                                                 onClick = {() => {
-                                                    setEnlargedImage(lineItem?.substitution?.variantInfo?.image);
+                                                    setEnlargedImage(lineItem?.substitution?.image);
                                                     setIsImageOpen(true);
                                                 }}
                                             />
                                             <div className="ml-4 mt-2 sm:mt-0">
                                                 <h3 className="font-semibold text-2xl text-yellow-600">
-                                                    Subbed: {lineItem?.substitution?.variantInfo?.title}
+                                                    Subbed: {lineItem?.substitution?.title}
                                                 </h3>
 
                                                 <div className="flex gap-2 mt-2 mb-2">
@@ -658,23 +658,23 @@ export default function Finalise() {
                                                     )}
                                                 </div>
 
-                                                <p className="font-semibold text-xl text-gray-900">SKU: {lineItem?.substitution?.variantInfo?.sku}</p>
+                                                <p className="font-semibold text-xl text-gray-900">SKU: {lineItem?.substitution?.sku}</p>
                                             </div>
                                         </div>
                                         
                                         <div className="flex justify-end mt-4 space-x-3 sm:flex-col sm:justify-start sm:mt-0 sm:space-x-0 sm:space-y-2 ">
-                                            {!lineItem?.substitution?.used && (
+                                            {!isPickingMode && !lineItem?.subbed && (
                                                 <>
                                                     <button
                                                         title = "Confirm Substitution"
-                                                        onClick={() => handleConfirmSubstitution(lineItem?.productId, lineItem?.variantId)}
+                                                        onClick={() => handleConfirmSubstitution(lineItem?.shopifyLineItemId)}
                                                         className="bg-white text-green-600 border border-green-600 hover:bg-green-200 w-16 h-16 rounded flex items-center justify-center"
                                                     >
                                                         <CheckIcon className="w-10 h-10" />
                                                     </button>
                                                     <button
                                                         title = "Cancel Substitution" 
-                                                        onClick={() => handleCancelSubstitution(lineItem?.productId, lineItem?.variantId)}
+                                                        onClick={() => handleCancelSubstitution(lineItem?.shopifyLineItemId)}
                                                         className="bg-white text-red-600 border border-red-600 hover:bg-red-200 w-16 h-16 rounded flex items-center justify-center"
                                                     >
                                                         <XMarkIcon className="w-10 h-10" />
