@@ -211,7 +211,9 @@ export default function Finalise() {
         try {
             await axios.post(
                 `${import.meta.env.VITE_API_URL}/packer/order/${order._id}/complete-packing`, 
-                {},
+                {
+                    boxCount
+                },
                 { headers: { Authorization: `Bearer ${token}` } 
             });
             navigate(`/packer/orders`);
