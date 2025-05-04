@@ -9,7 +9,8 @@ import {
     PencilSquareIcon,
     ArrowPathIcon,
     CurrencyDollarIcon,
-    XMarkIcon
+    XMarkIcon,
+    PrinterIcon
 } from '@heroicons/react/24/outline'
 import axios from 'axios';
 import dataURLToFile from '../../utils/dataURLToFile';
@@ -19,6 +20,7 @@ import ImageZoomModal from '../../components/ImageZoomModal';
 import Spinbox from '../../components/Spinbox';
 import SwitchButton from '../../components/SwitchButton';
 import FlagDialog from '../../components/FlagDialog'
+import { generatePackingSlip, generateDeliveryLabel } from '../../utils/print'; // Adjust the path if necessary
 
 export default function Finalise() {
     const { id } = useParams();
@@ -206,6 +208,25 @@ export default function Finalise() {
     const handBoxCountChange = (newValue) => {
         setBoxCount(newValue);
     }
+
+    const handlePrint = (pdfDoc) => {
+        const printWindow = window.open('', '', 'height=600,width=800');
+        printWindow.document.write('<html><head><title>Print</title></head><body>');
+        printWindow.document.write(pdfDoc.output('datauristring'));
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+        printWindow.print();
+    };
+
+    const handlePrintPackingSlip = () => {
+        //handlePrint(generatePackingSlip(order));
+        generatePackingSlip(order);
+    };
+
+    const handlePrintDeliveryLabel = () => {
+        //handlePrint(generateDeliveryLabel(order, boxCount));
+        generateDeliveryLabel(order, boxCount);
+    };
 
     const handleCompletePacking = async () => {
         try {
@@ -740,13 +761,31 @@ export default function Finalise() {
                         </div>
                     </div>
 
-                    <div className='flex justify-start items-center mt-3'>
-                        <p className='text-md font-semibold mr-2'>Box Count : </p>
-                        <Spinbox
-                            value = {boxCount}
-                            max= {10}
+                    <div className='flex justify-between mt-3'>
+                        <div className='flex items-center'>
+                            <p className='text-md font-semibold mr-2'>Box Count:</p>
+                            <Spinbox
+                            value={boxCount}
+                            max={10}
                             OnValueChange={handBoxCountChange}
-                        />
+                            />
+                        </div>
+                        <div className='flex space-x-2'>
+                            <button
+                            className='w-10 h-10 bg-gray-200 hover:bg-gray-300 rounded'
+                            title="Print Packing Slip"
+                            onClick={handlePrintPackingSlip}
+                            >
+                            <PrinterIcon />
+                            </button>
+                            <button
+                            className='w-10 h-10 bg-gray-200 hover:bg-gray-300 rounded'
+                            title="Print Box Labels"
+                            onClick={handlePrintDeliveryLabel}
+                            >
+                            <PrinterIcon />
+                            </button>
+                        </div>
                     </div>
                     
                     {/* Submit Button */}
