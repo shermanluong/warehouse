@@ -4,6 +4,7 @@ import axios from 'axios';
 import Layout from '../../layouts/layout';
 import { 
     ArrowLeftIcon, 
+    ArrowPathIcon, 
     ArrowRightIcon, 
 } from '@heroicons/react/24/outline'
 
@@ -24,31 +25,31 @@ const Product = () => {
 
   const token = localStorage.getItem("token");
 
+  const fetchProducts = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/admin/getProducts`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: {
+          search: searchTerm,
+          sort: sortOption,
+          order: sortOrder,
+          page: currentPage,
+          limit: pageSize,
+          vendor: selectedVendor || undefined, // Only send if selected
+          status: selectedStatus || undefined,
+        }
+      });
+
+      setProducts(res?.data?.products || []);
+      setTotalPages(Math.ceil(res?.data?.total / pageSize));
+    } catch (err) {
+      console.error('Failed to fetch products:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/admin/getProducts`, {
-          headers: { Authorization: `Bearer ${token}` },
-          params: {
-            search: searchTerm,
-            sort: sortOption,
-            order: sortOrder,
-            page: currentPage,
-            limit: pageSize,
-            vendor: selectedVendor || undefined, // Only send if selected
-            status: selectedStatus || undefined,
-          }
-        });
-  
-        setProducts(res?.data?.products || []);
-        setTotalPages(Math.ceil(res?.data?.total / pageSize));
-      } catch (err) {
-        console.error('Failed to fetch products:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-  
     fetchProducts();
   }, [searchTerm, sortOption, sortOrder, currentPage, pageSize, selectedVendor, selectedStatus]);
 
@@ -90,8 +91,25 @@ const Product = () => {
     setCurrentPage(1); // Reset to the first page when the page size changes
   };
 
-  const handleSync = () => {
+  const handleSync = async  () => {
+    setSyncLoading(true);
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/shopify/sync-products`,
+        { 
+          headers: { Authorization: `Bearer ${token}` },
+          params: {
+          }
+        }
+      );
 
+      fetchProducts();
+    } catch (error) {
+      console.error("Failed to sync products:",  error);
+      alert("Error syncing products. Please try again.")
+    } finally {
+      setSyncLoading(false);
+    }
   }
 
   if (loading) return <div className="p-4 text-center">Loading products...</div>;
@@ -109,7 +127,11 @@ const Product = () => {
                   onClick={handleSync}
                   disabled={syncLoading}
                 >
-                  Sync
+                  {syncLoading ? (
+                    <ArrowPathIcon className="animate-spin h-5 w-5 text-white"/>
+                  ) : (
+                    'Sync'
+                  )}
                 </button>
                 <select
                   className="px-4 py-2 max-w-50 border rounded-md"
