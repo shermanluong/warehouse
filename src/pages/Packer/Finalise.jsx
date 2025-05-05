@@ -763,27 +763,29 @@ export default function Finalise() {
 
                     <div className='flex justify-between mt-3'>
                         <div className='flex items-center'>
-                            <p className='text-md font-semibold mr-2'>Box Count:</p>
+                            <p className='text-xl font-semibold mr-2'>Box Count:</p>
                             <Spinbox
                             value={boxCount}
                             max={10}
                             OnValueChange={handBoxCountChange}
                             />
                         </div>
-                        <div className='flex space-x-2'>
+                        <div className='flex space-x-3 items-center'>
+                            <p className='font-semibold text-xl'>Slip</p>
                             <button
-                            className='w-10 h-10 bg-gray-200 hover:bg-gray-300 rounded'
-                            title="Print Packing Slip"
-                            onClick={handlePrintPackingSlip}
+                                className='px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 rounded-md'
+                                title="Print Packing Slip"
+                                onClick={handlePrintPackingSlip}
                             >
-                            <PrinterIcon />
+                                <PrinterIcon className='w-8 h-8'/>
                             </button>
+                            <p className='font-semibold text-xl'>Label</p>
                             <button
-                            className='w-10 h-10 bg-gray-200 hover:bg-gray-300 rounded'
-                            title="Print Box Labels"
-                            onClick={handlePrintDeliveryLabel}
+                                className='px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 rounded-md'
+                                title="Print Box Labels"
+                                onClick={handlePrintDeliveryLabel}
                             >
-                            <PrinterIcon />
+                                <PrinterIcon className='w-8 h-8'/>
                             </button>
                         </div>
                     </div>

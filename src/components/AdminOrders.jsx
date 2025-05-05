@@ -126,7 +126,6 @@ const AdminOrders = () => {
   const handleImport = async () => {
     setLoading(true); // Set loading to true when the import process starts
     try {
-      console.log("OK");
       // Send note to backend
       const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/shopify/sync-orders`,
