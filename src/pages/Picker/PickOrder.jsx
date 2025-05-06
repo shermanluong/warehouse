@@ -113,10 +113,10 @@ const PickOrder = () => {
     
                 fetchOrder();
             } catch (err) {
-                console.error("Failed to increment pick count:", err);
+                console.error("Failed to scan barcode for picking", err);
             }
         } else {
-            console.log("1 No matching line item found");
+            console.log("No matching line item found");
         }
     };
     

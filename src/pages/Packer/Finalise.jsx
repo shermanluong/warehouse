@@ -14,7 +14,7 @@ import {
 } from '@heroicons/react/24/outline'
 import axios from 'axios';
 import dataURLToFile from '../../utils/dataURLToFile';
-import BarcodeScannerComponent from "react-qr-barcode-scanner";
+import BarcodeScanner from '../../components/BarcodeScanner';
 import CameraModal from '../../components/CameraModal';
 import ImageZoomModal from '../../components/ImageZoomModal';
 import Spinbox from '../../components/Spinbox';
@@ -193,15 +193,25 @@ export default function Finalise() {
         }
     };
 
-    const handleScan = async (err, result)=> {
-        if (isScanning.current) {
-            if (result) {
-                setBarcode(result.text);
-                handlePickPlus(result.text);
+    const handleScan = async (barcode) => {
+        const scannedItem = order?.lineItems.find(
+            (item) => item.variantInfo?.barcode == barcode
+        );
+    
+        if (scannedItem) {
+            try {
+                await axios.patch(
+                    `${import.meta.env.VITE_API_URL}/packer/order/${order._id}/pack-plus`,
+                    { shopifyLineItemId: scannedItem.shopifyLineItemId },
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+        
+                fetchOrder();
+            } catch (err) {
+                console.error("Failed to scan barcode for packing", err);
             }
-            else setBarcode("Not Found");
         } else {
-            setBarcode("Not Found");
+            console.log("No matching line item found");
         }
     };
 
@@ -370,66 +380,9 @@ export default function Finalise() {
                         </div>
                     )}
 
-                    {/* Scan input and buttons */}
-                    {!isScanningPreview && (
-                        <div className="flex flex-col sm:flex-row sm:space-x-2 mb-3">
-                            <input
-                                type="text"
-                                placeholder="Scan item barcode"
-                                className="flex-1 border border-gray-300 rounded-md p-2 mb-4 sm:mb-0"
-                            />
-                            <div className="flex flex-row space-x-2">
-                                <button className="flex-1 bg-blue-500 text-white p-2 px-4 rounded-md hover:bg-blue-600">
-                                <PencilSquareIcon className="w-5 h-5" />
-                                </button>
-                                <button
-                                    className="border border-gray-500 bg-white p-2 px-4 rounded-md hover:bg-gray-600"
-                                    onClick={() => setIsScanningPreview(true)}
-                                >
-                                    <CameraIcon className="w-5 h-5" />
-                                </button>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Barcode Scanner */}
-                    {isScanningPreview && (
-                        <>
-                            <div className="relative w-full h-64 bg-gray-200 mb-4 overflow-hidden flex justify-center items-center">
-                                <BarcodeScannerComponent
-                                    onUpdate={(err, result) => handleScan(err, result)}
-                                />
-                            </div>
-                            <div className="flex flex-row mb-3 gap-1">
-                                <button
-                                    className={`flex flex-1 items-center justify-center gap-2 text-white rounded-md p-2 ${
-                                        isScanning.current ? "bg-red-500 hover:bg-red-600" : "bg-blue-500 hover:bg-blue-600"
-                                    }`}
-                                    onClick={() => {
-                                        isScanning.current = !isScanning.current;
-                                        setIsButtonScanning(!isButtonScanning);
-                                    }}
-                                >
-                                <CameraIcon className="w-5 h-5" />
-                                {isScanning.current ? "Stop Scanning" : "Start Scanning"}
-                                </button>
-                                <button
-                                    className="border border-gray-500 px-4 rounded-md hover:bg-gray-600"
-                                    onClick={() => setIsScanningPreview(false)}
-                                >
-                                    <PencilSquareIcon className="w-5 h-5" />
-                                </button>
-                            </div>
-                        </>
-                    )}
-
-                    {/* Display Scanned Barcode */}
-                    <div className="mb-4">
-                        <SwitchButton 
-                            isChecked = {isPickingMode}
-                            OnValueChange = {handleChangeMode}
-                        />
-                    </div>
+                    <BarcodeScanner 
+                        OnScan={handleScan}
+                    />
 
                     {/* Cards */}
                     <div className="flex flex-col gap-4">
