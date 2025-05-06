@@ -8,7 +8,7 @@ import {
 } from '@heroicons/react/24/outline'
 import axios from 'axios';
 
-const PickLineItem = ({ orderId, lineItem, OnClickImage, OnRefresh }) => {
+const PickLineItem = ({ orderId, lineItem, OnClickImage, OnRefresh, OnFlagDialog }) => {
     const token = localStorage.getItem("token");
 
     const handlePickPlus = async (shopifyLineItemId) => {
@@ -153,7 +153,7 @@ const PickLineItem = ({ orderId, lineItem, OnClickImage, OnRefresh }) => {
                     {!lineItem.picked && 
                         <button 
                             title = "Flag Item"
-                            onClick={() => openFlagDialog(lineItem)}
+                            onClick={() => OnFlagDialog(lineItem)}
                             className="bg-white text-red-600 border border-red-600 hover:bg-red-200 w-16 h-16 rounded flex items-center justify-center"
                         >
                             <XMarkIcon className="w-10 h-10" />

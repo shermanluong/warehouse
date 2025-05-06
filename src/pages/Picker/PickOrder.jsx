@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import React, { useEffect, useState, useRef} from 'react';
+import React, { useEffect, useState} from 'react';
 import FlagDialog from '../../components/FlagDialog'
 import axios from 'axios';
 import Layout from '../../layouts/layout';
@@ -12,10 +12,11 @@ const PickOrder = () => {
     const navigate = useNavigate();
     const [order, setOrder] = useState(null);
     const [lineItems, setLineItems] = useState([]);
-    const isScanning = useRef(false);
     const [allPicked, setAllPicked] = useState(false);
     const [enlargedImage, setEnlargedImage] = useState('');
     const [isImageOpen, setIsImageOpen] = useState(false);
+    const [showDialog, setShowDialog] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
     
     const token = localStorage.getItem("token");
 
@@ -36,18 +37,6 @@ const PickOrder = () => {
         ));
     }, [lineItems]);
 
-    const handleScan = async (err, result)=> {
-        if (isScanning.current) {
-            if (result) {
-                setBarcode(result.text);
-                handlePickPlus(result.text);
-            }
-            else setBarcode("Not Found");
-        } else {
-            setBarcode("Not Found");
-        }
-    };
-
     const handleCompletePicking = async () => {
         console.log(token);
         try {
@@ -61,9 +50,6 @@ const PickOrder = () => {
           console.error(err?.response?.data?.message);
         }
     };
-
-    const [showDialog, setShowDialog] = useState(false);
-    const [selectedItem, setSelectedItem] = useState(null);
 
     const openFlagDialog = (item) => {
         setSelectedItem(item);
@@ -161,10 +147,11 @@ const PickOrder = () => {
                         {lineItems.map((lineItem) => (
                             <PickLineItem 
                                 key={lineItem.shopifyLineItemId}
-                                orderId={order._id}
-                                lineItem={lineItem}
+                                orderId = {order._id}
+                                lineItem = {lineItem}
                                 OnRefresh = {fetchOrder}
-                                OnClickImage={handleClickImage}
+                                OnClickImage = {handleClickImage}
+                                OnFlagDialog = {openFlagDialog}
                             />
                         ))}
                     </div>
