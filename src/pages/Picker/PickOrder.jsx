@@ -141,7 +141,9 @@ const PickOrder = () => {
                         </div>
                     )}
 
-                    <BarcodeScanner />
+                    <BarcodeScanner 
+                        order = {order}
+                    />
 
                     <div className="flex flex-col gap-4">
                         {lineItems.map((lineItem) => (
@@ -169,15 +171,13 @@ const PickOrder = () => {
                     </button>
                 </div>
             </div>
-            {showDialog && selectedItem && (
-                <FlagDialog
-                    isOpen={showDialog}
-                    onClose={() => setShowDialog(false)}
-                    lineItem={selectedItem}
-                    onSubmit={handleFlagSubmit}
-                    onSelectSubstitution= {handleSubstitutionSelect}
-                />
-            )}
+            <FlagDialog
+                isOpen={showDialog}
+                onClose={() => setShowDialog(false)}
+                lineItem={selectedItem}
+                onSubmit={handleFlagSubmit}
+                onSelectSubstitution= {handleSubstitutionSelect}
+            />
             <ImageZoomModal
                 isOpen={isImageOpen}
                 onClose={() => setIsImageOpen(false)}

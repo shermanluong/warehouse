@@ -2,11 +2,11 @@ import React, { useState, useRef } from 'react';
 import { PencilSquareIcon, CameraIcon } from '@heroicons/react/24/outline';
 import BarcodeScannerComponent from 'react-qr-barcode-scanner';
 
-const BarcodeScanner = () => {
+const BarcodeScanner = ({order}) => {
     const [isScanningPreview, setIsScanningPreview] = useState(false);
-    const [barcode, setBarcode] = useState('');
     const [isButtonScanning, setIsButtonScanning] = useState(false);
     const isScanning = useRef(false);
+    const [barcode, setBarcode] = useState('');
 
     const handleScan = (err, result) => {
         if (result?.text && isScanning.current) {
@@ -19,25 +19,24 @@ const BarcodeScanner = () => {
     return (
         <>
             {!isScanningPreview && ( 
-                <div className="flex flex-col sm:flex-row sm:space-x-2 mb-3">
+                <div className="flex space-x-2 mb-3">
                     <input
                         type="text"
                         placeholder="Type item barcode"
-                        className="flex-1 border border-gray-300 rounded-md p-2 mb-4 sm:mb-0"
+                        className="flex-1 border border-gray-300 rounded-md p-2 mb-0"
                         value={barcode}
                         onChange={(e) => setBarcode(e.target.value)}
                     />
-                    <div className="flex flex-row space-x-2">
-                        <button className="flex-1 bg-blue-500 text-white p-2 px-4 rounded-md hover:bg-blue-600">
-                            <PencilSquareIcon className="w-5 h-5" />
-                        </button>
-                        <button 
-                            className="border border-gray-500 bg-white p-2 px-4 rounded-md hover:bg-gray-600"
-                            onClick={() => setIsScanningPreview(true)}
-                        >
-                            <CameraIcon className="w-5 h-5" />
-                        </button>
-                    </div>
+                   
+                    <button className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
+                        <PencilSquareIcon className="w-5 h-5" />
+                    </button>
+                    <button 
+                        className="border border-gray-500 bg-white p-2 px-4 rounded-md hover:bg-gray-600"
+                        onClick={() => setIsScanningPreview(true)}
+                    >
+                        <CameraIcon className="w-5 h-5" />
+                    </button>
                 </div>
             )}
 
