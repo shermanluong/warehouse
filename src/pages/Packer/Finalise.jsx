@@ -386,7 +386,14 @@ export default function Finalise() {
                     />
 
                     <p className='mb-2'>Scanned Barcode: {barcodeStatus}</p>
-
+                    
+                    <div className='mb-2'>
+                        <SwitchButton 
+                            isChecked = {isPickingMode}
+                            OnValueChange={handleChangeMode}
+                        />
+                    </div>
+                    
                     {/* Cards */}
                     <div className="flex flex-col gap-4">
                         {lineItems.map((lineItem) => (
