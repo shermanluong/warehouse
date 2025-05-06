@@ -27,10 +27,7 @@ export default function Finalise() {
     const navigate = useNavigate();
     const [order, setOrder] = useState(null);
     const [lineItems, setLineItems] = useState([]);
-    const [isScanningPreview, setIsScanningPreview] = useState(false);
-    const [barcode, setBarcode] = useState("");
-    const isScanning = useRef(false);
-    const [isButtonScanning, setIsButtonScanning] = useState(false);
+    const [barcodeStatus, setBarcodeStatus] = useState('');
     const [modalOpen, setModalOpen] = useState(false);
     const [capturedPhotos, setCapturedPhotos] = useState([]);
     const [isImageOpen, setIsImageOpen] = useState(false);
@@ -42,7 +39,6 @@ export default function Finalise() {
 
     
     useEffect(() => {
-        console.log('test');
         fetchOrder();
     }, [id]);
 
@@ -194,27 +190,32 @@ export default function Finalise() {
     };
 
     const handleScan = async (barcode) => {
-        const scannedItem = order?.lineItems.find(
-            (item) => item.variantInfo?.barcode == barcode
+        const scannedItem = lineItems.find(
+            (item) => item.variantInfo?.barcode === barcode
         );
-    
-        if (scannedItem) {
+
+        if (!scannedItem) {
+            setBarcodeStatus("No matching item found for the scanned barcode.");
+        } else if (scannedItem.packed) {
+            setBarcodeStatus("This item is already packed.");
+        } else {
             try {
                 await axios.patch(
                     `${import.meta.env.VITE_API_URL}/packer/order/${order._id}/pack-plus`,
                     { shopifyLineItemId: scannedItem.shopifyLineItemId },
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
-        
+                setBarcodeStatus(`Successfully packed: ${scannedItem.productTitle}`);
                 fetchOrder();
             } catch (err) {
-                console.error("Failed to scan barcode for packing", err);
+                console.error("Failed to update packing status:", err);
+                setBarcodeStatus("Failed to update packing status.");
             }
-        } else {
-            console.log("No matching line item found");
         }
+    
+        setTimeout(() => setBarcodeStatus(""), 2000);
     };
-
+    
     const handBoxCountChange = (newValue) => {
         setBoxCount(newValue);
     }
@@ -383,6 +384,8 @@ export default function Finalise() {
                     <BarcodeScanner 
                         OnScan={handleScan}
                     />
+
+                    <p className='mb-2'>Scanned Barcode: {barcodeStatus}</p>
 
                     {/* Cards */}
                     <div className="flex flex-col gap-4">

@@ -17,15 +17,9 @@ const PickOrder = () => {
     const [isImageOpen, setIsImageOpen] = useState(false);
     const [showDialog, setShowDialog] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [barcodeStatus, setBarcodeStatus] = useState('');
     
     const token = localStorage.getItem("token");
-
-    const fetchOrder = async () => {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/picker/order/${id}`, { headers: { Authorization: `Bearer ${token}` } });
-        setOrder(res?.data || null);
-        setLineItems(res?.data?.lineItems);
-        console.log(res?.data);
-    };
 
     useEffect(() => {
         fetchOrder();
@@ -98,26 +92,38 @@ const PickOrder = () => {
         setIsImageOpen(true);
     };
 
+    const fetchOrder = async () => {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/picker/order/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+        setOrder(res?.data || null);
+        setLineItems(res?.data?.lineItems);
+        console.log(res?.data);
+    };
+
     const handleScan = async (barcode) => {
-        const scannedItem = order?.lineItems.find(
-            (item) => item.variantInfo?.barcode == barcode
+        const scannedItem = lineItems.find(
+            (item) => item.variantInfo?.barcode === barcode
         );
-    
-        if (scannedItem) {
+            
+        if (!scannedItem) {
+            setBarcodeStatus("No matching item found for the scanned barcode.");
+        } else if (scannedItem.picked) {
+            setBarcodeStatus("This item has already been picked.");
+        } else {
             try {
                 await axios.patch(
                     `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-plus`,
                     { shopifyLineItemId: scannedItem.shopifyLineItemId },
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
-    
+                setBarcodeStatus(`Successfully picked: ${scannedItem.productTitle}`);
                 fetchOrder();
             } catch (err) {
-                console.error("Failed to scan barcode for picking", err);
+                console.error("Failed to update picking status:", err);
+                setBarcodeStatus("Failed to update picking status.");
             }
-        } else {
-            console.log("No matching line item found");
         }
+    
+        setTimeout(() => setBarcodeStatus(""), 2000);
     };
     
     if (!order) return <div>Loading...</div>;
@@ -166,6 +172,8 @@ const PickOrder = () => {
                     <BarcodeScanner 
                         OnScan={handleScan}
                     />
+
+                    <p className='mb-2'>Scanned Barcode: {barcodeStatus}</p>
 
                     <div className="flex flex-col gap-4">
                         {lineItems.map((lineItem) => (

@@ -72,10 +72,6 @@ const BarcodeScanner = ({OnScan}) => {
                     </div>
                 </>
             )}
-
-            <div>
-                <p>Scanned Barcode: {barcode}</p>
-            </div>
         </>
     );
 };
