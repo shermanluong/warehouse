@@ -5,7 +5,7 @@ import axios from 'axios';
 import Layout from '../../layouts/layout';
 import ImageZoomModal from '../../components/ImageZoomModal';
 import BarcodeScanner from '../../components/BarcodeScanner';
-import PickOrderComponent from '../../components/PickOrderComponent';
+import PickLineItem from '../../components/PickLineItem';
 
 const PickOrder = () => {
     const { id } = useParams();
@@ -35,48 +35,6 @@ const PickOrder = () => {
             item => item.picked
         ));
     }, [lineItems]);
-
-    const handlePickPlus = async (shopifyLineItemId) => {
-        try {
-            await axios.patch(
-                `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-plus`,
-                { shopifyLineItemId },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-    
-            fetchOrder();
-        } catch (err) {
-            console.error('Failed to pick plus', err);
-        }
-    };
-
-    const handlePickMinus = async (shopifyLineItemId) => {
-        try {
-            await axios.patch(
-                `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-minus`,
-                { shopifyLineItemId },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-    
-            fetchOrder();
-        } catch (err) {
-            console.error('Failed to pick minus', err);
-        }
-    };
-
-    const handleUndo = async (shopifyLineItemId) => {
-        try {
-            await axios.patch(
-                `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/undo-item`,
-                { shopifyLineItemId },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-    
-            fetchOrder();
-        } catch (err) {
-            console.error('Failed to undo', err);
-        }
-    };
 
     const handleScan = async (err, result)=> {
         if (isScanning.current) {
@@ -201,9 +159,11 @@ const PickOrder = () => {
 
                     <div className="flex flex-col gap-4">
                         {lineItems.map((lineItem) => (
-                            <PickOrderComponent 
+                            <PickLineItem 
                                 key={lineItem.shopifyLineItemId}
+                                orderId={order._id}
                                 lineItem={lineItem}
+                                OnRefresh = {fetchOrder}
                                 OnClickImage={handleClickImage}
                             />
                         ))}

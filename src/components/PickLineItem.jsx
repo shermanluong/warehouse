@@ -6,9 +6,53 @@ import {
     CheckIcon,
     ArrowPathIcon
 } from '@heroicons/react/24/outline'
+import axios from 'axios';
 
-const PickOrderComponent = ({ lineItem, OnClickImage }) => {
+const PickLineItem = ({ orderId, lineItem, OnClickImage, OnRefresh }) => {
+    const token = localStorage.getItem("token");
+
+    const handlePickPlus = async (shopifyLineItemId) => {
+        try {
+            await axios.patch(
+                `${import.meta.env.VITE_API_URL}/picker/order/${orderId}/pick-plus`,
+                { shopifyLineItemId },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
     
+            OnRefresh();
+        } catch (err) {
+            console.error('Failed to pick plus', err);
+        }
+    };
+
+    const handlePickMinus = async (shopifyLineItemId) => {
+        try {
+            await axios.patch(
+                `${import.meta.env.VITE_API_URL}/picker/order/${orderId}/pick-minus`,
+                { shopifyLineItemId },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+    
+            OnRefresh();
+        } catch (err) {
+            console.error('Failed to pick minus', err);
+        }
+    };
+
+    const handleUndo = async (shopifyLineItemId) => {
+        try {
+            await axios.patch(
+                `${import.meta.env.VITE_API_URL}/picker/order/${orderId}/undo-item`,
+                { shopifyLineItemId },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+    
+            OnRefresh();
+        } catch (err) {
+            console.error('Failed to undo', err);
+        }
+    };
+
     return (
         <div className = "border border-gray-200 rounded-lg p-4 shadow-md">
             <div className="flex flex-col sm:flex-row justify-between">
@@ -68,7 +112,7 @@ const PickOrderComponent = ({ lineItem, OnClickImage }) => {
                         {lineItem.adminNote && (
                         <p className="text-xl text-red-600 mt-1">Admin: {lineItem.adminNote}</p>
                         )}
-                        
+
                         {lineItem.customerNote && (
                         <p className="text-xl text-blue-600 mt-1">Customer: {lineItem.customerNote}</p>
                         )}
@@ -154,4 +198,4 @@ const PickOrderComponent = ({ lineItem, OnClickImage }) => {
     );
 };
 
-export default PickOrderComponent;
+export default PickLineItem;
