@@ -98,6 +98,28 @@ const PickOrder = () => {
         setIsImageOpen(true);
     };
 
+    const handleScan = async (barcode) => {
+        const scannedItem = order?.lineItems.find(
+            (item) => item.variantInfo?.barcode == barcode
+        );
+    
+        if (scannedItem) {
+            try {
+                await axios.patch(
+                    `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-plus`,
+                    { shopifyLineItemId: scannedItem.shopifyLineItemId },
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+    
+                fetchOrder();
+            } catch (err) {
+                console.error("Failed to increment pick count:", err);
+            }
+        } else {
+            console.log("1 No matching line item found");
+        }
+    };
+    
     if (!order) return <div>Loading...</div>;
 
     return (
@@ -142,7 +164,7 @@ const PickOrder = () => {
                     )}
 
                     <BarcodeScanner 
-                        order = {order}
+                        OnScan={handleScan}
                     />
 
                     <div className="flex flex-col gap-4">
