@@ -295,7 +295,7 @@ const PickOrder = () => {
 
                                             <p className="font-semibold text-xl text-gray-900">SKU: {lineItem?.variantInfo?.sku}</p>
                                             {lineItem?.variantInfo?.barcode && 
-                                                <p className="font-semibold text-lg text-gray-900">Barcode: {lineItem?.variantInfo?.barcode}</p>
+                                                <p className="font-semibold text-lg text-yellow-900">Barcode: {lineItem?.variantInfo?.barcode}</p>
                                             }
                                             <span className="font-semibold text-xl text-gray-900">
                                                 { 
