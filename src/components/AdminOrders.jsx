@@ -190,10 +190,61 @@ const AdminOrders = () => {
               {/*Right section*/}
               <div className="flex items-center">
                 {/*Date picker section*/}
+                <select
+                    className="px-4 py-2 border rounded-md"
+                    value={pageSize}
+                    onChange={handlePageSizeChange}
+                >
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={30}>30</option>
+                    <option value={50}>50</option>
+                </select>
+                <select
+                    className="px-4 py-2 ml-2 border rounded-md"
+                    value={pageSize}
+                    onChange={handlePageSizeChange}
+                >
+                  <option value='All'>All</option>
+                  <option value='Zone1'>Zone1</option>
+                  <option value='Zone2'>Zone2</option>
+                  <option value='Zone3'>Zone3</option>
+                  <option value='Zone4'>Zone4</option>
+                  <option value='Zone5'>Zone5</option>
+                  <option value='Zone6'>Zone6</option>
+                  <option value='Zone7'>Zone7</option>
+                  <option value='Zone8'>Zone8</option>
+                  <option value='Zone9'>Zone9</option>
+                  <option value='Zone10'>Zone10</option>
+                  <option value='Zone11'>Zone11</option>
+                  <option value='Zone12'>Zone12</option>
+                  <option value='Zone13'>Zone13</option>
+                  <option value='Zone14'>Zone14</option>
+                  <option value='Zone15'>Zone15</option>
+                  <option value='Zone16'>Zone16</option>
+                  <option value='NEWY'>NEWY</option>
+                  <option value='Central Coast'>Central Coast</option>
+                  <option value='WOOL'>WOOL</option>
+                  <option value='ACT'>ACT</option>
+                  <option value='PickUp'>PickUp</option>
+                  <option value='BONDI'>BONDI</option>
+                  <option value='Wollongong'>Wollongong</option>
+                  <option value='Ramsgate'>Ramsgate</option>
+                  <option value='Warwick Farm'>Warwick Farm</option>
+                  <option value='Kingscross'>Kingscross</option>
+                  <option value='Kiama'>Kiama</option>
+                  <option value='Berry'>Berry</option>
+                  <option value='Canberra Sat'>Canberra Sat</option>
+                  <option value='Mona Vale'>Mona Vale</option>
+                  <option value='Manly'>Manly</option>
+                  <option value='Marrickville'>Marrickville</option>
+                  <option value='Haig'>Haig</option>
+                  <option value='Gosford'>Gosford</option>
+                </select>
                 <DatePicker
                   selected={selectedDate}
                   onChange={handleDatechange}
-                  className="px-4 py-2 border rounded-md"
+                  className="px-4 py-2 ml-2 border rounded-md"
                   dateFormat="yyyy/MM/dd"
                 />
                 <button
