@@ -28,6 +28,7 @@ const AdminOrders = () => {
   const [selectedDate, setSelecteDate] = useState(null);
   const [formattedDate, setFormattedDate] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [tag, setTag] = useState('');
 
   useEffect(() => {
     const today = new Date();
@@ -145,6 +146,10 @@ const AdminOrders = () => {
       setLoading(false); // Set loading to false once the import is finished
     }
   };
+
+  const handleTagChange = (e) => {
+    setTag(e.target.value)
+  };
   
   return (
       <>
@@ -202,10 +207,10 @@ const AdminOrders = () => {
                 </select>
                 <select
                     className="px-4 py-2 ml-2 border rounded-md"
-                    value={pageSize}
-                    onChange={handlePageSizeChange}
+                    value={tag}
+                    onChange={handleTagChange}
                 >
-                  <option value='All'>All</option>
+                  <option value=''>All</option>
                   <option value='Zone1'>Zone1</option>
                   <option value='Zone2'>Zone2</option>
                   <option value='Zone3'>Zone3</option>
