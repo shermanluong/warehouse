@@ -159,7 +159,9 @@ const AdminOrders = () => {
         { 
           headers: { Authorization: `Bearer ${token}` },
           params: {
-            tripDate: formattedDate
+            tripDate: formattedDate,
+            driver: selectedDriver,
+            tag: selectedTag
           }
         }
       );
