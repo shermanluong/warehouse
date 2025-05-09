@@ -154,7 +154,7 @@ const PickOrder = () => {
                                 {order?.customer?.first_name} {order?.customer?.last_name}
                             </span>
                         </p>
-                        <div className="bg-green-400 px-3 rounded-2xl">{order.lineItems.length} items</div>
+                        <div className="bg-green-400 px-3 rounded-2xl">{order.pickedCount}/{order.lineItems.length} picked</div>
                     </div>
 
                     {order?.adminNote && (
