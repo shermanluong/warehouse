@@ -14,6 +14,7 @@ import PickOrder from './pages/Picker/PickOrder';
 import PackerOrders from './pages/Packer/Orders';
 import ProtectedRoute from './routes/ProtectedRoute';
 import Finalise from './pages/Packer/Finalise';
+import { ViewPreferenceProvider} from './Context/ViewPreferenceContext';
 
 
 function App() {
@@ -25,23 +26,25 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="*" element={<Navigate to="/login" replace />} />
-        <Route path="/login" element={<Login setUser={setUser} />} />
-        <Route path="/register" element={<Register/>} />
-        <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles= {["admin"]}><AdminDashboard/></ProtectedRoute>} />
-        <Route path="/admin/product" element={<ProtectedRoute allowedRoles= {["admin"]}><Product/></ProtectedRoute>} />
-        <Route path="/admin/substitution" element={<ProtectedRoute allowedRoles= {["admin"]}><Substitution/></ProtectedRoute>} />
-        <Route path="/admin/users" element={<ProtectedRoute allowedRoles= {["admin"]}><Users/></ProtectedRoute>} />
-        <Route path="/admin/order/:id" element={<ProtectedRoute allowedRoles= {["admin"]}><AdminOrder/></ProtectedRoute>} />
-        <Route path="/picker/orders" element={<ProtectedRoute allowedRoles={["picker"]}><PickerOrders /></ProtectedRoute>} />
-        <Route path="/picker/order/:id" element={<ProtectedRoute allowedRoles={["picker"]}><PickOrder /></ProtectedRoute>} />
-        <Route path="/packer/orders" element={<ProtectedRoute allowedRoles={["packer"]}><PackerOrders /></ProtectedRoute>} />
-        <Route path="/packer/order/:id" element={<ProtectedRoute allowedRoles={["packer"]}><Finalise /></ProtectedRoute>} />
-      </Routes>
-    </Router>
+    <ViewPreferenceProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+          <Route path="/login" element={<Login setUser={setUser} />} />
+          <Route path="/register" element={<Register/>} />
+          <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles= {["admin"]}><AdminDashboard/></ProtectedRoute>} />
+          <Route path="/admin/product" element={<ProtectedRoute allowedRoles= {["admin"]}><Product/></ProtectedRoute>} />
+          <Route path="/admin/substitution" element={<ProtectedRoute allowedRoles= {["admin"]}><Substitution/></ProtectedRoute>} />
+          <Route path="/admin/users" element={<ProtectedRoute allowedRoles= {["admin"]}><Users/></ProtectedRoute>} />
+          <Route path="/admin/order/:id" element={<ProtectedRoute allowedRoles= {["admin"]}><AdminOrder/></ProtectedRoute>} />
+          <Route path="/picker/orders" element={<ProtectedRoute allowedRoles={["picker"]}><PickerOrders /></ProtectedRoute>} />
+          <Route path="/picker/order/:id" element={<ProtectedRoute allowedRoles={["picker"]}><PickOrder /></ProtectedRoute>} />
+          <Route path="/packer/orders" element={<ProtectedRoute allowedRoles={["packer"]}><PackerOrders /></ProtectedRoute>} />
+          <Route path="/packer/order/:id" element={<ProtectedRoute allowedRoles={["packer"]}><Finalise /></ProtectedRoute>} />
+        </Routes>
+      </Router>
+    </ViewPreferenceProvider>
   );
 }
 

@@ -6,6 +6,7 @@ import FlagDialog from '../../components/FlagDialog'
 import ImageZoomModal from '../../components/ImageZoomModal';
 import BarcodeScanner from '../../components/BarcodeScanner';
 import PickLineItem from '../../components/PickLineItem';
+import { useViewPreference } from '../../context/ViewPreferenceContext';
 
 const ListView = ({id}) => {
     const navigate = useNavigate();
@@ -17,6 +18,7 @@ const ListView = ({id}) => {
     const [showDialog, setShowDialog] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
     const [barcodeStatus, setBarcodeStatus] = useState('');
+    //const { view, setView } = useViewPreference();
     const token = localStorage.getItem("token");
 
     useEffect(() => {
@@ -171,6 +173,14 @@ const ListView = ({id}) => {
                 />
 
                 <p className='mb-2'>Scanned Barcode: {barcodeStatus}</p>
+
+                {/*<button
+                    onClick={() => setView('single')}
+                    className="mb-4 bg-blue-500 text-white px-4 py-2 rounded"
+                >
+                    Switch to Single Item View
+                </button>*/
+                }
 
                 <div className="flex flex-col gap-4">
                     {lineItems.map((lineItem) => (

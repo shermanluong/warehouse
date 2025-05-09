@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { PencilSquareIcon, CameraIcon } from '@heroicons/react/24/outline';
 import BarcodeScannerComponent from 'react-qr-barcode-scanner';
 
-const BarcodeScanner = ({OnScan}) => {
+const BarcodeScanner = ({onScan}) => {
     const [isScanningPreview, setIsScanningPreview] = useState(false);
     const [isButtonScanning, setIsButtonScanning] = useState(false);
     const isScanning = useRef(false);
@@ -13,7 +13,7 @@ const BarcodeScanner = ({OnScan}) => {
             setBarcode(result.text);
             isScanning.current = false;
             setIsButtonScanning(false);
-            OnScan(result.text);
+            onScan(result.text);
         }
     };
 
