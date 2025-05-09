@@ -57,23 +57,17 @@ const SingleItem = ({ orderId, lineItem, OnClickImage, OnRefresh, OnFlagDialog }
         <div className = "border border-gray-200 rounded-lg p-4 shadow-md">
             <div className="flex flex-col sm:flex-row justify-between">
                 {/* Left side: image + name + SKU */}
-                <div className="flex items-start">
-                    <img
-                        src={lineItem?.image}
-                        alt={lineItem?.productTitle}
-                        className="w-48 h-48 rounded object-cover cursor-pointer"
-                        onClick={() => OnClickImage(lineItem?.image)}
-                    />
-                    <div className="ml-4">
-                        <h3 className="font-semibold text-2xl text-gray-900">
-                            {lineItem?.variantInfo?.title === "Default Title"
-                                ? lineItem?.productTitle
-                                : lineItem?.variantInfo?.title}
-                            {(lineItem.adminNote || lineItem.customerNote) && (
-                                <span title="This item has notes" className="text-yellow-500 text-2xl ml-2">📌</span>
-                            )}
-                        </h3>
+                <h3 className="text-center font-semibold text-2xl text-gray-900 mb-10">
+                    {lineItem?.variantInfo?.title === "Default Title"
+                        ? lineItem?.productTitle
+                        : lineItem?.variantInfo?.title}
+                    {(lineItem.adminNote || lineItem.customerNote) && (
+                        <span title="This item has notes" className="text-yellow-500 text-2xl ml-2">📌</span>
+                    )}
+                </h3>
 
+                <div className="flex justify-center gap-10">
+                    <div className="">
                         <p className="font-semibold text-xl text-gray-900">SKU: {lineItem?.variantInfo?.sku}</p>
                         {lineItem?.variantInfo?.barcode && 
                             <p className="font-semibold text-lg text-yellow-900">Barcode: {lineItem?.variantInfo?.barcode}</p>
@@ -117,6 +111,12 @@ const SingleItem = ({ orderId, lineItem, OnClickImage, OnRefresh, OnFlagDialog }
                         <p className="text-xl text-blue-600 mt-1">Customer: {lineItem.customerNote}</p>
                         )}
                     </div>
+                    <img
+                        src={lineItem?.image}
+                        alt={lineItem?.productTitle}
+                        className="w-64 h-64 rounded object-cover cursor-pointer"
+                        onClick={() => OnClickImage(lineItem?.image)}
+                    />
                 </div>
 
                 <div className="flex justify-end mt-4 space-x-3 sm:flex-col sm:justify-start sm:mt-0 sm:space-x-0 sm:space-y-2 ">

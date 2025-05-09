@@ -6,7 +6,6 @@ import FlagDialog from '../../components/FlagDialog'
 import ImageZoomModal from '../../components/ImageZoomModal';
 import BarcodeScanner from '../../components/BarcodeScanner';
 import PickLineItem from '../../components/PickLineItem';
-import { useViewPreference } from '../../context/ViewPreferenceContext';
 
 const ListView = ({id}) => {
     const navigate = useNavigate();

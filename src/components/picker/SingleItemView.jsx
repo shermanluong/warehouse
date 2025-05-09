@@ -7,7 +7,6 @@ import ImageZoomModal from '../../components/ImageZoomModal';
 import BarcodeScanner from '../../components/BarcodeScanner';
 import BarcodeListener from '../BarcodeListener';
 import SingleItem from './SingleItem';
-import { SignalIcon } from '@heroicons/react/24/outline';
 
 const SingleItemView = ({id}) => {
     const navigate = useNavigate();
@@ -19,6 +18,7 @@ const SingleItemView = ({id}) => {
     const [showDialog, setShowDialog] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
     const [barcodeStatus, setBarcodeStatus] = useState('');
+    const [currentItemIndex, setCurrentItemIndex] = useState(0);
     const token = localStorage.getItem("token");
 
     useEffect(() => {
@@ -176,9 +176,8 @@ const SingleItemView = ({id}) => {
                 <div className="flex flex-col gap-4">
                     {lineItems.length > 0 && (
                         <SingleItem 
-                            key={lineItems[0].shopifyLineItemId}
                             orderId={order._id}
-                            lineItem={lineItems[0]}
+                            lineItem={lineItems[currentItemIndex]}
                             OnRefresh={fetchOrder}
                             OnClickImage={handleClickImage}
                             OnFlagDialog={openFlagDialog}
