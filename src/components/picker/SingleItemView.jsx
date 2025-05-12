@@ -251,9 +251,9 @@ const SingleItemView = ({id}) => {
                 <BarcodeScanner onScan={handleScan}/>
                 <BarcodeListener onScan={handleScan} />
 
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col mt-6">
                     {lineItems.length > 0 && (
-                        <div className = "border border-gray-200 rounded-lg p-4 shadow-md">
+                        <div className = "">
                             <div className="flex flex-col sm:flex-row justify-between">
                                 {/* Left side: image + name + SKU */}
                                 <h3 className="text-center font-semibold text-2xl text-gray-900 mb-10">
@@ -266,7 +266,7 @@ const SingleItemView = ({id}) => {
                                 </h3>
                 
                                 <div className="flex justify-center">
-                                    <div className="flex flex-col justify-center ml-5 mr-5">
+                                    <div className="flex flex-col justify-center ml-5 mr-10">
                                         <p className="font-semibold text-xl text-gray-900">SKU: {lineItems[currentItemIndex]?.variantInfo?.sku}</p>
                                         {lineItems[currentItemIndex]?.variantInfo?.barcode && 
                                             <p className="font-semibold text-sm text-yellow-900">Barcode: {lineItems[currentItemIndex]?.variantInfo?.barcode}</p>
@@ -373,22 +373,22 @@ const SingleItemView = ({id}) => {
                 
                             {lineItems[currentItemIndex]?.substitution?.shopifyVariantId && 
                                 <div
-                                    className="flex flex-col sm:flex-row mt-4 justify-between border border-yellow-600 rounded-lg p-4"
+                                    className="flex flex-col sm:flex-row mt-4 mb-2 justify-between border border-yellow-600 rounded-lg p-4"
                                 >
                                     {/* Left side: image + name + SKU */}
                                     <div className="flex items-start">
                                         <img
-                                            src={lineItem?.substitution?.image}
-                                            alt={lineItem?.substitution?.title}
+                                            src={lineItems[currentItemIndex]?.substitution?.image}
+                                            alt={lineItems[currentItemIndex]?.substitution?.title}
                                             className="w-36 h-36 rounded object-cover"
-                                            onClick={() => handleClickImage(lineItem?.substitution?.image)}
+                                            onClick={() => handleClickImage(lineItems[currentItemIndex]?.substitution?.image)}
                                         />
                                         <div className="ml-4 mt-2 sm:mt-0">
                                             <h3 className="font-semibold text-2xl text-yellow-600">
-                                                Subbed: {lineItem?.substitution?.title}
+                                                Subbed: {lineItems[currentItemIndex]?.substitution?.title}
                                             </h3>
                 
-                                            <p className="font-semibold text-xl text-gray-900">SKU: {lineItem?.substitution?.sku}</p>
+                                            <p className="font-semibold text-xl text-gray-900">SKU: {lineItems[currentItemIndex]?.substitution?.sku}</p>
                                         </div>
                                     </div>
                                 </div>  
@@ -402,7 +402,7 @@ const SingleItemView = ({id}) => {
                 <button 
                     disabled={!allPicked}
                     onClick={handleCompletePicking}
-                    className={`w-full mt-4 rounded-sm p-2 
+                    className={`w-full mt-4 rounded-md p-2 
                         ${allPicked 
                             ? 'bg-blue-500 hover:bg-blue-600 text-white' 
                             : 'bg-gray-300 text-gray-500 cursor-not-allowed'}

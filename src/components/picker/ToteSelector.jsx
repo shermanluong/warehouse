@@ -132,10 +132,9 @@ export default function ToteSelector({ orderId }) {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-6 relative" ref={wrapperRef}>
-      <label className="block mb-2 font-semibold">Select Totes:</label>
+    <div className="mt-2 relative" ref={wrapperRef}>
       <div
-        className="w-full border rounded px-2 py-1 flex flex-wrap items-center gap-1 min-h-[42px] bg-white shadow-sm cursor-text"
+        className="w-full border border-gray-300 rounded-md px-2 py-1 flex flex-wrap items-center gap-1 min-h-[42px] bg-white cursor-text"
         onClick={handleInputClick}
       >
         {selectedTotes.map((tote) => (
@@ -163,12 +162,12 @@ export default function ToteSelector({ orderId }) {
           onChange={(e) => setSearchTerm(e.target.value)}
           onKeyDown={handleKeyDown}
           className="flex-1 border-none focus:outline-none py-1 px-1 min-w-[60px]"
-          placeholder="Search totes..."
+          placeholder="Select Totes"
         />
       </div>
 
       {isDropdownOpen && (
-        <div className="absolute left-0 right-0 border mt-1 rounded shadow bg-white max-h-40 overflow-y-auto z-10">
+       <div className="absolute left-0 right-0 bottom-full mb-1 border rounded shadow bg-white max-h-40 overflow-y-auto z-10">
           {filteredTotes.length > 0 ? (
             filteredTotes.map((tote) => (
               <div
