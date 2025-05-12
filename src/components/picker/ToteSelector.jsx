@@ -132,7 +132,7 @@ export default function ToteSelector({ orderId }) {
   };
 
   return (
-    <div className="mt-2 relative" ref={wrapperRef}>
+    <div className="mt-4 relative" ref={wrapperRef}>
       <div
         className="w-full border border-gray-300 rounded-md px-2 py-1 flex flex-wrap items-center gap-1 min-h-[42px] bg-white cursor-text"
         onClick={handleInputClick}

@@ -257,7 +257,7 @@ const SingleItemView = ({id}) => {
                             <div className="flex flex-col sm:flex-row justify-between">
                                 {/* Left side: image + name + SKU */}
                                 <h3 className="text-center font-semibold text-2xl text-gray-900 mb-10">
-                                    {lineItems[currentItemIndex]?.variantInfo?.title === "Default Title"
+                                    {currentItemIndex + 1} - {lineItems[currentItemIndex]?.variantInfo?.title === "Default Title"
                                         ? lineItems[currentItemIndex]?.productTitle
                                         : lineItems[currentItemIndex]?.variantInfo?.title}
                                     {(lineItems[currentItemIndex].adminNote || lineItems[currentItemIndex].customerNote) && (
@@ -318,7 +318,7 @@ const SingleItemView = ({id}) => {
                                     />
                                 </div>
                 
-                                <div className="flex justify-end mt-4 space-x-3 sm:flex-col sm:justify-start sm:mt-0 sm:space-x-0 sm:space-y-2 ">
+                                <div className="flex justify-center mt-4 space-x-20">
                                     
                                     {!lineItems[currentItemIndex].picked && lineItems[currentItemIndex].quantity <= 1 &&
                                         <button
