@@ -16,6 +16,8 @@ import {
     ArrowPathIcon
   } from '@heroicons/react/24/outline';
 
+import ToteSelector from './ToteSelector';
+
 const SingleItemView = ({id}) => {
     const navigate = useNavigate();
     const [order, setOrder] = useState(null);
@@ -394,6 +396,9 @@ const SingleItemView = ({id}) => {
                         </div>
                     )}
                 </div>
+
+                <ToteSelector orderId = {order._id}/>
+
                 <button 
                     disabled={!allPicked}
                     onClick={handleCompletePicking}
