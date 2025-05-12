@@ -30,8 +30,11 @@ const SingleItemView = ({id}) => {
     const [barcodeStatus, setBarcodeStatus] = useState('');
     const [currentItemIndex, setCurrentItemIndex] = useState(0);
     const [assignedTotes, setAssignedTotes] = useState([]);
-    const token = localStorage.getItem("token");
+    const [imageLoaded, setImageLoaded] = useState(false);
+    const currentImage = lineItems[currentItemIndex]?.image;
+    const imageSizeClass = "w-[200px] h-[200px]"; // or use w-full h-full if inside a fixed container
 
+    const token = localStorage.getItem("token");
     useEffect(() => {
         fetchOrder();
     }, [id]);
@@ -41,6 +44,12 @@ const SingleItemView = ({id}) => {
         const totesAssigned = assignedTotes.length > 0;
         setAllPicked(allItemsPicked && totesAssigned);
       }, [lineItems, assignedTotes]);
+
+    useEffect(() => {
+    // Reset imageLoaded when current item changes
+    setImageLoaded(false);
+    }, [currentImage]);
+      
 
     const handleCompletePicking = async () => {
         console.log(token);
@@ -311,12 +320,25 @@ const SingleItemView = ({id}) => {
                                         <p className="text-xl text-blue-600 mt-1">Customer: {lineItems[currentItemIndex].customerNote}</p>
                                         )}
                                     </div>
-                                    <img
-                                        src={lineItems[currentItemIndex]?.image}
-                                        alt={lineItems[currentItemIndex]?.productTitle}
-                                        className="w-50 h-50 rounded object-cover cursor-pointer"
-                                        onClick={() => handleClickImage(lineItems[currentItemIndex]?.image)}
-                                    />
+                                    <div className="relative w-[200px] h-[200px]">
+                                        {!imageLoaded && (
+                                            <div className="w-50 h-50 flex items-center justify-center bg-gray-100">
+                                                Loading...
+                                            </div>
+                                        )}
+                                        
+                                        {currentImage && (
+                                            <img
+                                            src={currentImage}
+                                            alt={lineItems[currentItemIndex]?.productTitle}
+                                            className={`absolute top-0 left-0 w-full h-full rounded object-cover cursor-pointer transition-opacity duration-300 ${
+                                                imageLoaded ? 'opacity-100' : 'opacity-0'
+                                            }`}
+                                            onLoad={() => setImageLoaded(true)}
+                                            onClick={() => handleClickImage(currentImage)}
+                                            />
+                                        )}
+                                    </div>
                                 </div>
                 
                                 <div className="flex justify-center mt-4 space-x-20">
