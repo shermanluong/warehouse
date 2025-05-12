@@ -218,7 +218,7 @@ const SingleItemView = ({id}) => {
                     </button>
                 </div>
 
-                <div className="flex flex-row mb-4 justify-between text-xl">
+                <div className="flex flex-row mb-4 justify-between text-md">
                     <p>Customer: 
                         <span className="font-mono text-gray-700 ml-2">
                             {order?.customer?.first_name} {order?.customer?.last_name}

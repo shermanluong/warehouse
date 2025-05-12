@@ -1,6 +1,7 @@
 import Layout from "../../layouts/layout";
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ShoppingCartIcon } from "@heroicons/react/24/outline"; // or /solid for filled version
 import axios from 'axios';
 
 export default function Orders() {
@@ -52,7 +53,7 @@ export default function Orders() {
             <div key = {order._id} className="bg-white border border-gray-200 rounded-x1 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
               <div className="p-4">
                 <div className="flex justify-between items-start">
-                <h3 className="font-bold text-2xl text-gray-900">
+                  <h3 className="font-bold text-2xl text-gray-900">
                     Order {order?.name}
                     {(order?.orderNote || order?.adminNote) && (
                       <span title="This order has notes" className="text-yellow-500 ml-2">📌</span>
@@ -62,7 +63,14 @@ export default function Orders() {
                     {order.lineItemCount} items
                   </span>
                 </div>
-
+                <div className="flex items-center space-x-2 my-2">
+                  {order.totes?.map((tote) => (
+                      <div key={tote._id} className="flex space-x-1">
+                        <ShoppingCartIcon className="w-6 h-6 text-gray-700" />
+                        <p className="text-sm">{tote.name}</p>
+                      </div>
+                    ))}
+                </div>
                 <div className="mt-2 mb-4 flex justify-between">
                   <p className="text-sm text-gray-500">Customer: </p>
                   <span className="font-mono text-sm text-gray-500">
