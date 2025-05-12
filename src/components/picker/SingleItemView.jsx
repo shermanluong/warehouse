@@ -201,26 +201,7 @@ const SingleItemView = ({id}) => {
 
     return (
         <>
-            <div className="bg-white p-4 rounded-sm shadow-md relative">
-                {/* Navigation buttons */}
-                {currentItemIndex > 0 && (
-                    <button
-                    className="absolute left-0 top-90 transform -translate-y-1/2 px-2 py-2 bg-gray-200 rounded-md shadow"
-                    onClick={() => handleItemChange(currentItemIndex - 1)}
-                    >
-                    <ArrowLeftIcon className="w-5 h-5" />
-                    </button>
-                )}
-                
-                {currentItemIndex < lineItems.length - 1  && (
-                    <button
-                    className="absolute right-0 top-90 transform -translate-y-1/2 px-2 py-2 bg-gray-200 rounded-md shadow"
-                    onClick={() => handleItemChange(currentItemIndex + 1)}
-                    >
-                    <ArrowRightIcon className="w-5 h-5" />
-                    </button>
-                )}
-
+            <div className="bg-white p-4 rounded-sm shadow-md">
                 <div className="flex flex-row mb-4 justify-between">
 
                     <h3 className="font-semibold text-3xl">Order: {order?.name}
@@ -261,6 +242,29 @@ const SingleItemView = ({id}) => {
                 <BarcodeScanner onScan={handleScan}/>
                 <BarcodeListener onScan={handleScan} />
 
+                <div className="flex justify-between space-x-2">
+                    {/* Navigation buttons */}
+                    <button
+                        className={`px-2 py-2 rounded-md shadow ${
+                        currentItemIndex > 0 ? "bg-gray-200" : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                        }`}
+                        onClick={() => handleItemChange(currentItemIndex - 1)}
+                        disabled={currentItemIndex === 0}
+                    >
+                        <ArrowLeftIcon className="w-5 h-5" />
+                    </button>
+
+                    <button
+                        className={`px-2 py-2 rounded-md shadow ${
+                        currentItemIndex < lineItems.length - 1 ? "bg-gray-200" : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                        }`}
+                        onClick={() => handleItemChange(currentItemIndex + 1)}
+                        disabled={currentItemIndex >= lineItems.length - 1}
+                    >
+                        <ArrowRightIcon className="w-5 h-5" />
+                    </button>
+                </div>
+                
                 <div className="flex flex-col mt-6">
                     {lineItems.length > 0 && (
                         <div className = "">
@@ -276,10 +280,10 @@ const SingleItemView = ({id}) => {
                                 </h3>
                 
                                 <div className="flex justify-center">
-                                    <div className="flex flex-col justify-center ml-5 mr-10">
+                                    <div className="flex flex-col justify-center ml-5 mr-5">
                                         <p className="font-semibold text-xl text-gray-900">SKU: {lineItems[currentItemIndex]?.variantInfo?.sku}</p>
                                         {lineItems[currentItemIndex]?.variantInfo?.barcode && 
-                                            <p className="font-semibold text-sm text-yellow-900">Barcode: {lineItems[currentItemIndex]?.variantInfo?.barcode}</p>
+                                            <p className="font-semibold text-sm text-yellow-900">{lineItems[currentItemIndex]?.variantInfo?.barcode}</p>
                                         }
                                         <span className="font-semibold text-xl text-gray-900">
                                             { 
@@ -320,9 +324,9 @@ const SingleItemView = ({id}) => {
                                         <p className="text-xl text-blue-600 mt-1">Customer: {lineItems[currentItemIndex].customerNote}</p>
                                         )}
                                     </div>
-                                    <div className="relative w-[200px] h-[200px]">
+                                    <div className="relative w-50 h-50">
                                         {!imageLoaded && (
-                                            <div className="w-50 h-50 flex items-center justify-center bg-gray-100">
+                                            <div className="w-full h-full flex items-center justify-center bg-gray-100">
                                                 Loading...
                                             </div>
                                         )}
