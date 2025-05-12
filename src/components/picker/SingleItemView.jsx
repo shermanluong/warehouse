@@ -59,7 +59,6 @@ const SingleItemView = ({id}) => {
     };
 
     const handleFlagSubmit = async ({ shopifyLineItemId, reason, quantity }) => {
-        console.log(quantity);
         await axios.patch(
             `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-flag`,
             { 
@@ -71,6 +70,9 @@ const SingleItemView = ({id}) => {
         );
         
         fetchOrder();
+
+        if ( currentItemIndex < lineItems.length - 1 ) 
+            setCurrentItemIndex(currentItemIndex + 1);
     };
 
     const handleSubstitutionSelect = async ({
@@ -145,8 +147,11 @@ const SingleItemView = ({id}) => {
                 { shopifyLineItemId },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-    
+
             fetchOrder();
+
+            if (currentItemIndex < lineItems.length - 1 && lineItems[currentItemIndex].pickedStatus.verified.quantity == lineItems[currentItemIndex].quantity - 1) 
+                setCurrentItemIndex(currentItemIndex + 1);
         } catch (err) {
             console.error('Failed to pick plus', err);
         }
