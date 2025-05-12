@@ -5,8 +5,6 @@ import {
     PlusIcon, 
     MinusIcon, 
     CheckIcon,
-    CameraIcon,
-    PencilSquareIcon,
     ArrowPathIcon,
     CurrencyDollarIcon,
     XMarkIcon,

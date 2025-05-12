@@ -14,6 +14,7 @@
     "@heroicons/react": "^2.2.0",
     "@tailwindcss/vite": "^4.1.3",
     "axios": "^1.8.4",
+    "html2canvas": "^1.4.1",
     "jsbarcode": "^3.11.6",
     "jspdf": "^3.0.1",
     "jsqr": "^1.4.0",
