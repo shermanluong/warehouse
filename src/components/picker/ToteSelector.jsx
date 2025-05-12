@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from 'axios';
 
-export default function ToteSelector({ orderId }) {
-  const [selectedTotes, setSelectedTotes] = useState([]); // now stores tote objects
+export default function ToteSelector({ orderId, assignedTotes, onAssignedTotesChange}) {
+  const selectedTotes = assignedTotes;
+  const updateTotes = onAssignedTotesChange;
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [availableTotes, setAvailableTotes] = useState([]);
@@ -27,22 +28,22 @@ export default function ToteSelector({ orderId }) {
     fetchAvailableTotes();
   }, []);
 
+  const fetchAssignedTotes = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/picker/assigned-totes/${orderId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      const data = await res.json(); // expecting array of { name: string }
+      updateTotes(data);
+      onAssignedTotesChange?.(data); // notify parent
+    } catch (error) {
+      console.error("Failed to load assigned totes:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchAssignedTotes = async () => {
-      try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/picker/assigned-totes/${orderId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        const data = await res.json(); // expecting array of { name: string }
-        console.log(data);
-        setSelectedTotes(data);
-      } catch (error) {
-        console.error("Failed to load assigned totes:", error);
-      }
-    };
-  
     if (orderId) {
       fetchAssignedTotes();
     }
@@ -56,7 +57,7 @@ export default function ToteSelector({ orderId }) {
 
   const handleSelect = (tote) => {
     if (!selectedTotes.some((t) => t._id === tote._id)) {
-      setSelectedTotes([...selectedTotes, tote]);
+      updateTotes([...selectedTotes, tote]);
       assignToteToOrder(tote._id);
     }
     setSearchTerm("");
@@ -64,7 +65,7 @@ export default function ToteSelector({ orderId }) {
   };
 
   const handleRemove = (toteId) => {
-    setSelectedTotes((prev) => prev.filter((t) => t._id !== toteId));
+    updateTotes((prev) => prev.filter((t) => t._id !== toteId));
   };
 
   const handleInputClick = () => {
@@ -76,7 +77,7 @@ export default function ToteSelector({ orderId }) {
       const lastTote = selectedTotes[selectedTotes.length - 1];
       if (lastTote) {
         removeToteFromOrder(lastTote._id);
-        setSelectedTotes((prev) => prev.slice(0, -1));
+        updateTotes((prev) => prev.slice(0, -1));
       }
     }
   };
@@ -122,7 +123,7 @@ export default function ToteSelector({ orderId }) {
       );
   
       // Remove from selected list
-      setSelectedTotes((prev) => prev.filter((t) => t._id !== toteId));
+      updateTotes((prev) => prev.filter((t) => t._id !== toteId));
   
       // Refresh available totes
       fetchAvailableTotes(); // Make sure this function is in scope

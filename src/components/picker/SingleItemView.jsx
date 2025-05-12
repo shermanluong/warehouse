@@ -29,6 +29,7 @@ const SingleItemView = ({id}) => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [barcodeStatus, setBarcodeStatus] = useState('');
     const [currentItemIndex, setCurrentItemIndex] = useState(0);
+    const [assignedTotes, setAssignedTotes] = useState([]);
     const token = localStorage.getItem("token");
 
     useEffect(() => {
@@ -36,10 +37,10 @@ const SingleItemView = ({id}) => {
     }, [id]);
 
     useEffect(() => {
-        setAllPicked(lineItems.every(
-            item => item.picked
-        ));
-    }, [lineItems]);
+        const allItemsPicked = lineItems.every(item => item.picked);
+        const totesAssigned = assignedTotes.length > 0;
+        setAllPicked(allItemsPicked && totesAssigned);
+      }, [lineItems, assignedTotes]);
 
     const handleCompletePicking = async () => {
         console.log(token);
@@ -397,7 +398,11 @@ const SingleItemView = ({id}) => {
                     )}
                 </div>
 
-                <ToteSelector orderId = {order._id}/>
+                <ToteSelector 
+                    orderId = {order._id}
+                    assignedTotes={assignedTotes}
+                    onAssignedTotesChange={setAssignedTotes}
+                />
 
                 <button 
                     disabled={!allPicked}
