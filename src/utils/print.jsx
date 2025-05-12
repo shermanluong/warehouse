@@ -49,21 +49,20 @@ export const generateDeliveryLabel = (order, boxCount) => {
   
       // Driver Name
       doc.setFontSize(12);
-      doc.text(`${order.delivery.driverName}`, 15, 90);
+      const driverY = 90;
+      doc.text(`${order.delivery.driverName}`, 15, driverY);
   
       // Box Count with rectangle
-      const boxText = `${i + 1}`;
-      doc.setFontSize(60);
+      const boxText = `${i + 1}/${boxCount}`;
+      doc.setFontSize(40);
       const x = 70;
-      const y = 95;
-      doc.text(boxText, x, y);
-  
-      // Draw rectangle around the box count
+      const y = driverY + 2; // Raise or lower to center align with driver text
       const textWidth = doc.getTextWidth(boxText);
-      const textHeight = 60 * 0.35; // Rough height estimate
-      const paddingX = 4;
-      const paddingY = 4;
+      const textHeight = 40 * 0.35;
+      const paddingX = 3;
+      const paddingY = 3;
   
+      // Draw rectangle
       doc.rect(
         x - paddingX,
         y - textHeight - paddingY,
@@ -71,17 +70,27 @@ export const generateDeliveryLabel = (order, boxCount) => {
         textHeight + paddingY * 2
       );
   
+      doc.text(boxText, x, y);
+  
       // Address
       doc.setFontSize(8);
+      const address = order.customer.default_address;
       doc.text(
-        `${order.customer.default_address.address1}, ${order.customer.default_address.city}, ${order.customer.default_address.province}, ${order.customer.default_address.zip}, ${order.customer.default_address.country}`,
+        `${address.address1}, ${address.city}, ${address.province}, ${address.zip}, ${address.country}`,
         5,
-        120
+        110
+      );
+
+      doc.setFontSize(20);
+      doc.text(
+        `${order.name}`,
+        40,
+        125
       );
     }
   
-    // Automatically print all labels
     doc.autoPrint();
     window.open(doc.output('bloburl'), '_blank');
 };
+  
   
