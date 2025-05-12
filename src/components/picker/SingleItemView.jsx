@@ -7,13 +7,13 @@ import ImageZoomModal from '../../components/ImageZoomModal';
 import BarcodeScanner from '../../components/BarcodeScanner';
 import BarcodeListener from '../BarcodeListener';
 import {
-    ArrowLeftIcon,
-    ArrowRightIcon,
     PlusIcon, 
     MinusIcon, 
     XMarkIcon, 
     CheckIcon,
-    ArrowPathIcon
+    ArrowPathIcon,
+    ArrowLongRightIcon,
+    ArrowLongLeftIcon
   } from '@heroicons/react/24/outline';
 
 import ToteSelector from './ToteSelector';
@@ -212,9 +212,9 @@ const SingleItemView = ({id}) => {
                     </h3>
                     <button 
                         onClick={() => navigate(`/picker/orders`)}
-                        className="px-4 rounded-md hover:bg-blue-300"
+                        className="rounded-md hover:bg-blue-300"
                     >
-                        Back to list
+                        <ArrowLongRightIcon className="w-5 h-5" />
                     </button>
                 </div>
 
@@ -251,7 +251,7 @@ const SingleItemView = ({id}) => {
                         onClick={() => handleItemChange(currentItemIndex - 1)}
                         disabled={currentItemIndex === 0}
                     >
-                        <ArrowLeftIcon className="w-5 h-5" />
+                        <ArrowLongLeftIcon className="w-5 h-5" />
                     </button>
 
                     <button
@@ -261,7 +261,7 @@ const SingleItemView = ({id}) => {
                         onClick={() => handleItemChange(currentItemIndex + 1)}
                         disabled={currentItemIndex >= lineItems.length - 1}
                     >
-                        <ArrowRightIcon className="w-5 h-5" />
+                        <ArrowLongRightIcon className="w-5 h-5" />
                     </button>
                 </div>
                 
