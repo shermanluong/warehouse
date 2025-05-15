@@ -23,6 +23,7 @@
     "react-dom": "^18.2.0",
     "react-qr-barcode-scanner": "^2.0.0",
     "react-router-dom": "^7.5.0",
+    "react-toastify": "^11.0.5",
     "react-webcam": "^7.2.0",
     "tailwindcss": "^4.1.3"
   },

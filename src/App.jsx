@@ -17,7 +17,8 @@ import PackerOrders from './pages/Packer/Orders';
 import ProtectedRoute from './routes/ProtectedRoute';
 import Finalise from './pages/Packer/Finalise';
 import { ViewPreferenceProvider} from './Context/ViewPreferenceContext';
-
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -29,6 +30,7 @@ function App() {
 
   return (
     <ViewPreferenceProvider>
+      <ToastContainer />
       <Router>
         <Routes>
           <Route path="/" element={<Navigate to="/login" />} />
