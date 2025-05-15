@@ -18,7 +18,7 @@ const ApprovalPage = () => {
     const fetchOrders = async () => {
         try {
             const res = await axios.get(
-                `${import.meta.env.VITE_API_URL}/admin/getOrders`,
+                `${import.meta.env.VITE_API_URL}/admin/getApprovalOrders`,
                 {
                     headers: { Authorization: `Bearer ${token}` },
                     params: {
@@ -73,29 +73,29 @@ const ApprovalPage = () => {
                                 </div>
 
                                 { false && 
-                                <>
-                                    <div className="flex justify-between mt-1">
-                                    <p className="text-md text-gray-900">Start Time: </p>
-                                    <span className="text-md text-gray-900">{order?.delivery?.startTime}</span>
-                                    </div>
+                                    <>
+                                        <div className="flex justify-between mt-1">
+                                        <p className="text-md text-gray-900">Start Time: </p>
+                                        <span className="text-md text-gray-900">{order?.delivery?.startTime}</span>
+                                        </div>
 
-                                    <div className="flex justify-between mt-1">
-                                    <p className="text-md text-gray-900">Stop Number</p>
-                                    <span className="text-md text-gray-900">{order?.delivery?.stopNumber}</span>
-                                    </div>
-                                </>
+                                        <div className="flex justify-between mt-1">
+                                        <p className="text-md text-gray-900">Stop Number</p>
+                                        <span className="text-md text-gray-900">{order?.delivery?.stopNumber}</span>
+                                        </div>
+                                    </>
                                 }
                                 
                                 {order.adminNote && (
-                                <div className="mt-1">
-                                    <p className="text-md text-red-600">Admin Note: {order.adminNote}</p>
-                                </div>
+                                    <div className="mt-1">
+                                        <p className="text-md text-red-600">Admin Note: {order.adminNote}</p>
+                                    </div>
                                 )}
                             
                                 {order.orderNote && (
-                                <div className="mt-1">
-                                    <p className="text-md text-red-600">Customer Note: {order.orderNote}</p>
-                                </div>
+                                    <div className="mt-1">
+                                        <p className="text-md text-red-600">Customer Note: {order.orderNote}</p>
+                                    </div>
                                 )}
                             </div>
                         ))}
