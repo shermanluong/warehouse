@@ -1,6 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import React, { useEffect, useState, useRef} from 'react';
-import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import { 
     PencilIcon
 } from '@heroicons/react/24/outline'
@@ -8,7 +7,7 @@ import NoteDialog from '../../components/NoteDialog'
 import axios from 'axios';
 import Layout from '../../layouts/layout';
 
-const Order = () => {
+const ApprovalOrder = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [order, setOrder] = useState(null);
@@ -124,7 +123,7 @@ const Order = () => {
                                 </div>
                           
                                 {/* Right side: picked info + buttons */}
-                                {!lineItem.picked && (
+                                {!lineItem.picked && !lineItem.flags.length >  0 && (
                                     <div className="flex mt-4 space-x-3 sm:flex-col sm:items-start sm:mt-0 sm:space-x-0 sm:space-y-2 ">
                                         <button 
                                             onClick={() => openNoteDialog(lineItem)}
@@ -150,4 +149,4 @@ const Order = () => {
     )
 }
 
-export default Order;
+export default ApprovalOrder;

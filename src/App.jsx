@@ -6,6 +6,7 @@ import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import AdminDashboard from './pages/Admin/Dashboard';
 import ApprovalPage from './pages/Admin/Approval';
+import ApprovalOrder from './pages/Admin/ApprovalOrder';
 import Product from './pages/Admin/Product';
 import Substitution from './pages/Admin/Substitution';
 import Users from './pages/Admin/Users';
@@ -36,6 +37,7 @@ function App() {
           <Route path="/register" element={<Register/>} />
           <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles= {["admin"]}><AdminDashboard/></ProtectedRoute>} />
           <Route path="/admin/approval" element={<ProtectedRoute allowedRoles= {["admin"]}><ApprovalPage/></ProtectedRoute>} />
+          <Route path="/admin/approval/:id" element={<ProtectedRoute allowedRoles= {["admin"]}><ApprovalOrder/></ProtectedRoute>} />
           <Route path="/admin/product" element={<ProtectedRoute allowedRoles= {["admin"]}><Product/></ProtectedRoute>} />
           <Route path="/admin/substitution" element={<ProtectedRoute allowedRoles= {["admin"]}><Substitution/></ProtectedRoute>} />
           <Route path="/admin/users" element={<ProtectedRoute allowedRoles= {["admin"]}><Users/></ProtectedRoute>} />

@@ -6,12 +6,12 @@ import axios from "axios";
 
 
 const navigation = [
-    { name: 'Dashboard', href: 'dashboard', current: false, roles: ['admin']},
-    { name: 'Approval', href: 'approval', current: false, roles: ['admin']},
-    { name: 'Product', href: 'product', current: false, roles: ['admin']},
-    { name: 'Substitution', href: 'substitution', current: false, roles: ['admin']},
-    { name: 'Users', href: 'users', current: false, roles: ['admin']},
-]
+    { name: 'Dashboard', href: '/admin/dashboard', current: false, roles: ['admin'] },
+    { name: 'Approval', href: '/admin/approval', current: false, roles: ['admin'] },
+    { name: 'Product', href: '/admin/product', current: false, roles: ['admin'] },
+    { name: 'Substitution', href: '/admin/substitution', current: false, roles: ['admin'] },
+    { name: 'Users', href: '/admin/users', current: false, roles: ['admin'] },
+];
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
@@ -62,7 +62,6 @@ const Layout = ({children, headerTitle}) => {
     };
 
     const handleMarkAllRead = async () => {
-        console.log(1);
         try {
             const res = await axios.patch(
                 `${import.meta.env.VITE_API_URL}/notification/read-all`,
