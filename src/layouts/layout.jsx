@@ -7,6 +7,7 @@ import axios from "axios";
 
 const navigation = [
     { name: 'Dashboard', href: 'dashboard', current: false, roles: ['admin']},
+    { name: 'Approval', href: 'approval', current: false, roles: ['admin']},
     { name: 'Product', href: 'product', current: false, roles: ['admin']},
     { name: 'Substitution', href: 'substitution', current: false, roles: ['admin']},
     { name: 'Users', href: 'users', current: false, roles: ['admin']},
