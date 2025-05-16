@@ -19,7 +19,8 @@ import Spinbox from '../../components/Spinbox';
 import SwitchButton from '../../components/SwitchButton';
 import FlagDialog from '../../components/FlagDialog'
 import { generatePackingSlip, generateDeliveryLabel } from '../../utils/print'; // Adjust the path if necessary
-import { useLoading } from "../../context/LoadingContext";
+import { useLoading } from "../../Context/LoadingContext";
+import { toast } from 'react-toastify';
 
 export default function Finalise() {
     const { id } = useParams();
@@ -249,9 +250,11 @@ export default function Finalise() {
                 },
                 { headers: { Authorization: `Bearer ${token}` } 
             });
+            toast.success('Order packed');
             navigate(`/packer/orders`);
         } catch (err) {
-          console.error(err?.response?.data?.message);
+            toast.success('Failed to pack order');
+            console.error(err?.response?.data?.message);
         } finally {
             setLoading(false);
         }
