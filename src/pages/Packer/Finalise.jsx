@@ -19,6 +19,7 @@ import Spinbox from '../../components/Spinbox';
 import SwitchButton from '../../components/SwitchButton';
 import FlagDialog from '../../components/FlagDialog'
 import { generatePackingSlip, generateDeliveryLabel } from '../../utils/print'; // Adjust the path if necessary
+import { useLoading } from "../../context/LoadingContext";
 
 export default function Finalise() {
     const { id } = useParams();
@@ -33,6 +34,7 @@ export default function Finalise() {
     const [boxCount, setBoxCount] = useState(0);
     const [allPacked, setAllPacked] = useState(false);
     const [isPickingMode, setIsPickingMode] = useState(false);
+    const { setLoading } = useLoading();
     const token = localStorage.getItem("token");
 
     
@@ -238,6 +240,7 @@ export default function Finalise() {
     };
 
     const handleCompletePacking = async () => {
+        setLoading(true);
         try {
             await axios.post(
                 `${import.meta.env.VITE_API_URL}/packer/order/${order._id}/complete-packing`, 
@@ -249,6 +252,8 @@ export default function Finalise() {
             navigate(`/packer/orders`);
         } catch (err) {
           console.error(err?.response?.data?.message);
+        } finally {
+            setLoading(false);
         }
     };
 
