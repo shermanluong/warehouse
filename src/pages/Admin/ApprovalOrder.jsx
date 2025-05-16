@@ -21,17 +21,42 @@ const ApprovalOrder = () => {
         fetchOrder();
     }, [id]);
 
-    const handleApprove = (item) => {
-        setLineItems(prev =>
-          prev.map(li =>
-            li.variantId === item.variantId ? { ...li, approved: true } : li
-          )
-        );
+    const handleApprove = async (item) => {
+        try {
+          await axios.patch(
+            `${import.meta.env.VITE_API_URL}/admin/order/${order._id}/item/${item.shopifyLineItemId}/approve`,
+            {},
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+      
+          setLineItems(prev =>
+            prev.map(li =>
+              li.shopifyLineItemId === item.shopifyLineItemId ? { ...li, approved: true } : li
+            )
+          );
+      
+          toast.success("Item approved!");
+        } catch (err) {
+          console.error(err);
+          toast.error("Failed to approve item.");
+        }
     };
 
     const approveOrder = async () => {
         try {
-          //await axios.post(`/api/orders/${order._id}/approve`);
+          await axios.post(
+            `${import.meta.env.VITE_API_URL}/admin/order/${order._id}/approve`,
+            {}, // request body is empty in this case
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
           toast.success("Order approved successfully!");
           navigate('/admin/approval');
         } catch (err) {

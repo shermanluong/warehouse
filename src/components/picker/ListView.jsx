@@ -6,6 +6,7 @@ import FlagDialog from '../../components/FlagDialog'
 import ImageZoomModal from '../../components/ImageZoomModal';
 import BarcodeScanner from '../../components/BarcodeScanner';
 import PickLineItem from '../../components/PickLineItem';
+import ToteSelector from './ToteSelector';
 
 const ListView = ({id}) => {
     const navigate = useNavigate();
@@ -17,7 +18,7 @@ const ListView = ({id}) => {
     const [showDialog, setShowDialog] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
     const [barcodeStatus, setBarcodeStatus] = useState('');
-    //const { view, setView } = useViewPreference();
+    const [assignedTotes, setAssignedTotes] = useState([]);
     const token = localStorage.getItem("token");
 
     useEffect(() => {
@@ -25,13 +26,12 @@ const ListView = ({id}) => {
     }, [id]);
 
     useEffect(() => {
-        setAllPicked(lineItems.every(
-            item => item.picked
-        ));
-    }, [lineItems]);
+        const allItemsPicked = lineItems.every(item => item.picked);
+        const totesAssigned = assignedTotes.length > 0;
+        setAllPicked(allItemsPicked && totesAssigned);
+    }, [lineItems, assignedTotes]);
 
     const handleCompletePicking = async () => {
-        console.log(token);
         try {
             await axios.post(
                 `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/complete-picking`, 
@@ -193,6 +193,12 @@ const ListView = ({id}) => {
                         />
                     ))}
                 </div>
+                
+                <ToteSelector 
+                    orderId = {order._id}
+                    assignedTotes={assignedTotes}
+                    onAssignedTotesChange={setAssignedTotes}
+                />
 
                 <button 
                     disabled={!allPicked}

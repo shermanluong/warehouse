@@ -32,7 +32,6 @@ const SingleItemView = ({id}) => {
     const [assignedTotes, setAssignedTotes] = useState([]);
     const [imageLoaded, setImageLoaded] = useState(false);
     const currentImage = lineItems[currentItemIndex]?.image;
-    const imageSizeClass = "w-[200px] h-[200px]"; // or use w-full h-full if inside a fixed container
 
     const token = localStorage.getItem("token");
     useEffect(() => {
