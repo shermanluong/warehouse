@@ -11,6 +11,7 @@ import {
 import NoteDialog from './NoteDialog';
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css';
+import { toast } from 'react-toastify';
 
 const AdminOrders = () => {
   const navigate = useNavigate();
@@ -165,10 +166,12 @@ const AdminOrders = () => {
           }
         }
       );
-
+      
+      toast.success("Orders imported successfully.");
       fetchOrders();
     } catch (error) {
       console.error("Failed to import orders:", error);
+      toast.error("Unable to import orders. Please try again.");
       alert("Error importing orders. Please try again.");
     } finally {
       setLoading(false); // Set loading to false once the import is finished
