@@ -172,7 +172,6 @@ const AdminOrders = () => {
     } catch (error) {
       console.error("Failed to import orders:", error);
       toast.error("Unable to import orders. Please try again.");
-      alert("Error importing orders. Please try again.");
     } finally {
       setLoading(false); // Set loading to false once the import is finished
     }
