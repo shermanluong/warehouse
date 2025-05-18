@@ -7,10 +7,12 @@ import {
     ArrowPathIcon, 
     ArrowRightIcon, 
 } from '@heroicons/react/24/outline'
+import { toast } from 'react-toastify';
+import { useLoading } from "../../Context/LoadingContext";
 
 const Product = () => {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { setLoading } = useLoading();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOption, setSortOption] = useState('title'); // Default to sorting by title
   const [sortOrder, setSortOrder] = useState('asc'); // Default ascending order
@@ -93,6 +95,7 @@ const Product = () => {
 
   const handleSync = async  () => {
     setSyncLoading(true);
+    setLoading(true);
     try {
       const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/shopify/sync-products`,
@@ -104,15 +107,16 @@ const Product = () => {
       );
 
       fetchProducts();
+      toast.success("Prosuces has synced successfully!");
     } catch (error) {
       console.error("Failed to sync products:",  error);
+      toast.error("Failed to sync products.");
       alert("Error syncing products. Please try again.")
     } finally {
       setSyncLoading(false);
+      setLoading(false);
     }
   }
-
-  if (loading) return <div className="p-4 text-center">Loading products...</div>;
 
   return (
     <Layout headerTitle={"Products"}>

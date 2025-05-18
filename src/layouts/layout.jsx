@@ -7,7 +7,7 @@ import axios from "axios";
 
 const navigation = [
     { name: 'Dashboard', href: '/admin/dashboard', current: false, roles: ['admin'] },
-    { name: 'Approval', href: '/admin/approval', current: false, roles: ['admin'] },
+    { name: 'Approve', href: '/admin/approval', current: false, roles: ['admin'] },
     { name: 'Product', href: '/admin/product', current: false, roles: ['admin'] },
     { name: 'Substitution', href: '/admin/substitution', current: false, roles: ['admin'] },
     { name: 'Users', href: '/admin/users', current: false, roles: ['admin'] },
@@ -49,8 +49,6 @@ const Layout = ({children, headerTitle}) => {
                 headers: { Authorization: `Bearer ${token}` },
             }
             );
-            console.log(res);
-            
             const notifs = res?.data || [];
             setNotifications(notifs);
 

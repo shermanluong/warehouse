@@ -32,7 +32,7 @@ const ApprovalPage = () => {
     };
 
     return (
-        <Layout headerTitle={"Approval"}>
+        <Layout headerTitle={"Approve"}>
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                 {orders?.length > 0 ? (
                 <div className="grid grid-cols-1 gap-6">
