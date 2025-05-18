@@ -61,45 +61,48 @@ const FlagDialog = ({ isOpen, onClose, lineItem, onSubmit, onSelectSubstitution 
 
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
-      <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+      <div className="fixed inset-0 bg-black/40" aria-hidden="true" />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel className="w-full max-w-2xl rounded-lg bg-white p-6 shadow-xl relative"> {/* Added relative positioning here */}
+        <Dialog.Panel className="w-full max-w-2xl rounded-2xl bg-white p-8 shadow-2xl relative">
           
-          {/* Cancel Button - Positioned at the top-right */}
+          {/* Cancel Button */}
           <button
             onClick={onClose}
-            className="absolute top-0 right-2 text-4xl text-gray-500 hover:text-gray-700 z-10" // Ensuring z-index for visibility
+            className="absolute top-2 right-4 text-5xl text-gray-400 hover:text-gray-700 z-10"
+            aria-label="Close"
           >
             &times;
           </button>
-
-          <Dialog.Title className="text-lg font-bold mb-4">Substitute Item</Dialog.Title>
-
-          <div className="flex flex-col sm:flex-row justify-between border border-gray-200 rounded-lg p-4 shadow-md">
-            <div className="flex items-start">
-              <img src={lineItem?.image} alt={lineItem?.productTitle} className="w-24 h-24 rounded object-cover" />
-              <div className="ml-4">
-                <h3 className="font-semibold text-xl text-gray-900">
+  
+          <Dialog.Title className="text-3xl font-extrabold mb-6 text-green-800 text-center">Substitute Item</Dialog.Title>
+  
+          {/* Main Product */}
+          <div className="flex flex-col sm:flex-row justify-between border-2 border-gray-100 rounded-xl p-6 shadow-lg bg-gray-50 mb-6">
+            <div className="flex items-center">
+              <img src={lineItem?.image} alt={lineItem?.productTitle} className="w-32 h-32 rounded-xl object-cover border-2 border-blue-200" />
+              <div className="ml-6">
+                <h3 className="font-bold text-2xl text-gray-900 mb-1">
                   {lineItem?.variantInfo?.title === "Default Title"
                     ? lineItem?.productTitle
                     : lineItem?.variantInfo?.title}
                 </h3>
-                <p className="font-semibold text-md text-gray-900">
-                  SKU: {lineItem?.variantInfo?.sku}
+                <p className="font-semibold text-lg text-gray-700">
+                  SKU: <span className="font-mono">{lineItem?.variantInfo?.sku}</span>
                 </p>
-                <p className="font-semibold text-md text-gray-900 mb-2">
-                  Price: ${lineItem?.variantInfo?.price}
+                <p className="font-semibold text-lg text-gray-700">
+                  Price: <span className="text-green-700">${lineItem?.variantInfo?.price}</span>
                 </p>
-                <p className="font-semibold text-md text-gray-900 mb-2">
+                <p className="font-bold text-xl text-blue-700 mt-2">
                   {flagQuantity} units
                 </p>
               </div>
             </div>
-
-            <div className="flex mt-4 space-x-2 justify-between items-center sm:flex-col sm:mt-0 sm:space-x-0 sm:space-y-2">
+  
+            {/* Flag selection and confirm */}
+            <div className="flex flex-col items-center justify-center mt-6 sm:mt-0">
               <select
                 onChange={(e) => setSelectedFlag(e.target.value)}
-                className="bg-red-500 text-white px-1 py-0 rounded-2xl"
+                className="bg-red-600 text-white px-6 py-3 text-xl rounded-2xl font-bold mb-4 shadow focus:outline-none"
                 value={selectedFlag}
               >
                 <option className="bg-white text-gray-900" value="Out Of Stock">
@@ -109,45 +112,45 @@ const FlagDialog = ({ isOpen, onClose, lineItem, onSubmit, onSelectSubstitution 
                   Damaged
                 </option>
               </select>
-
-              <div className="flex justify-end">
-                <button
-                  onClick={handleConfirm}
-                  className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
-                  Confirm
-                </button>
-              </div>
+              <button
+                onClick={handleConfirm}
+                className="w-40 py-3 text-xl bg-blue-700 text-white rounded-2xl font-bold shadow-lg hover:bg-blue-800"
+              >
+                Confirm
+              </button>
             </div>
           </div>
-
+  
+          {/* Suggested Substitutions */}
           <div className="mt-4">
-            <p className="font-medium text-gray-700 mb-2">Suggested Substitutions</p>
-            <ul className="space-y-2 max-h-60 overflow-y-auto">
+            <p className="font-extrabold text-2xl text-gray-800 mb-3 text-center">Suggested Substitutions</p>
+            <ul className="space-y-4 max-h-72 overflow-y-auto">
               {substitutions.length === 0 && (
-                <li className="text-sm text-gray-500 italic">No substitutes available</li>
+                <li className="text-lg text-gray-400 italic text-center">No substitutes available</li>
               )}
               {substitutions.map((item) => (
                 <li
                   key={item.shopifyVariantId}
-                  className={`border p-2 rounded flex justify-between items-center ${
-                    selectedSubstitute?.variantId === item.variantId ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+                  className={`border-2 p-4 rounded-xl flex justify-between items-center gap-4 ${
+                    selectedSubstitute?.variantId === item.variantId ? 'border-blue-600 bg-blue-50' : 'border-gray-200 bg-white'
                   }`}
                 >
-                  <div className="flex justify-start">
-                    <img src={item?.image} alt={item?.title} className="w-20 h-20 rounded object-cover" />
-                    <div className="ml-3">
-                      <p className="font-semibold text-sm">{item.title}</p>
-                      <p className="text-xs text-gray-500">SKU: {item.sku}</p>
-                      <p className="text-xs text-gray-500">Price: ${item.price}</p>
+                  <div className="flex items-center">
+                    <img src={item?.image} alt={item?.title} className="w-24 h-24 rounded-xl object-cover border" />
+                    <div className="ml-4">
+                      <p className="font-bold text-lg">{item.title}</p>
+                      <p className="text-md text-gray-600">SKU: <span className="font-mono">{item.sku}</span></p>
+                      <p className="text-md text-green-700 font-bold">Price: ${item.price}</p>
                     </div>
                   </div>
-
+  
                   <button
                     onClick={() => handleSelectSubstitute(item)}
                     disabled={!selectedFlag}
-                    className={`text-sm px-4 py-2 rounded ${
-                      selectedFlag ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-300 text-white'
+                    className={`text-xl font-bold px-8 py-3 rounded-2xl shadow transition ${
+                      selectedFlag
+                        ? 'bg-blue-700 text-white hover:bg-blue-900'
+                        : 'bg-gray-300 text-white cursor-not-allowed'
                     }`}
                   >
                     Select
@@ -156,7 +159,6 @@ const FlagDialog = ({ isOpen, onClose, lineItem, onSubmit, onSelectSubstitution 
               ))}
             </ul>
           </div>
-
         </Dialog.Panel>
       </div>
     </Dialog>

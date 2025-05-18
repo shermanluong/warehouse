@@ -33,11 +33,11 @@ export default function CameraModal({ isOpen, onClose, onCaptureComplete }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-center items-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md sm:max-w-lg lg:max-w-2xl p-4 relative">
-        <h2 className="text-xl font-semibold text-center mb-4">Capture Photo</h2>
-
-        <div className="w-full aspect-[4/3] bg-gray-200 rounded-md overflow-hidden mb-4">
+    <div className="fixed inset-0 z-50 flex justify-center items-center p-4 bg-black/70">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg lg:max-w-2xl p-8 relative">
+        <h2 className="text-3xl font-extrabold text-center mb-8 text-green-900">Capture Photo</h2>
+  
+        <div className="w-full aspect-[4/3] bg-gray-200 rounded-xl overflow-hidden mb-8 flex items-center justify-center border-4 border-blue-200">
           {cameraStarted && (
             <Webcam
               ref={webcamRef}
@@ -54,37 +54,37 @@ export default function CameraModal({ isOpen, onClose, onCaptureComplete }) {
             />
           )}
         </div>
-
+  
         {/* Buttons */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-4">
           {cameraStarted ? (
             <button
               onClick={handleCapture}
-              className="bg-yellow-500 text-white py-2 rounded hover:bg-yellow-600"
+              className="text-2xl font-bold bg-yellow-500 text-white py-4 rounded-xl shadow hover:bg-yellow-600 transition"
             >
-              Take Photo
+              📸 Take Photo
             </button>
           ) : (
             <>
               <button
                 onClick={handleRetake}
-                className="bg-gray-300 text-black py-2 rounded hover:bg-gray-400"
+                className="text-2xl font-bold bg-gray-400 text-white py-4 rounded-xl shadow hover:bg-gray-500 transition"
               >
-                Retake
+                🔄 Retake
               </button>
               <button
                 onClick={handleAccept}
-                className="bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+                className="text-2xl font-bold bg-blue-600 text-white py-4 rounded-xl shadow hover:bg-blue-800 transition"
               >
-                Confirm & Upload
+                ✅ Confirm & Upload
               </button>
             </>
           )}
           <button
             onClick={onClose}
-            className="bg-red-500 text-white py-2 rounded hover:bg-red-600"
+            className="text-2xl font-bold bg-red-600 text-white py-4 rounded-xl shadow hover:bg-red-800 transition"
           >
-            Cancel
+            ✖ Cancel
           </button>
         </div>
       </div>

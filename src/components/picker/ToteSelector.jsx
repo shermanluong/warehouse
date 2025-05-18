@@ -133,24 +133,25 @@ export default function ToteSelector({ orderId, assignedTotes, onAssignedTotesCh
   };
 
   return (
-    <div className="mt-4 relative" ref={wrapperRef}>
+    <div className="mt-6 relative" ref={wrapperRef}>
       <div
-        className="w-full border border-gray-300 rounded-md px-2 py-1 flex flex-wrap items-center gap-1 min-h-[42px] bg-white cursor-text"
+        className="w-full border-2 border-blue-300 rounded-xl px-3 py-2 flex flex-wrap items-center gap-2 min-h-[48px] bg-white cursor-text shadow"
         onClick={handleInputClick}
       >
         {selectedTotes.map((tote) => (
           <span
             key={tote._id}
-            className="flex items-center bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded"
+            className="flex items-center bg-blue-100 text-blue-900 text-lg px-3 py-1 rounded-2xl font-bold mr-2 mb-2"
           >
             {tote.name}
             <button
-              className="ml-1 text-blue-600 hover:text-red-500"
+              className="ml-2 text-blue-600 hover:text-red-600 text-xl font-bold"
               onClick={(e) => {
                 e.stopPropagation();
                 handleRemove(tote._id);
                 removeToteFromOrder(tote._id);
               }}
+              aria-label={`Remove ${tote.name}`}
             >
               &times;
             </button>
@@ -162,25 +163,25 @@ export default function ToteSelector({ orderId, assignedTotes, onAssignedTotesCh
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="flex-1 border-none focus:outline-none py-1 px-1 min-w-[60px]"
-          placeholder="Select Totes"
+          className="flex-1 border-none focus:outline-none py-2 px-2 text-lg min-w-[80px] bg-transparent"
+          placeholder="Select Totes…"
         />
       </div>
-
+  
       {isDropdownOpen && (
-       <div className="absolute left-0 right-0 bottom-full mb-1 border rounded shadow bg-white max-h-40 overflow-y-auto z-10">
+        <div className="absolute left-0 right-0 mt-1 border border-blue-200 rounded-xl shadow-xl bg-white max-h-52 overflow-y-auto z-20">
           {filteredTotes.length > 0 ? (
             filteredTotes.map((tote) => (
               <div
                 key={tote._id}
-                className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
+                className="px-5 py-3 hover:bg-blue-100 cursor-pointer text-lg"
                 onClick={() => handleSelect(tote)}
               >
                 {tote.name}
               </div>
             ))
           ) : (
-            <div className="px-4 py-2 text-gray-500">No matches</div>
+            <div className="px-5 py-3 text-gray-500 text-lg">No matches</div>
           )}
         </div>
       )}

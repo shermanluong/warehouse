@@ -200,221 +200,222 @@ const SingleItemView = ({id}) => {
 
     return (
         <>
-            <div className="bg-white p-4 rounded-sm shadow-md">
-                <div className="flex flex-row mb-4 justify-between">
-
-                    <h3 className="font-semibold text-3xl">Order: {order?.name}
-
-                    {(order?.orderNote || order?.adminNote) && (
-                        <span title="This order has notes" className="text-yellow-500 ml-2">📌</span>
-                    )}
+            <div className="bg-white p-6 rounded-lg shadow-xl max-w-3xl mx-auto mt-4">
+                {/* Top bar */}
+                <div className="flex flex-row mb-6 justify-between items-center">
+                    <h3 className="font-bold text-4xl tracking-tight text-green-800">
+                        Order: {order?.name}
+                        {(order?.orderNote || order?.adminNote) && (
+                            <span title="This order has notes" className="text-yellow-500 ml-3 text-3xl">📌</span>
+                        )}
                     </h3>
                     <button 
                         onClick={() => navigate(`/picker/orders`)}
-                        className="rounded-md hover:bg-blue-300"
-                    >
-                        <ArrowLongRightIcon className="w-5 h-5" />
+                        className="rounded-full bg-blue-200 hover:bg-blue-400 transition-colors p-3">
+                        <ArrowLongRightIcon className="w-8 h-8" />
                     </button>
                 </div>
 
-                <div className="flex flex-row mb-4 justify-between text-md">
-                    <p>Customer: 
-                        <span className="font-mono text-gray-700 ml-2">
+                {/* Customer and picked count */}
+                <div className="flex flex-row mb-6 justify-between items-center text-2xl">
+                    <span>
+                        <span className="font-bold text-gray-800">Customer:</span>
+                        <span className="font-mono text-green-700 ml-3">
                             {order?.customer?.first_name} {order?.customer?.last_name}
                         </span>
-                    </p>
-                    <div className="bg-green-400 px-3 rounded-2xl">{order.pickedCount}/{order.lineItems.length} picked</div>
+                    </span>
+                    <div className="bg-green-500 text-white text-lg px-5 py-1 rounded-3xl shadow whitespace-nowrap min-w-[90px] text-center">
+                        {order.pickedCount}/{order.lineItems.length} picked
+                    </div>
                 </div>
 
+                {/* Notes */}
                 {order?.adminNote && (
-                    <div className="my-3">
-                        <p className="text-sm font-semibold text-red-600">Admin Note: {order.adminNote}</p>
+                    <div className="my-4">
+                        <p className="text-2xl font-bold text-red-700">Admin Note: {order.adminNote}</p>
                     </div>
                 )}
-                    
                 {order?.orderNote && (
-                    <div className="my-3">
-                        <p className="text-sm font-semibold text-red-600">Customer Note: {order.orderNote}</p>
+                    <div className="my-4">
+                        <p className="text-2xl font-bold text-blue-700">Customer Note: {order.orderNote}</p>
                     </div>
                 )}
 
-                <BarcodeScanner onScan={handleScan}/>
-                <BarcodeListener onScan={handleScan} />
+                {/* Barcode section */}
+                <div className="mb-5">
+                    <BarcodeScanner onScan={handleScan}/>
+                    <BarcodeListener onScan={handleScan} />
+                    {barcodeStatus && (
+                        <div className="text-center text-2xl font-semibold text-yellow-600 mt-2">
+                            {barcodeStatus}
+                        </div>
+                    )}
+                </div>
 
-                <div className="flex justify-between space-x-2">
-                    {/* Navigation buttons */}
+                {/* Navigation buttons */}
+                <div className="flex justify-between mb-6">
                     <button
-                        className={`px-2 py-2 rounded-md shadow ${
-                        currentItemIndex > 0 ? "bg-gray-200" : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                        className={`w-24 h-24 rounded-full shadow-lg text-3xl flex items-center justify-center ${
+                            currentItemIndex > 0 ? "bg-gray-200 hover:bg-gray-400" : "bg-gray-100 text-gray-400 cursor-not-allowed"
                         }`}
                         onClick={() => handleItemChange(currentItemIndex - 1)}
                         disabled={currentItemIndex === 0}
                     >
-                        <ArrowLongLeftIcon className="w-5 h-5" />
+                        <ArrowLongLeftIcon className="w-10 h-10" />
                     </button>
-
                     <button
-                        className={`px-2 py-2 rounded-md shadow ${
-                        currentItemIndex < lineItems.length - 1 ? "bg-gray-200" : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                        className={`w-24 h-24 rounded-full shadow-lg text-3xl flex items-center justify-center ${
+                            currentItemIndex < lineItems.length - 1 ? "bg-gray-200 hover:bg-gray-400" : "bg-gray-100 text-gray-400 cursor-not-allowed"
                         }`}
                         onClick={() => handleItemChange(currentItemIndex + 1)}
                         disabled={currentItemIndex >= lineItems.length - 1}
                     >
-                        <ArrowLongRightIcon className="w-5 h-5" />
+                        <ArrowLongRightIcon className="w-10 h-10" />
                     </button>
                 </div>
                 
-                <div className="flex flex-col mt-6">
+                {/* Main item display */}
+                <div className="flex flex-col mt-2">
                     {lineItems.length > 0 && (
-                        <div className = "">
+                        <div>
                             <div className="flex flex-col sm:flex-row justify-between">
-                                {/* Left side: image + name + SKU */}
-                                <h3 className="text-center font-semibold text-2xl text-gray-900 mb-10">
-                                    {currentItemIndex + 1} - {lineItems[currentItemIndex]?.variantInfo?.title === "Default Title"
-                                        ? lineItems[currentItemIndex]?.productTitle
-                                        : lineItems[currentItemIndex]?.variantInfo?.title}
-                                    {(lineItems[currentItemIndex].adminNote || lineItems[currentItemIndex].customerNote) && (
-                                        <span title="This item has notes" className="text-yellow-500 text-2xl ml-2">📌</span>
-                                    )}
-                                </h3>
-                
-                                <div className="flex justify-center">
-                                    <div className="flex flex-col justify-center ml-5 mr-5">
-                                        <p className="font-semibold text-xl text-gray-900">SKU: {lineItems[currentItemIndex]?.variantInfo?.sku}</p>
-                                        {lineItems[currentItemIndex]?.variantInfo?.barcode && 
-                                            <p className="font-semibold text-sm text-yellow-900">{lineItems[currentItemIndex]?.variantInfo?.barcode}</p>
-                                        }
-                                        <span className="font-semibold text-xl text-gray-900">
-                                            { 
-                                                lineItems[currentItemIndex]?.pickedStatus?.verified.quantity 
-                                                +
-                                                lineItems[currentItemIndex]?.pickedStatus?.damaged.quantity 
-                                                +
-                                                lineItems[currentItemIndex]?.pickedStatus?.outOfStock.quantity 
-                                            } / {lineItems[currentItemIndex]?.quantity} units
-                                        </span>
-                
-                                        <div className="flex gap-1 mt-2 mb-2 flex-wrap">
-                                            {lineItems[currentItemIndex]?.pickedStatus?.verified.quantity > 0 && (
-                                                <p className="text-lg text-white bg-green-500 rounded-2xl px-3 mt-2 sm:mt-0">
-                                                    {lineItems[currentItemIndex]?.pickedStatus?.verified.quantity} picked
-                                                </p>
-                                            )}
-                
-                                            {lineItems[currentItemIndex]?.pickedStatus?.outOfStock.quantity > 0 && (
-                                                <p className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">
-                                                    {lineItems[currentItemIndex]?.pickedStatus?.outOfStock.quantity} Out Of Stock
-                                                </p>
-                                            )}
-                
-                                            {lineItems[currentItemIndex]?.pickedStatus?.damaged.quantity > 0 && (
-                                                <p className="text-lg text-white bg-red-500 rounded-2xl px-3 mt-2 sm:mt-0">
-                                                    {lineItems[currentItemIndex]?.pickedStatus?.damaged.quantity} Damaged
-                                                </p>
-                                            )}
-                                        </div>
-                                        
-                                        {/* Notes Display */}
-                                        {lineItems[currentItemIndex].adminNote && (
-                                        <p className="text-xl text-red-600 mt-1">Admin: {lineItems[currentItemIndex].adminNote}</p>
+                                {/* Left: Image, large name, SKU */}
+                                <div className="flex-1 flex flex-col items-center">
+                                    <h3 className="text-center font-extrabold text-3xl mb-6 text-gray-900">
+                                        {currentItemIndex + 1} - {lineItems[currentItemIndex]?.variantInfo?.title === "Default Title"
+                                            ? lineItems[currentItemIndex]?.productTitle
+                                            : lineItems[currentItemIndex]?.variantInfo?.title}
+                                        {(lineItems[currentItemIndex].adminNote || lineItems[currentItemIndex].customerNote) && (
+                                            <span title="This item has notes" className="text-yellow-500 text-2xl ml-2">📌</span>
                                         )}
-                
-                                        {lineItems[currentItemIndex].customerNote && (
-                                        <p className="text-xl text-blue-600 mt-1">Customer: {lineItems[currentItemIndex].customerNote}</p>
-                                        )}
-                                    </div>
-                                    <div className="relative w-50 h-50">
+                                    </h3>
+                                    <div className="relative w-48 h-48 mb-4">
                                         {!imageLoaded && (
-                                            <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                                            <div className="w-full h-full flex items-center justify-center bg-gray-200 text-lg">
                                                 Loading...
                                             </div>
                                         )}
-                                        
                                         {currentImage && (
                                             <img
-                                            src={currentImage}
-                                            alt={lineItems[currentItemIndex]?.productTitle}
-                                            className={`absolute top-0 left-0 w-full h-full rounded object-cover cursor-pointer transition-opacity duration-300 ${
-                                                imageLoaded ? 'opacity-100' : 'opacity-0'
-                                            }`}
-                                            onLoad={() => setImageLoaded(true)}
-                                            onClick={() => handleClickImage(currentImage)}
+                                                src={currentImage}
+                                                alt={lineItems[currentItemIndex]?.productTitle}
+                                                className={`absolute top-0 left-0 w-full h-full rounded-2xl object-cover cursor-pointer transition-opacity duration-300 border-4 border-blue-200 ${
+                                                    imageLoaded ? 'opacity-100' : 'opacity-0'
+                                                }`}
+                                                onLoad={() => setImageLoaded(true)}
+                                                onClick={() => handleClickImage(currentImage)}
                                             />
                                         )}
                                     </div>
+                                    <span className="font-bold text-xl text-gray-900 mb-2">
+                                        SKU: {lineItems[currentItemIndex]?.variantInfo?.sku}
+                                    </span>
+                                    {lineItems[currentItemIndex]?.variantInfo?.barcode && (
+                                        <p className="font-bold text-lg text-yellow-800 mb-2">{lineItems[currentItemIndex]?.variantInfo?.barcode}</p>
+                                    )}
+                                    <span className="font-bold text-2xl text-gray-900 mb-2">
+                                        { 
+                                            lineItems[currentItemIndex]?.pickedStatus?.verified.quantity 
+                                            +
+                                            lineItems[currentItemIndex]?.pickedStatus?.damaged.quantity 
+                                            +
+                                            lineItems[currentItemIndex]?.pickedStatus?.outOfStock.quantity 
+                                        } / {lineItems[currentItemIndex]?.quantity} units
+                                    </span>
                                 </div>
-                
-                                <div className="flex justify-center mt-4 space-x-20">
-                                    
-                                    {!lineItems[currentItemIndex].picked && lineItems[currentItemIndex].quantity <= 1 &&
-                                        <button
-                                            title = "Pick item"
-                                            onClick={() => handlePickPlus(lineItems[currentItemIndex].shopifyLineItemId)}
-                                            className="bg-white text-green-600 border border-green-600 hover:bg-green-200 w-16 h-16 rounded flex items-center justify-center"
-                                        >
-                                            <CheckIcon className="w-10 h-10" />
-                                        </button>
-                                    }
-                
-                                    {!lineItems[currentItemIndex].picked && lineItems[currentItemIndex].quantity > 1 &&
-                                        <>
+                                
+                                {/* Right: Action & notes */}
+                                <div className="flex flex-col items-center justify-center space-y-3 flex-1 min-w-[280px]">
+                                    {/* Status tags */}
+                                    <div className="flex gap-2 mt-2 mb-2 flex-wrap justify-center">
+                                        {lineItems[currentItemIndex]?.pickedStatus?.verified.quantity > 0 && (
+                                            <span className="text-2xl font-bold text-white bg-green-600 rounded-2xl px-4 py-1">
+                                                {lineItems[currentItemIndex]?.pickedStatus?.verified.quantity} picked
+                                            </span>
+                                        )}
+                                        {lineItems[currentItemIndex]?.pickedStatus?.outOfStock.quantity > 0 && (
+                                            <span className="text-2xl font-bold text-white bg-red-600 rounded-2xl px-4 py-1">
+                                                {lineItems[currentItemIndex]?.pickedStatus?.outOfStock.quantity} Out Of Stock
+                                            </span>
+                                        )}
+                                        {lineItems[currentItemIndex]?.pickedStatus?.damaged.quantity > 0 && (
+                                            <span className="text-2xl font-bold text-white bg-red-400 rounded-2xl px-4 py-1">
+                                                {lineItems[currentItemIndex]?.pickedStatus?.damaged.quantity} Damaged
+                                            </span>
+                                        )}
+                                    </div>
+                                    {/* Notes */}
+                                    {lineItems[currentItemIndex].adminNote && (
+                                        <p className="text-2xl text-red-700 mt-1 text-center">Admin: {lineItems[currentItemIndex].adminNote}</p>
+                                    )}
+                                    {lineItems[currentItemIndex].customerNote && (
+                                        <p className="text-2xl text-blue-700 mt-1 text-center">Customer: {lineItems[currentItemIndex].customerNote}</p>
+                                    )}
+                                    {/* Action buttons */}
+                                    <div className="flex justify-center mt-4 space-x-10">
+                                        {!lineItems[currentItemIndex].picked && lineItems[currentItemIndex].quantity <= 1 &&
                                             <button
-                                                title = "Add one Item"
+                                                title="Pick item"
                                                 onClick={() => handlePickPlus(lineItems[currentItemIndex].shopifyLineItemId)}
-                                                className="bg-white text-blue-400 border border-blue-400 hover:bg-blue-200 w-16 h-16 rounded flex items-center justify-center"
+                                                className="bg-white text-green-700 border-4 border-green-600 hover:bg-green-200 w-20 h-20 rounded-full flex items-center justify-center text-3xl shadow-xl"
                                             >
-                                                <PlusIcon className="w-10 h-10" />
+                                                <CheckIcon className="w-10 h-10" />
                                             </button>
+                                        }
+                                        {!lineItems[currentItemIndex].picked && lineItems[currentItemIndex].quantity > 1 &&
+                                            <>
+                                                <button
+                                                    title="Add one Item"
+                                                    onClick={() => handlePickPlus(lineItems[currentItemIndex].shopifyLineItemId)}
+                                                    className="bg-white text-blue-700 border-4 border-blue-500 hover:bg-blue-200 w-20 h-20 rounded-full flex items-center justify-center text-3xl shadow-xl"
+                                                >
+                                                    <PlusIcon className="w-10 h-10" />
+                                                </button>
+                                                <button
+                                                    title="Remove one Item"
+                                                    onClick={() => handlePickMinus(lineItems[currentItemIndex].shopifyLineItemId)}
+                                                    className="bg-white text-gray-500 border-4 border-gray-400 hover:bg-stone-200 w-20 h-20 rounded-full flex items-center justify-center text-3xl shadow-xl"
+                                                >
+                                                    <MinusIcon className="w-10 h-10" />
+                                                </button>
+                                            </>
+                                        }
+                                        {!lineItems[currentItemIndex].picked && 
+                                            <button 
+                                                title="Flag Item"
+                                                onClick={() => openFlagDialog(lineItems[currentItemIndex])}
+                                                className="bg-white text-red-700 border-4 border-red-600 hover:bg-red-200 w-20 h-20 rounded-full flex items-center justify-center text-3xl shadow-xl"
+                                            >
+                                                <XMarkIcon className="w-10 h-10" />
+                                            </button>
+                                        }
+                                        {lineItems[currentItemIndex].picked && 
                                             <button
-                                                title = "Remove one Item"
-                                                onClick={() => handlePickMinus(lineItems[currentItemIndex].shopifyLineItemId)}
-                                                className="bg-white text-stone-400 border border-stone-400 hover:bg-stone-200 w-16 h-16 rounded flex items-center justify-center"
+                                                title="Undo" 
+                                                onClick={() => handleUndo(lineItems[currentItemIndex].shopifyLineItemId)}
+                                                className="bg-white text-blue-700 border-4 border-blue-500 hover:bg-blue-200 w-20 h-20 rounded-full flex items-center justify-center text-3xl shadow-xl"
                                             >
-                                                <MinusIcon className="w-10 h-10" />
+                                                <ArrowPathIcon className="w-10 h-10" />
                                             </button>
-                                        </>
-                                    }
-                
-                                    {!lineItems[currentItemIndex].picked && 
-                                        <button 
-                                            title = "Flag Item"
-                                            onClick={() => openFlagDialog(lineItems[currentItemIndex])}
-                                            className="bg-white text-red-600 border border-red-600 hover:bg-red-200 w-16 h-16 rounded flex items-center justify-center"
-                                        >
-                                            <XMarkIcon className="w-10 h-10" />
-                                        </button>
-                                    }
-                
-                                    {lineItems[currentItemIndex].picked && 
-                                        <button
-                                            title = "Undo" 
-                                            onClick={() => handleUndo(lineItems[currentItemIndex].shopifyLineItemId)}
-                                            className="bg-white text-blue-400 border border-blue-400 hover:bg-blue-200 w-16 h-16 rounded flex items-center justify-center"
-                                        >
-                                            <ArrowPathIcon className="w-10 h-10" />
-                                        </button>
-                                    }
+                                        }
+                                    </div>
                                 </div>
                             </div>
-                
+                            {/* Substitution Display */}
                             {lineItems[currentItemIndex]?.substitution?.shopifyVariantId && 
-                                <div
-                                    className="flex flex-col sm:flex-row mt-4 mb-2 justify-between border border-yellow-600 rounded-lg p-4"
-                                >
-                                    {/* Left side: image + name + SKU */}
-                                    <div className="flex items-start">
+                                <div className="flex flex-col sm:flex-row mt-6 mb-2 justify-center border-4 border-yellow-600 rounded-xl p-6 bg-yellow-50">
+                                    <div className="flex items-center">
                                         <img
                                             src={lineItems[currentItemIndex]?.substitution?.image}
                                             alt={lineItems[currentItemIndex]?.substitution?.title}
-                                            className="w-36 h-36 rounded object-cover"
+                                            className="w-44 h-44 rounded-xl object-cover cursor-pointer border-2 border-yellow-400"
                                             onClick={() => handleClickImage(lineItems[currentItemIndex]?.substitution?.image)}
                                         />
-                                        <div className="ml-4 mt-2 sm:mt-0">
-                                            <h3 className="font-semibold text-2xl text-yellow-600">
+                                        <div className="ml-6">
+                                            <h3 className="font-bold text-2xl text-yellow-700">
                                                 Subbed: {lineItems[currentItemIndex]?.substitution?.title}
                                             </h3>
-                
-                                            <p className="font-semibold text-xl text-gray-900">SKU: {lineItems[currentItemIndex]?.substitution?.sku}</p>
+                                            <p className="font-bold text-xl text-gray-900">SKU: {lineItems[currentItemIndex]?.substitution?.sku}</p>
                                         </div>
                                     </div>
                                 </div>  
@@ -423,18 +424,20 @@ const SingleItemView = ({id}) => {
                     )}
                 </div>
 
-                <ToteSelector 
-                    orderId = {order._id}
-                    assignedTotes={assignedTotes}
-                    onAssignedTotesChange={setAssignedTotes}
-                />
+                <div className="mt-10">
+                    <ToteSelector 
+                        orderId={order._id}
+                        assignedTotes={assignedTotes}
+                        onAssignedTotesChange={setAssignedTotes}
+                    />
+                </div>
 
                 <button 
                     disabled={!allPicked}
                     onClick={handleCompletePicking}
-                    className={`w-full mt-4 rounded-md p-2 
+                    className={`w-full mt-8 rounded-2xl text-3xl p-4 font-bold shadow-xl transition-all
                         ${allPicked 
-                            ? 'bg-blue-500 hover:bg-blue-600 text-white' 
+                            ? 'bg-blue-600 hover:bg-blue-800 text-white' 
                             : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
                     `}
                 >
@@ -446,7 +449,7 @@ const SingleItemView = ({id}) => {
                 onClose={() => setShowDialog(false)}
                 lineItem={selectedItem}
                 onSubmit={handleFlagSubmit}
-                onSelectSubstitution= {handleSubstitutionSelect}
+                onSelectSubstitution={handleSubstitutionSelect}
             />
             <ImageZoomModal
                 isOpen={isImageOpen}

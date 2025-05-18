@@ -5,6 +5,7 @@ import axios from 'axios';
 import FlagDialog from '../../components/FlagDialog'
 import ImageZoomModal from '../../components/ImageZoomModal';
 import BarcodeScanner from '../../components/BarcodeScanner';
+import BarcodeListener from '../../components/BarcodeListener';
 import PickLineItem from '../../components/PickLineItem';
 import ToteSelector from './ToteSelector';
 
@@ -99,6 +100,12 @@ const ListView = ({id}) => {
     };
 
     const handleScan = async (barcode) => {
+        if (barcode == '') {
+            setBarcodeStatus("Please input barcode");
+            setTimeout(() => setBarcodeStatus(""), 2000);
+            return;
+        }
+
         const scannedItem = lineItems.find(
             (item) => item.variantInfo?.barcode === barcode
         );
@@ -129,101 +136,109 @@ const ListView = ({id}) => {
 
     return (
         <>
-            <div className="bg-white p-4 rounded-sm shadow-md">
-                <div className="flex flex-row mb-4 justify-between">
-
-                    <h3 className="font-semibold text-3xl">Order: {order?.name}
-
-                    {(order?.orderNote || order?.adminNote) && (
-                        <span title="This order has notes" className="text-yellow-500 ml-2">📌</span>
-                    )}
-                    </h3>
-                    <button 
-                        onClick={() => navigate(`/picker/orders`)}
-                        className="px-4 rounded-md hover:bg-blue-300"
-                    >
-                        Back to list
-                    </button>
-                </div>
-
-                <div className="flex flex-row mb-4 justify-between text-xl">
-                    <p>Customer: 
-                        <span className="font-mono text-gray-700 ml-2">
-                            {order?.customer?.first_name} {order?.customer?.last_name}
-                        </span>
-                    </p>
-                    <div className="bg-green-400 px-3 rounded-2xl">{order.pickedCount}/{order.lineItems.length} picked</div>
-                </div>
-
-                {order?.adminNote && (
-                    <div className="my-3">
-                        <p className="text-sm font-semibold text-red-600">Admin Note: {order.adminNote}</p>
-                    </div>
+          <div className="bg-white p-6 rounded-xl shadow-lg">
+            {/* Header row with order name and back button */}
+            <div className="flex flex-row items-center justify-between mb-6">
+              <h3 className="font-extrabold text-3xl text-blue-900 flex items-center">
+                Order: {order?.name}
+                {(order?.orderNote || order?.adminNote) && (
+                  <span title="This order has notes" className="text-yellow-500 ml-4 text-2xl">📌</span>
                 )}
-                    
-                {order?.orderNote && (
-                    <div className="my-3">
-                        <p className="text-sm font-semibold text-red-600">Customer Note: {order.orderNote}</p>
-                    </div>
-                )}
-
-                <BarcodeScanner 
-                    OnScan={handleScan}
-                />
-
-                <p className='mb-2'>Scanned Barcode: {barcodeStatus}</p>
-
-                {/*<button
-                    onClick={() => setView('single')}
-                    className="mb-4 bg-blue-500 text-white px-4 py-2 rounded"
-                >
-                    Switch to Single Item View
-                </button>*/
-                }
-
-                <div className="flex flex-col gap-4">
-                    {lineItems.map((lineItem) => (
-                        <PickLineItem 
-                            key={lineItem.shopifyLineItemId}
-                            orderId = {order._id}
-                            lineItem = {lineItem}
-                            OnRefresh = {fetchOrder}
-                            OnClickImage = {handleClickImage}
-                            OnFlagDialog = {openFlagDialog}
-                        />
-                    ))}
-                </div>
-                
-                <ToteSelector 
-                    orderId = {order._id}
-                    assignedTotes={assignedTotes}
-                    onAssignedTotesChange={setAssignedTotes}
-                />
-
-                <button 
-                    disabled={!allPicked}
-                    onClick={handleCompletePicking}
-                    className={`w-full mt-4 rounded-sm p-2 
-                        ${allPicked 
-                            ? 'bg-blue-500 hover:bg-blue-600 text-white' 
-                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
-                    `}
-                >
-                    Complete Picking
-                </button>
+              </h3>
+              <button 
+                onClick={() => navigate(`/picker/orders`)}
+                className="px-6 py-2 rounded-xl bg-blue-100 hover:bg-blue-300 text-blue-900 font-bold text-lg shadow transition"
+              >
+                Back to list
+              </button>
             </div>
-            <FlagDialog
-                isOpen={showDialog}
-                onClose={() => setShowDialog(false)}
-                lineItem={selectedItem}
-                onSubmit={handleFlagSubmit}
-                onSelectSubstitution= {handleSubstitutionSelect}
-            />
-            <ImageZoomModal
-                isOpen={isImageOpen}
-                onClose={() => setIsImageOpen(false)}
-                imageUrl={enlargedImage}
-            />
+      
+            {/* Customer and picked badge */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2 text-xl">
+              <p>
+                Customer: 
+                <span className="font-mono text-gray-700 ml-2">
+                  {order?.customer?.first_name} {order?.customer?.last_name}
+                </span>
+              </p>
+              <div className="bg-green-400 text-white px-4 py-1 rounded-2xl font-bold text-lg shadow">
+                {order.pickedCount}/{order.lineItems.length} picked
+              </div>
+            </div>
+      
+            {/* Notes */}
+            {order?.adminNote && (
+              <div className="my-3">
+                <p className="text-lg font-semibold text-red-600">Admin Note: {order.adminNote}</p>
+              </div>
+            )}
+            {order?.orderNote && (
+              <div className="my-3">
+                <p className="text-lg font-semibold text-blue-600">Customer Note: {order.orderNote}</p>
+              </div>
+            )}
+      
+            {/* Barcode section */}
+            <div className="mb-5">
+                <BarcodeScanner onScan={handleScan}/>
+                <BarcodeListener onScan={handleScan} />
+                {barcodeStatus && (
+                    <div className="text-left text-2xl font-semibold text-yellow-600 mt-2">
+                        {barcodeStatus}
+                    </div>
+                )}
+            </div>
+      
+            {/* Line items */}
+            <div className="flex flex-col gap-4">
+              {lineItems.map((lineItem) => (
+                <PickLineItem 
+                  key={lineItem.shopifyLineItemId}
+                  orderId={order._id}
+                  lineItem={lineItem}
+                  OnRefresh={fetchOrder}
+                  OnClickImage={handleClickImage}
+                  OnFlagDialog={openFlagDialog}
+                />
+              ))}
+            </div>
+            
+            {/* Tote Selector */}
+            <div className="my-6">
+              <ToteSelector 
+                orderId={order._id}
+                assignedTotes={assignedTotes}
+                onAssignedTotesChange={setAssignedTotes}
+              />
+            </div>
+      
+            {/* Complete Picking Button */}
+            <button 
+              disabled={!allPicked}
+              onClick={handleCompletePicking}
+              className={`w-full mt-4 py-4 rounded-xl font-extrabold text-xl shadow transition
+                ${allPicked 
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
+              `}
+            >
+              Complete Picking
+            </button>
+          </div>
+          
+          {/* Dialogs */}
+          <FlagDialog
+            isOpen={showDialog}
+            onClose={() => setShowDialog(false)}
+            lineItem={selectedItem}
+            onSubmit={handleFlagSubmit}
+            onSelectSubstitution={handleSubstitutionSelect}
+          />
+          <ImageZoomModal
+            isOpen={isImageOpen}
+            onClose={() => setIsImageOpen(false)}
+            imageUrl={enlargedImage}
+          />
         </>
     );
 };
