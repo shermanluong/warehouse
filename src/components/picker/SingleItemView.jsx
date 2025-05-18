@@ -48,10 +48,8 @@ const SingleItemView = ({id}) => {
     // Reset imageLoaded when current item changes
     setImageLoaded(false);
     }, [currentImage]);
-      
 
     const handleCompletePicking = async () => {
-        console.log(token);
         try {
             await axios.post(
                 `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/complete-picking`, 
