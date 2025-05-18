@@ -74,21 +74,21 @@ const Substitution = () => {
   return (
     <Layout headerTitle="Substitution Rules">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="bg-white p-4 rounded-sm shadow-md">
+        <div className="bg-white p-4 rounded-md shadow-md">
           <div className="flex justify-between mb-4">
             <h1 className="text-2xl font-bold">Substitution Rules</h1>
             <button
               onClick={() => setShowAddRule(true)}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
             >
               New Rule
             </button>
           </div>
-
+  
           {rules.map(rule => (
             <div key={rule._id} className="mb-6 p-4 border border-gray-200 rounded shadow-md">
               <div className="flex items-center gap-4">
-                <img src={rule.originProduct.image} className="w-24 h-24 rounded object-cover" />
+                <img src={rule.originProduct.image} className="w-24 h-24 rounded object-cover" alt={rule.originProduct.title} />
                 <div>
                   <div className="font-semibold">{rule.originProduct.title}</div>
                   <div className="text-sm">SKU: {rule.originProduct.sku}</div>
@@ -96,16 +96,16 @@ const Substitution = () => {
                 </div>
                 <button
                   onClick={() => deleteRule(rule._id)}
-                  className="ml-auto text-red-600 hover:underline"
+                  className="ml-auto text-red-600 hover:underline text-base"
                 >
                   Delete Rule
                 </button>
               </div>
-
+  
               <div className="mt-4 space-y-4">
                 {rule?.substitutes?.map(sub => (
                   <div key={sub?.substituteVariantId} className="flex items-center gap-4 ml-4 p-2 border border-gray-200 rounded-md shadow-md">
-                    <img src={sub?.substituteProduct?.image} className="w-20 h-20 rounded object-cover" />
+                    <img src={sub?.substituteProduct?.image} className="w-20 h-20 rounded object-cover" alt={sub?.substituteProduct?.title} />
                     <div>
                       <div>{sub?.substituteProduct?.title}</div>
                       <div className="text-sm">SKU: {sub?.substituteProduct?.sku}</div>
@@ -120,7 +120,7 @@ const Substitution = () => {
                   </div>
                 ))}
               </div>
-
+  
               <button
                 onClick={() => { setSelectedRuleId(rule._id); setShowAddSubstitute(true); }}
                 className="mt-4 text-sm text-blue-600 hover:underline"
@@ -137,7 +137,7 @@ const Substitution = () => {
           setShowAddSubstitute={setShowAddSubstitute}
           setSelectedRuleId={setSelectedRuleId}
           handleSelectProduct={handleSelectProduct}
-          handleCloseDialog= {handleCloseDialog}
+          handleCloseDialog={handleCloseDialog}
         />
       </div>
     </Layout>

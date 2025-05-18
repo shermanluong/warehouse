@@ -33,14 +33,16 @@ function Spinbox({value, max, OnValueChange}) {
   }, [value, min, max, OnValueChange]);
 
   return (
-    <div className="flex items-center space-x-2">
+    <div className="flex items-center space-x-4">
       <button
-        className="px-3 py-1 bg-gray-300 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-12 h-12 text-2xl bg-blue-600 text-white rounded-full hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 transition"
         onClick={decrement}
+        aria-label="Decrease"
+        type="button"
       >
-        -
+        –
       </button>
-
+  
       <input
         type="number"
         value={value}
@@ -48,17 +50,20 @@ function Spinbox({value, max, OnValueChange}) {
         max={max}
         step={step}
         onChange={handleChange}
-        className="w-16 text-center p-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+        className="w-20 h-12 text-2xl text-center border-2 border-blue-300 rounded-xl focus:ring-4 focus:ring-blue-300 transition"
+        aria-label="Box count"
       />
-
+  
       <button
-        className="px-3 py-1 bg-gray-300 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-12 h-12 text-2xl bg-blue-600 text-white rounded-full hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 transition"
         onClick={increment}
+        aria-label="Increase"
+        type="button"
       >
         +
       </button>
     </div>
-  );
+  )
 }
 
 export default Spinbox;

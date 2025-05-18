@@ -121,7 +121,7 @@ const Product = () => {
   return (
     <Layout headerTitle={"Products"}>
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="bg-white p-4 rounded-sm shadow-md">
+        <div className="bg-white p-4 rounded-md shadow-md">
           <div className="flex flex-col gap-4">
             {/* Sort and Pagination Controls */}
             <div className="flex flex-col justify-between gap-4 sm:flex-row">
@@ -188,7 +188,7 @@ const Product = () => {
                 </button>
               </div>
             </div>
-
+  
             {/* Search Bar */}
             <input
               type="text"
@@ -197,16 +197,16 @@ const Product = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-
+  
             {products.length === 0 && (
               <div className="text-center text-gray-500">No products found.</div>
             )}
-
+  
             {products.map((product) =>
               product.variants?.map((variant) => {
                 const displayTitle =
                   variant.title === "Default Title" ? product.title : variant.title;
-
+  
                 return (
                   <div
                     key={variant.shopifyVariantId}

@@ -179,238 +179,222 @@ const AdminOrders = () => {
   };
   
   return (
-      <>
-        <div className="flex flex-col sm:flex-row sm:space-x-2 mb-3">
-            <input
-            type="text"
-            placeholder="Search orders by number or customer name"
-            className="border rounded-md p-2 w-full mb-4 sm:mb-0"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            />
+    <>
+      {/* Search bar */}
+        <div className="flex flex-col sm:flex-row sm:space-x-2 mb-4">
+        <input
+          type="text"
+          placeholder="Search orders by number or customer name"
+          className="border rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400 transition"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
+      {/* Filters and actions */}
+      <div className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:justify-between sm:items-center mb-6">
+        {/* Left: Pagination */}
+        <div className="flex items-center">
+          <select
+            className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-400 transition"
+            value={pageSize}
+            onChange={handlePageSizeChange}
+          >
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={30}>30</option>
+            <option value={50}>50</option>
+          </select>
+          <span className="mx-4 text-sm text-gray-600">{`Page ${currentPage} of ${totalPages}`}</span>
+          <button
+            className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md transition disabled:opacity-50"
+            disabled={currentPage === 1}
+            onClick={() => handlePageChange(currentPage - 1)}
+          >
+            <ArrowLeftIcon className='w-5 h-5' />
+          </button>
+          <button
+            className="px-3 py-2 ml-2 bg-gray-100 hover:bg-gray-200 rounded-md transition disabled:opacity-50"
+            disabled={currentPage === totalPages}
+            onClick={() => handlePageChange(currentPage + 1)}
+          >
+            <ArrowRightIcon className='w-5 h-5' />
+          </button>
         </div>
 
-        <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 justify-between items-left mb-4">
-            {/*Left section*/}
-            <div className="flex items-center">
-              <select
-                  className="px-4 py-2 border rounded-md"
-                  value={pageSize}
-                  onChange={handlePageSizeChange}
-              >
-                  <option value={10}>10</option>
-                  <option value={20}>20</option>
-                  <option value={30}>30</option>
-                  <option value={50}>50</option>
-              </select>
-              <span className="mx-4">{`Page ${currentPage} of ${totalPages}`}</span>
-              <button
-                  className="px-4 py-2 bg-gray-200 rounded-md"
-                  disabled={currentPage === 1}
-                  onClick={() => handlePageChange(currentPage - 1)}
-              >
-                  <ArrowLeftIcon className='w-5 h-5' />
-              </button>
-              <button
-                  className="px-4 py-2 ml-2 bg-gray-200 rounded-md"
-                  disabled={currentPage === totalPages}
-                  onClick={() => handlePageChange(currentPage + 1)}
-              >
-                  <ArrowRightIcon className='w-5 h-5' />
-              </button>
-            </div>
-
-            {/*Right section*/}
-            <div className="flex items-center">
-              {/*Date picker section*/}
-              <select
-                  className="px-4 py-2 border rounded-md"
-                  value={selectedDriver}
-                  onChange={(e)=>setSelectedDriver(e.target.value)}
-              >
-                  <option value=''>All</option>
-                  {drivers.map((driver, index) => (
-                    <option key={index} value={driver.teamMemberId}>
-                      {driver.firstName} {driver.lastName}
-                    </option>
-                  ))}
-              </select>
-              <select
-                  className="px-4 py-2 ml-2 border rounded-md"
-                  value={selectedTag}
-                  onChange={(e)=>setSelectedTag(e.target.value)}
-              >
-                <option value=''>All</option>
-                <option value='Zone1'>Zone1</option>
-                <option value='Zone2'>Zone2</option>
-                <option value='Zone3'>Zone3</option>
-                <option value='Zone4'>Zone4</option>
-                <option value='Zone5'>Zone5</option>
-                <option value='Zone6'>Zone6</option>
-                <option value='Zone7'>Zone7</option>
-                <option value='Zone8'>Zone8</option>
-                <option value='Zone9'>Zone9</option>
-                <option value='Zone10'>Zone10</option>
-                <option value='Zone11'>Zone11</option>
-                <option value='Zone12'>Zone12</option>
-                <option value='Zone13'>Zone13</option>
-                <option value='Zone14'>Zone14</option>
-                <option value='Zone15'>Zone15</option>
-                <option value='Zone16'>Zone16</option>
-                <option value='NEWY'>NEWY</option>
-                <option value='Central Coast'>Central Coast</option>
-                <option value='WOOL'>WOOL</option>
-                <option value='ACT'>ACT</option>
-                <option value='PickUp'>PickUp</option>
-                <option value='BONDI'>BONDI</option>
-                <option value='Wollongong'>Wollongong</option>
-                <option value='Ramsgate'>Ramsgate</option>
-                <option value='Warwick Farm'>Warwick Farm</option>
-                <option value='Kingscross'>Kingscross</option>
-                <option value='Kiama'>Kiama</option>
-                <option value='Berry'>Berry</option>
-                <option value='Canberra Sat'>Canberra Sat</option>
-                <option value='Mona Vale'>Mona Vale</option>
-                <option value='Manly'>Manly</option>
-                <option value='Marrickville'>Marrickville</option>
-                <option value='Haig'>Haig</option>
-                <option value='Gosford'>Gosford</option>
-              </select>
-              <DatePicker
-                selected={selectedDate}
-                onChange={handleDatechange}
-                className="px-4 py-2 ml-2 border rounded-md"
-                dateFormat="yyyy/MM/dd"
-              />
-              <button
-                className="px-4 py-2 ml-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md disabled:opacity-50"
-                onClick={handleImport}
-                disabled={loading} // Disable button when loading is true
-              >
-                {loading ? (
-                  <ArrowPathIcon className="animate-spin h-5 w-5 text-white" /> // Heroicon spinner
-                ) : (
-                  'Import'
-                )}
-              </button>
-            </div>
+        {/* Right: Filters */}
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-400 transition"
+            value={selectedDriver}
+            onChange={(e) => setSelectedDriver(e.target.value)}
+          >
+            <option value=''>All Drivers</option>
+            {drivers.map((driver, index) => (
+              <option key={index} value={driver.teamMemberId}>
+                {driver.firstName} {driver.lastName}
+              </option>
+            ))}
+          </select>
+          <select
+            className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-400 transition"
+            value={selectedTag}
+            onChange={(e) => setSelectedTag(e.target.value)}
+          >
+            <option value=''>All Zones</option>
+            {/* ...zone options as before... */}
+            <option value='Zone1'>Zone1</option>
+            <option value='Zone2'>Zone2</option>
+            <option value='Zone3'>Zone3</option>
+            <option value='Zone4'>Zone4</option>
+            <option value='Zone5'>Zone5</option>
+            <option value='Zone6'>Zone6</option>
+            <option value='Zone7'>Zone7</option>
+            <option value='Zone8'>Zone8</option>
+            <option value='Zone9'>Zone9</option>
+            <option value='Zone10'>Zone10</option>
+            <option value='Zone11'>Zone11</option>
+            <option value='Zone12'>Zone12</option>
+            <option value='Zone13'>Zone13</option>
+            <option value='Zone14'>Zone14</option>
+            <option value='Zone15'>Zone15</option>
+            <option value='Zone16'>Zone16</option>
+            <option value='NEWY'>NEWY</option>
+            <option value='Central Coast'>Central Coast</option>
+            <option value='WOOL'>WOOL</option>
+            <option value='ACT'>ACT</option>
+            <option value='PickUp'>PickUp</option>
+            <option value='BONDI'>BONDI</option>
+            <option value='Wollongong'>Wollongong</option>
+            <option value='Ramsgate'>Ramsgate</option>
+            <option value='Warwick Farm'>Warwick Farm</option>
+            <option value='Kingscross'>Kingscross</option>
+            <option value='Kiama'>Kiama</option>
+            <option value='Berry'>Berry</option>
+            <option value='Canberra Sat'>Canberra Sat</option>
+            <option value='Mona Vale'>Mona Vale</option>
+            <option value='Manly'>Manly</option>
+            <option value='Marrickville'>Marrickville</option>
+            <option value='Haig'>Haig</option>
+            <option value='Gosford'>Gosford</option>
+          </select>
+          <DatePicker
+            selected={selectedDate}
+            onChange={handleDatechange}
+            className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-400 transition"
+            dateFormat="yyyy/MM/dd"
+          />
+          <button
+            className="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md transition disabled:opacity-50"
+            onClick={handleImport}
+            disabled={loading}
+          >
+            {loading ? (
+              <ArrowPathIcon className="animate-spin h-5 w-5 text-white" />
+            ) : (
+              'Import'
+            )}
+          </button>
         </div>
+      </div>
 
-        {orders?.length > 0 &&
-            <div className="grid grid-cols-1 gap-4">
-                {orders.map(order => (
-                    <div key={order?._id} className="bg-white p-4 rounded-lg shadow-md">
-                        <div className="flex justify-between items-start relative">
-                          <div className="flex">
-                              <h3 className="text-2xl font-bold text-gray-900 mr-2">Order {order?.name}</h3>
-                              <span className={`text-lg px-2 rounded-full ${statusColorMap[order.status] || 'bg-gray-100 text-gray-800'}`}>
-                                {order.status}
-                              </span>
-                          </div>
-                      
-                          <div className="relative dropdown-ref">
-                              <button
-                              onClick={() => {
-                                  setOpenDropdownId(openDropdownId === order?._id ? null : order?._id);
-                              }}
-                              >
-                              <EllipsisVerticalIcon className="w-5 h-5 text-gray-600" />
-                              </button>
-                      
-                              {openDropdownId === order?._id && (
-                              <div className="absolute right-0 mt-2 w-36 bg-gray-200 border border-gray-300 rounded-md shadow-lg z-10">
-                                  <button
-                                  type="button"
-                                  onClick={() => {
-                                      setOpenDropdownId(null);
-                                      openNoteDialog(order);
-                                  }}
-                                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-300"
-                                  >
-                                  Add note
-                                  </button>
-                                  <button
-                                  type="button"
-                                  onClick={() => {
-                                      navigate(`/admin/order/${order._id}`);
-                                      setOpenDropdownId(null);
-                                  }}
-                                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-300"
-                                  >
-                                  Detail
-                                  </button>
-                              </div>
-                              )}
-                          </div>
-                        </div>
-                    
-                        <div className="flex justify-between mt-1">
-                          <p className="text-md text-gray-900">Customer:</p>
-                          <span className="text-md text-gray-900">
-                            {order.customer.first_name} {order.customer.last_name}
-                          </span>
-                        </div>
-                        <div className="flex justify-between mt-1">
-                          <p className="text-md text-gray-900">Items:</p>
-                          <span className="text-sm text-gray-900">{order.lineItemCount}</span>
-                        </div>
-                        <div className="flex justify-between mt-1">
-                          <p className="text-md text-gray-900">Picker:</p>
-                          <span className="text-md text-gray-900">{order?.picker?.name}</span>
-                        </div>
-                        <div className="flex justify-between mt-1">
-                          <p className="text-md text-gray-900">Packer:</p>
-                          <span className="text-md text-gray-900">{order?.packer?.name}</span>
-                        </div>
-                        <div className="flex justify-between mt-1">
-                          <p className="text-md text-gray-900">Routes:</p>
-                          <span className="text-md text-gray-900">{order?.delivery?.tripId}({order?.delivery?.driverName})</span>
-                        </div>
-
-                        { false && 
-                          <>
-                            <div className="flex justify-between mt-1">
-                              <p className="text-md text-gray-900">Start Time: </p>
-                              <span className="text-md text-gray-900">{order?.delivery?.startTime}</span>
-                            </div>
-
-                            <div className="flex justify-between mt-1">
-                              <p className="text-md text-gray-900">Stop Number</p>
-                              <span className="text-md text-gray-900">{order?.delivery?.stopNumber}</span>
-                            </div>
-                          </>
-                        }
-                        
-                        {order.adminNote && (
-                          <div className="mt-1">
-                              <p className="text-md text-red-600">Admin Note: {order.adminNote}</p>
-                          </div>
-                        )}
-                    
-                        {order.orderNote && (
-                          <div className="mt-1">
-                              <p className="text-md text-red-600">Customer Note: {order.orderNote}</p>
-                          </div>
-                        )}
+      {/* Order Cards */}
+      {orders?.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+          {orders.map(order => (
+            <div key={order?._id} className="bg-white p-6 rounded-xl shadow hover:shadow-lg border border-gray-100 transition">
+              <div className="flex justify-between items-start relative">
+                <div className="flex">
+                  <h3 className="text-xl font-bold text-gray-900 mr-2">Order {order?.name}</h3>
+                  <span className={`text-base px-2 rounded-full font-medium ${statusColorMap[order.status] || 'bg-gray-100 text-gray-800'}`}>
+                    {order.status}
+                  </span>
+                </div>
+                <div className="relative dropdown-ref">
+                  <button
+                    onClick={() => setOpenDropdownId(openDropdownId === order?._id ? null : order?._id)}
+                    className="p-1 rounded hover:bg-gray-100 transition"
+                  >
+                    <EllipsisVerticalIcon className="w-5 h-5 text-gray-600" />
+                  </button>
+                  {openDropdownId === order?._id && (
+                    <div className="absolute right-0 mt-2 w-36 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdownId(null);
+                          openNoteDialog(order);
+                        }}
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100"
+                      >
+                        Add note
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigate(`/admin/order/${order._id}`);
+                          setOpenDropdownId(null);
+                        }}
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100"
+                      >
+                        Detail
+                      </button>
                     </div>
-                ))}
+                  )}
+                </div>
+              </div>
+              <div className="mt-3 space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-500">Customer:</span>
+                  <span className="text-sm text-gray-800 font-medium">
+                    {order.customer.first_name} {order.customer.last_name}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-500">Items:</span>
+                  <span className="text-sm text-gray-800">{order.lineItemCount}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-500">Picker:</span>
+                  <span className="text-sm text-gray-800">{order?.picker?.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-500">Packer:</span>
+                  <span className="text-sm text-gray-800">{order?.packer?.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-500">Routes:</span>
+                  <span className="text-sm text-gray-800">{order?.delivery?.tripId} ({order?.delivery?.driverName})</span>
+                </div>
+                {order.adminNote && (
+                  <div className="mt-2 bg-yellow-50 border-l-4 border-yellow-400 px-3 py-1 rounded text-yellow-700 text-sm">
+                    <span className="font-medium">Admin Note:</span> {order.adminNote}
+                  </div>
+                )}
+                {order.orderNote && (
+                  <div className="mt-2 bg-blue-50 border-l-4 border-blue-400 px-3 py-1 rounded text-blue-700 text-sm">
+                    <span className="font-medium">Customer Note:</span> {order.orderNote}
+                  </div>
+                )}
+              </div>
             </div>
-        }
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white p-8 rounded-xl shadow text-center text-gray-400 text-lg">
+          No data.
+        </div>
+      )}
 
-        {orders?.length == 0 && 
-          <div className="bg-white p-4 rounded-lg shadow-md">
-            No data.
-          </div>
-        }
-
-        {showDialog && selectedOrder && (
-            <NoteDialog
-                isOpen={showDialog}
-                onClose={() => setShowDialog(false)}
-                onSubmit={handleNoteSubmit}
-            />
-        )}
-      </>
+      {/* Note Dialog */}
+      {showDialog && selectedOrder && (
+        <NoteDialog
+          isOpen={showDialog}
+          onClose={() => setShowDialog(false)}
+          onSubmit={handleNoteSubmit}
+        />
+      )}
+    </>
   );
 };
 

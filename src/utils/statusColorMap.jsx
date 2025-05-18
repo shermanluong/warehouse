@@ -1,11 +1,11 @@
-// src/utils/statusColorMap.js
 const statusColorMap = {
-  new: 'bg-gray-100 text-gray-800',
-  picking: 'bg-yellow-100 text-yellow-800',
-  picked: 'bg-blue-100 text-blue-800',
-  packing: 'bg-purple-100 text-purple-800',
-  packed: 'bg-indigo-100 text-indigo-800',
-  delivered: 'bg-green-100 text-green-800'
+  new: 'bg-sky-100 text-sky-800',           // Soft blue, welcoming
+  picking: 'bg-amber-100 text-amber-800',   // Friendly amber/yellow
+  picked: 'bg-cyan-100 text-cyan-800',      // Calm cyan
+  packing: 'bg-pink-100 text-pink-800',     // Playful pink
+  packed: 'bg-violet-100 text-violet-800',  // Distinct violet
+  delivered: 'bg-green-100 text-green-800', // Success green
+  cancelled: 'bg-red-100 text-red-800',     // (Optional) Clear red for cancelled
 };
 
 export default statusColorMap;

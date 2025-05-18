@@ -34,91 +34,92 @@ const AdminPage = () => {
 
     return (
         <Layout headerTitle={"Dashboard"}>
-            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
-                    <div className="bg-white p-6 rounded-lg shadow-md">
-                        <div className="flex justify-center mb-2">
-                            <div className="bg-blue-100 p-4 rounded-full">
-                                <CubeIcon className="h-6 w-6 text-blue-600" />
-                            </div>
-                        </div>
-                        <h3 className="text-gray-600 flex justify-center">New</h3>
-                        <p className="font-semibold text-lg flex justify-center">{stats?.newOrders || 0}</p>
-                    </div>
-
-                    <div className="bg-white p-6 rounded-lg shadow-md">
-                        <div className="flex justify-center mb-2">
-                            <div className="bg-lime-100 p-4 rounded-full">
-                                <CubeIcon className="h-6 w-6 text-lime-600" />
-                            </div>
-                        </div>
-                        <h3 className="text-gray-600 flex justify-center">Picking</h3>
-                        <p className="font-semibold text-lg flex justify-center">{stats?.pickingOrders || 0}</p>
-                    </div>
-
-                    <div className="bg-white p-6 rounded-lg shadow-md">
-                        <div className="flex justify-center mb-2">
-                            <div className="bg-green-100 p-4 rounded-full">
-                                <CheckCircleIcon className="h-6 w-6 text-green-600" />
-                            </div>
-                        </div>
-                        <h3 className="text-gray-600 flex justify-center">Picked</h3>
-                        <p className="font-semibold text-lg flex justify-center">{stats?.pickedOrders || 0}</p>
-                    </div>
-
-                    <div className="bg-white p-6 rounded-lg shadow-md">
-                        <div className="flex justify-center mb-2">
-                            <div className="bg-orange-100 p-4 rounded-full">
-                                <ClockIcon className="h-6 w-6 text-orange-600" />
-                            </div>
-                        </div>
-                        <h3 className="text-gray-600 flex justify-center">Packing</h3>
-                        <p className="font-semibold text-lg flex justify-center">{stats?.packingOrders || 0}</p>
-                    </div>
-
-                    <div className="bg-white p-6 rounded-lg shadow-md">
-                        <div className="flex justify-center mb-2">
-                            <div className="bg-orange-100 p-4 rounded-full">
-                                <TruckIcon className="h-6 w-6 text-orange-600" />
-                            </div>
-                        </div>
-                        <h3 className="text-gray-600 flex justify-center">Packed</h3>
-                        <p className="font-semibold text-lg flex justify-center">{stats?.packeOrders || 0}</p>
-                    </div>
+          <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+              {/* New */}
+              <div className="bg-gradient-to-tr from-sky-50 to-sky-100 p-6 rounded-2xl shadow flex flex-col items-center hover:shadow-lg transition">
+                <div className="bg-sky-200 p-4 rounded-full mb-2 shadow">
+                  <CubeIcon className="h-7 w-7 text-sky-600" />
                 </div>
-                
-                {/*Tab Bar*/}
-                <div className="flex space-x-1 mb-3">
-                    <button
-                        onClick={() => setActiveTab(0)}
-                        className={`flex-auto p-2 px-4 rounded-sm ${activeTab === 0 ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`}
-                    >
-                        Orders
-                    </button>
-                    <button
-                        onClick={() => setActiveTab(1)}
-                        className={`flex-auto p-2 px-4 rounded-sm ${activeTab === 1 ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`}
-                    >
-                        Performance
-                    </button>
-                    <button
-                        onClick={() => setActiveTab(2)}
-                        className={`flex-auto p-2 px-4 rounded-sm ${activeTab === 2 ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`}
-                    >
-                        Order Photos
-                    </button>
+                <span className="text-gray-500 text-sm">New</span>
+                <span className="font-bold text-2xl text-sky-600">{stats?.newOrders || 0}</span>
+              </div>
+              {/* Picking */}
+              <div className="bg-gradient-to-tr from-lime-50 to-lime-100 p-6 rounded-2xl shadow flex flex-col items-center hover:shadow-lg transition">
+                <div className="bg-lime-200 p-4 rounded-full mb-2 shadow">
+                  <CubeIcon className="h-7 w-7 text-lime-600" />
                 </div>
-                {/* Third line: More content */}
-                {activeTab === 0 && (
-                    <AdminOrders />
-                )}
-                {activeTab === 1 && (
-                    <AdminPerformance />
-                )}
-                {activeTab === 2 && (
-                    <AdminPhotos />
-                )}
+                <span className="text-gray-500 text-sm">Picking</span>
+                <span className="font-bold text-2xl text-lime-600">{stats?.pickingOrders || 0}</span>
+              </div>
+              {/* Picked */}
+              <div className="bg-gradient-to-tr from-green-50 to-green-100 p-6 rounded-2xl shadow flex flex-col items-center hover:shadow-lg transition">
+                <div className="bg-green-200 p-4 rounded-full mb-2 shadow">
+                  <CheckCircleIcon className="h-7 w-7 text-green-600" />
+                </div>
+                <span className="text-gray-500 text-sm">Picked</span>
+                <span className="font-bold text-2xl text-green-600">{stats?.pickedOrders || 0}</span>
+              </div>
+              {/* Packing */}
+              <div className="bg-gradient-to-tr from-yellow-50 to-orange-100 p-6 rounded-2xl shadow flex flex-col items-center hover:shadow-lg transition">
+                <div className="bg-orange-200 p-4 rounded-full mb-2 shadow">
+                  <ClockIcon className="h-7 w-7 text-orange-600" />
+                </div>
+                <span className="text-gray-500 text-sm">Packing</span>
+                <span className="font-bold text-2xl text-orange-600">{stats?.packingOrders || 0}</span>
+              </div>
+              {/* Packed */}
+              <div className="bg-gradient-to-tr from-orange-50 to-pink-100 p-6 rounded-2xl shadow flex flex-col items-center hover:shadow-lg transition">
+                <div className="bg-pink-200 p-4 rounded-full mb-2 shadow">
+                  <TruckIcon className="h-7 w-7 text-pink-600" />
+                </div>
+                <span className="text-gray-500 text-sm">Packed</span>
+                <span className="font-bold text-2xl text-pink-600">{stats?.packeOrders || 0}</span>
+              </div>
             </div>
+      
+            {/* Tab Bar */}
+            <div className="flex rounded-lg overflow-hidden mb-6 bg-gray-100 shadow">
+              <button
+                onClick={() => setActiveTab(0)}
+                className={`flex-1 px-6 py-3 font-medium transition ${
+                  activeTab === 0
+                    ? 'bg-blue-600 text-white shadow'
+                    : 'text-gray-700 hover:bg-blue-100'
+                }`}
+              >
+                Orders
+              </button>
+              <button
+                onClick={() => setActiveTab(1)}
+                className={`flex-1 px-6 py-3 font-medium transition ${
+                  activeTab === 1
+                    ? 'bg-blue-600 text-white shadow'
+                    : 'text-gray-700 hover:bg-blue-100'
+                }`}
+              >
+                Performance
+              </button>
+              <button
+                onClick={() => setActiveTab(2)}
+                className={`flex-1 px-6 py-3 font-medium transition ${
+                  activeTab === 2
+                    ? 'bg-blue-600 text-white shadow'
+                    : 'text-gray-700 hover:bg-blue-100'
+                }`}
+              >
+                Order Photos
+              </button>
+            </div>
+      
+            {/* Tab Content */}
+            <div>
+              {activeTab === 0 && <AdminOrders />}
+              {activeTab === 1 && <AdminPerformance />}
+              {activeTab === 2 && <AdminPhotos />}
+            </div>
+          </div>
         </Layout>
     );
 };

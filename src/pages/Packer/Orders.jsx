@@ -61,72 +61,72 @@ export default function Orders() {
           <input
             type="text"
             placeholder="🔍 Search by TOTE NAME..."
-            className="w-full p-4 text-xl border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full p-6 text-2xl border-2 border-blue-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-300"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
           />
         </div>
-
+  
         {/* Orders Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredOrders.length > 0 ? (
             filteredOrders.map((order) => (
               <div
                 key={order._id}
-                className="bg-white border border-gray-200 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+                className="bg-white border-2 border-gray-200 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow"
               >
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold text-2xl text-gray-900">
+                <div className="p-8">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="font-extrabold text-2xl text-gray-900">
                       Order {order?.name}
                       {(order?.orderNote || order?.adminNote) && (
                         <span
                           title="This order has notes"
-                          className="text-yellow-500 ml-2"
+                          className="text-yellow-500 ml-3"
                         >
                           📌
                         </span>
                       )}
                     </h3>
-                    <span className="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">
+                    <span className="bg-green-100 text-green-800 text-lg px-4 py-1 rounded-full font-bold border border-green-500 whitespace-nowrap">
                       {order.lineItemCount} items
                     </span>
                   </div>
-
+  
                   {/* Totes */}
-                  <div className="flex flex-wrap items-center gap-2 mb-3">
+                  <div className="flex flex-wrap items-center gap-3 mb-4">
                     {order.totes?.map((tote) => (
                       <div
                         key={tote._id}
-                        className="flex items-center space-x-2 bg-gray-50 px-2 py-1 rounded"
+                        className="flex items-center space-x-2 bg-blue-50 px-3 py-2 rounded-xl"
                       >
-                        <ShoppingCartIcon className="w-5 h-5 text-gray-700" />
-                        <p className="text-sm font-medium text-gray-800">
+                        <ShoppingCartIcon className="w-6 h-6 text-blue-600" />
+                        <p className="text-base font-bold text-blue-900">
                           {tote.name}
                         </p>
                       </div>
                     ))}
                   </div>
-
+  
                   {/* Customer Info */}
-                  <div className="mb-2 flex justify-between text-sm text-gray-500">
-                    <span>Customer:</span>
-                    <span className="font-mono">
+                  <div className="mb-2 flex justify-between text-base text-gray-700">
+                    <span className="font-bold">Customer:</span>
+                    <span className="font-mono text-green-700">
                       {order.customer?.first_name} {order.customer?.last_name}
                     </span>
                   </div>
-
+  
                   {/* Packed Count */}
-                  <div className="mb-4">
-                    <span className="bg-green-100 text-green-800 border border-green-600 text-xs px-2 py-1 rounded-full">
+                  <div className="mb-6">
+                    <span className="bg-green-100 text-green-800 border-2 border-green-600 text-lg px-4 py-1 rounded-full font-bold whitespace-nowrap">
                       {order?.packedCount} / {order?.lineItemCount} packed
                     </span>
                   </div>
-
+  
                   {/* Action Button */}
                   <button
                     onClick={() => handleStart(order)}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-base font-semibold shadow"
+                    className="w-full bg-blue-600 hover:bg-blue-800 text-white py-4 px-4 rounded-2xl text-2xl font-extrabold shadow-xl transition-all"
                   >
                     Start Packing
                   </button>
@@ -134,7 +134,7 @@ export default function Orders() {
               </div>
             ))
           ) : (
-            <p className="text-xl text-center text-gray-500 col-span-full">
+            <p className="text-2xl text-center text-gray-400 col-span-full">
               No matching totes found.
             </p>
           )}
