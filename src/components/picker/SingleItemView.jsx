@@ -115,10 +115,15 @@ const SingleItemView = ({id}) => {
         const res = await axios.get(`${import.meta.env.VITE_API_URL}/picker/order/${id}`, { headers: { Authorization: `Bearer ${token}` } });
         setOrder(res?.data || null);
         setLineItems(res?.data?.lineItems);
-        console.log(res?.data);
     };
 
     const handleScan = async (barcode) => {
+        if (barcode == '') {
+            setBarcodeStatus("Please input barcode");
+            setTimeout(() => setBarcodeStatus(""), 2000);
+            return;
+        }
+
         const scannedItem = lineItems.find(
             (item) => item.variantInfo?.barcode === barcode
         );
@@ -244,7 +249,7 @@ const SingleItemView = ({id}) => {
                     <BarcodeScanner onScan={handleScan}/>
                     <BarcodeListener onScan={handleScan} />
                     {barcodeStatus && (
-                        <div className="text-center text-2xl font-semibold text-yellow-600 mt-2">
+                        <div className="text-left text-2xl font-semibold text-yellow-600 mt-2">
                             {barcodeStatus}
                         </div>
                     )}

@@ -51,7 +51,6 @@ const ListView = ({id}) => {
     };
 
     const handleFlagSubmit = async ({ shopifyLineItemId, reason, quantity }) => {
-        console.log(quantity);
         await axios.patch(
             `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-flag`,
             { 
@@ -96,7 +95,6 @@ const ListView = ({id}) => {
         const res = await axios.get(`${import.meta.env.VITE_API_URL}/picker/order/${id}`, { headers: { Authorization: `Bearer ${token}` } });
         setOrder(res?.data || null);
         setLineItems(res?.data?.lineItems);
-        console.log(res?.data);
     };
 
     const handleScan = async (barcode) => {
