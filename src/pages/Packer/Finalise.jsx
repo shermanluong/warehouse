@@ -58,6 +58,7 @@ export default function Finalise() {
                 `${import.meta.env.VITE_API_URL}/packer/order/${id}`, 
                 {headers:{Authorization:`Bearer ${token}`}}
             );
+            console.log(res?.data);
             setOrder(res?.data || null);
             setLineItems(res?.data?.lineItems || []);
             setCapturedPhotos(res?.data?.photos || []);
