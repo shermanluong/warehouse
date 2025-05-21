@@ -1,18 +1,22 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import React, { useEffect, useState, useRef} from 'react';
-import BarcodeScannerComponent from "react-qr-barcode-scanner";
+import React, { useEffect, useState} from 'react';
 import { 
     PencilIcon
 } from '@heroicons/react/24/outline'
 import NoteDialog from '../../components/NoteDialog'
 import axios from 'axios';
 import Layout from '../../layouts/layout';
+import ImageZoomModal from '../../components/ImageZoomModal';
 
 const Order = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [order, setOrder] = useState(null);
     const [lineItems, setLineItems] = useState([]);
+
+    //Image Modal
+    const [isImageOpen, setIsImageOpen] = useState(false);
+    const [enlargedImage, setEnlargedImage] = useState('');
 
     const token = localStorage.getItem("token");
 
@@ -106,6 +110,10 @@ const Order = () => {
                         src={lineItem?.image}
                         alt={lineItem?.productTitle}
                         className="w-28 h-28 sm:w-36 sm:h-36 rounded-lg object-cover shadow"
+                        onClick={() => {
+                          setEnlargedImage(lineItem?.image);
+                          setIsImageOpen(true);
+                        }}
                       />
                       <div className="ml-4 flex-1">
                         <h3 className="font-semibold text-lg text-gray-900 flex items-center">
@@ -158,6 +166,12 @@ const Order = () => {
               onSubmit={handleNoteSubmit}
             />
           )}
+
+          <ImageZoomModal
+            isOpen={isImageOpen}
+            onClose={() => setIsImageOpen(false)}
+            imageUrl={enlargedImage}
+          />
         </Layout>
     )
 }
