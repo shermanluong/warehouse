@@ -32,8 +32,11 @@ export default function Finalise() {
     const [barcodeStatus, setBarcodeStatus] = useState('');
     const [modalOpen, setModalOpen] = useState(false);
     const [capturedPhotos, setCapturedPhotos] = useState([]);
+
+    //Image Modal
     const [isImageOpen, setIsImageOpen] = useState(false);
     const [enlargedImage, setEnlargedImage] = useState('');
+    
     const [boxCount, setBoxCount] = useState(0);
     const [allPacked, setAllPacked] = useState(false);
     const [isPickingMode, setIsPickingMode] = useState(false);

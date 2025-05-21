@@ -9,6 +9,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { toast } from 'react-toastify';
 import { useLoading } from "../../Context/LoadingContext";
+import ImageZoomModal from '../../components/ImageZoomModal';
 
 const Product = () => {
   const [products, setProducts] = useState([]);
@@ -24,6 +25,10 @@ const Product = () => {
   const [selectedVendor, setSelectedVendor] = useState("Rita's Farm Produce");
   const [selectedStatus, setSelectedStatus] = useState("ACTIVE");
   const [syncLoading, setSyncLoading] = useState(false);
+
+  // Image Zoom Modal
+  const [isImageOpen, setIsImageOpen] = useState(false);
+  const [enlargedImage, setEnlargedImage] = useState('');
 
   const token = localStorage.getItem("token");
 
@@ -214,9 +219,13 @@ const Product = () => {
                   >
                     <div className="flex items-start">
                       <img
-                        src={variant.image || product.image || '/placeholder.png'}
-                        alt={displayTitle}
-                        className="w-36 h-36 rounded object-cover"
+                          src={variant.image || product.image || '/placeholder.png'}
+                          alt={displayTitle}
+                          className="w-36 h-36 object-cover"
+                          onClick={() => {
+                              setEnlargedImage(variant.image || product.image || '/placeholder.png');
+                              setIsImageOpen(true);
+                          }}
                       />
                       <div className="ml-4">
                         <h3 className="font-semibold text-lg text-gray-900">{displayTitle}</h3>
@@ -230,6 +239,11 @@ const Product = () => {
             )}
           </div>
         </div>
+        <ImageZoomModal
+          isOpen={isImageOpen}
+          onClose={() => setIsImageOpen(false)}
+          imageUrl={enlargedImage}
+        />
       </div>
     </Layout>
   );
