@@ -2,12 +2,18 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Layout from '../../layouts/layout';
 import ProductPickerDialog from '../../components/ProductPickerDialog';
+import ImageZoomModal from '../../components/ImageZoomModal';
 
 const Substitution = () => {
   const [rules, setRules] = useState([]);
   const [showAddRule, setShowAddRule] = useState(false);
   const [showAddSubstitute, setShowAddSubstitute] = useState(false);
   const [selectedRuleId, setSelectedRuleId] = useState(null);
+
+  //Image Modal
+  const [isImageOpen, setIsImageOpen] = useState(false);
+  const [enlargedImage, setEnlargedImage] = useState('');
+
   const API_URL = import.meta.env.VITE_API_URL;
 
   const fetchRules = async () => {
@@ -88,7 +94,15 @@ const Substitution = () => {
           {rules.map(rule => (
             <div key={rule._id} className="mb-6 p-4 border border-gray-200 rounded shadow-md">
               <div className="flex items-center gap-4">
-                <img src={rule.originProduct.image} className="w-24 h-24 rounded object-cover" alt={rule.originProduct.title} />
+                <img 
+                  src={rule.originProduct.image} 
+                  className="w-24 h-24 rounded object-cover" 
+                  alt={rule.originProduct.title} 
+                  onClick={() => {
+                    setEnlargedImage(rule.originProduct.image);
+                    setIsImageOpen(true);
+                  }}
+                />
                 <div>
                   <div className="font-semibold">{rule.originProduct.title}</div>
                   <div className="text-sm">SKU: {rule.originProduct.sku}</div>
@@ -105,7 +119,15 @@ const Substitution = () => {
               <div className="mt-4 space-y-4">
                 {rule?.substitutes?.map(sub => (
                   <div key={sub?.substituteVariantId} className="flex items-center gap-4 ml-4 p-2 border border-gray-200 rounded-md shadow-md">
-                    <img src={sub?.substituteProduct?.image} className="w-20 h-20 rounded object-cover" alt={sub?.substituteProduct?.title} />
+                    <img 
+                      src={sub?.substituteProduct?.image} 
+                      className="w-20 h-20 rounded object-cover" 
+                      alt={sub?.substituteProduct?.title} 
+                      onClick={() => {
+                        setEnlargedImage(sub?.substituteProduct?.image);
+                        setIsImageOpen(true);
+                      }}
+                    />
                     <div>
                       <div>{sub?.substituteProduct?.title}</div>
                       <div className="text-sm">SKU: {sub?.substituteProduct?.sku}</div>
@@ -130,7 +152,7 @@ const Substitution = () => {
             </div>
           ))}
         </div>
-        {/* Product Picker Dialog */}
+
         <ProductPickerDialog
           show={showAddRule || showAddSubstitute}
           setShowAddRule={setShowAddRule}
@@ -138,6 +160,12 @@ const Substitution = () => {
           setSelectedRuleId={setSelectedRuleId}
           handleSelectProduct={handleSelectProduct}
           handleCloseDialog={handleCloseDialog}
+        />
+
+        <ImageZoomModal
+          isOpen={isImageOpen}
+          onClose={() => setIsImageOpen(false)}
+          imageUrl={enlargedImage}
         />
       </div>
     </Layout>
