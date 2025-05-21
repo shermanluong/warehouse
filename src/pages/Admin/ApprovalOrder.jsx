@@ -3,12 +3,17 @@ import React, { useEffect, useState, useRef} from 'react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import Layout from '../../layouts/layout';
+import ImageZoomModal from '../../components/ImageZoomModal';
 
 const ApprovalOrder = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [order, setOrder] = useState(null);
     const [lineItems, setLineItems] = useState([]);
+
+    // Image Zoom Modal
+    const [isImageOpen, setIsImageOpen] = useState(false);
+    const [enlargedImage, setEnlargedImage] = useState('');
 
     const token = localStorage.getItem("token");
 
@@ -114,6 +119,10 @@ const ApprovalOrder = () => {
                                         src={lineItem?.image}
                                         alt={lineItem?.productTitle}
                                         className="w-full h-auto max-h-48 object-contain rounded border border-gray-200"
+                                        onClick={() => {
+                                            setEnlargedImage(lineItem?.image);
+                                            setIsImageOpen(true);
+                                        }}
                                     />
                                     </div>
 
@@ -182,10 +191,13 @@ const ApprovalOrder = () => {
                                     {/* Substitution Image - Fixed Size */}
                                     <div className="sm:col-span-2">
                                         <img
-                                        src={lineItem?.substitution?.image}
-                                        alt={lineItem?.substitution?.title}
-                                        className="w-full h-auto max-h-48 object-contain rounded border-2 border-yellow-300 cursor-pointer"
-                                        onClick={() => OnClickImage(lineItem?.substitution?.image)}
+                                            src={lineItem?.substitution?.image}
+                                            alt={lineItem?.substitution?.title}
+                                            className="w-full h-auto max-h-48 object-contain rounded border-2 border-yellow-300 cursor-pointer"
+                                            onClick={() => {
+                                                setEnlargedImage(lineItem?.image);
+                                                setIsImageOpen(true);
+                                            }}
                                         />
                                     </div>
                                     
@@ -231,6 +243,11 @@ const ApprovalOrder = () => {
                         </div>
                     )}
                 </div>
+                <ImageZoomModal
+                    isOpen={isImageOpen}
+                    onClose={() => setIsImageOpen(false)}
+                    imageUrl={enlargedImage}
+                />
             </div>
         </Layout>
     )
