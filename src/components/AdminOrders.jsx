@@ -57,7 +57,7 @@ const AdminOrders = () => {
     if (formattedDate) {
       fetchOrders();
     }
-  }, [searchTerm, sortOption, sortOrder, currentPage, pageSize, formattedDate, selectedDriver, selectedTag]);
+  }, [searchTerm, sortOption, sortOrder, currentPage, pageSize, formattedDate, selectedDrivers, selectedZones]);
 
   const fetchDrivers = async () => {
     try {
@@ -76,7 +76,7 @@ const AdminOrders = () => {
   };
 
   const fetchOrders = async () => {
-    console.log(selectedTag);
+    console.log(selectedDrivers);
     try {
       const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/admin/getOrders`,
@@ -89,8 +89,8 @@ const AdminOrders = () => {
             page: currentPage,
             limit: pageSize,
             date: formattedDate,
-            driver: selectedDriver,
-            tag: selectedTag,
+            driver: selectedDrivers,
+            tag: selectedZones,
           }
         }
       );
