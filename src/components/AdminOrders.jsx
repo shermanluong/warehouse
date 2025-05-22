@@ -76,7 +76,6 @@ const AdminOrders = () => {
   };
 
   const fetchOrders = async () => {
-    console.log(selectedDrivers);
     try {
       const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/admin/getOrders`,
@@ -165,8 +164,8 @@ const AdminOrders = () => {
           headers: { Authorization: `Bearer ${token}` },
           params: {
             tripDate: formattedDate,
-            driver: selectedDriver,
-            tag: selectedTag
+            driver: selectedDrivers,
+            tag: selectedZones
           }
         }
       );
