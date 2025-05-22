@@ -12,6 +12,8 @@ import NoteDialog from './NoteDialog';
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css';
 import { toast } from 'react-toastify';
+import DriverDropdown from './DriverDropdown';
+import ZoneDropdown from './ZoneDropDown';
 
 const AdminOrders = () => {
   const navigate = useNavigate();
@@ -30,7 +32,9 @@ const AdminOrders = () => {
   const [formattedDate, setFormattedDate] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selectedTag, setSelectedTag] = useState('');
+  const [selectedZones, setSelectedZones] = useState([]);
   const [selectedDriver, setSelectedDriver] = useState('');
+  const [selectedDrivers, setSelectedDrivers] = useState([]);
   const [drivers, setDrivers] = useState([]);
 
   useEffect(() => {
@@ -193,6 +197,7 @@ const AdminOrders = () => {
       {/* Filters and actions */}
       <div className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:justify-between sm:items-center mb-6">
         {/* Left: Pagination */}
+        
         <div className="flex items-center">
           <select
             className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-400 transition"
@@ -220,63 +225,18 @@ const AdminOrders = () => {
             <ArrowRightIcon className='w-5 h-5' />
           </button>
         </div>
-
+        
         {/* Right: Filters */}
         <div className="flex flex-wrap items-center gap-2">
-          <select
-            className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-400 transition"
-            value={selectedDriver}
-            onChange={(e) => setSelectedDriver(e.target.value)}
-          >
-            <option value=''>All Drivers</option>
-            {drivers.map((driver, index) => (
-              <option key={index} value={driver.teamMemberId}>
-                {driver.firstName} {driver.lastName}
-              </option>
-            ))}
-          </select>
-          <select
-            className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-400 transition"
-            value={selectedTag}
-            onChange={(e) => setSelectedTag(e.target.value)}
-          >
-            <option value=''>All Zones</option>
-            {/* ...zone options as before... */}
-            <option value='Zone1'>Zone1</option>
-            <option value='Zone2'>Zone2</option>
-            <option value='Zone3'>Zone3</option>
-            <option value='Zone4'>Zone4</option>
-            <option value='Zone5'>Zone5</option>
-            <option value='Zone6'>Zone6</option>
-            <option value='Zone7'>Zone7</option>
-            <option value='Zone8'>Zone8</option>
-            <option value='Zone9'>Zone9</option>
-            <option value='Zone10'>Zone10</option>
-            <option value='Zone11'>Zone11</option>
-            <option value='Zone12'>Zone12</option>
-            <option value='Zone13'>Zone13</option>
-            <option value='Zone14'>Zone14</option>
-            <option value='Zone15'>Zone15</option>
-            <option value='Zone16'>Zone16</option>
-            <option value='NEWY'>NEWY</option>
-            <option value='Central Coast'>Central Coast</option>
-            <option value='WOOL'>WOOL</option>
-            <option value='ACT'>ACT</option>
-            <option value='PickUp'>PickUp</option>
-            <option value='BONDI'>BONDI</option>
-            <option value='Wollongong'>Wollongong</option>
-            <option value='Ramsgate'>Ramsgate</option>
-            <option value='Warwick Farm'>Warwick Farm</option>
-            <option value='Kingscross'>Kingscross</option>
-            <option value='Kiama'>Kiama</option>
-            <option value='Berry'>Berry</option>
-            <option value='Canberra Sat'>Canberra Sat</option>
-            <option value='Mona Vale'>Mona Vale</option>
-            <option value='Manly'>Manly</option>
-            <option value='Marrickville'>Marrickville</option>
-            <option value='Haig'>Haig</option>
-            <option value='Gosford'>Gosford</option>
-          </select>
+          <DriverDropdown
+            drivers={drivers}
+            selected={selectedDrivers}
+            onChangeSelected={setSelectedDrivers}
+          />
+          <ZoneDropdown
+            selectedZones={selectedZones}
+            setSelectedZones={setSelectedZones}
+          />
           <DatePicker
             selected={selectedDate}
             onChange={handleDatechange}
