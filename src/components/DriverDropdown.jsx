@@ -46,7 +46,7 @@ export default function DriverDropdown({
       </button>
 
       {open && (
-        <div className="absolute mt-1 w-full bg-white border rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+        <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
           <div className="px-4 py-2 border-b">
             <label className="flex items-center space-x-2 cursor-pointer">
               <input

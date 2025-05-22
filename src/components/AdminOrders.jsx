@@ -14,6 +14,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { toast } from 'react-toastify';
 import DriverDropdown from './DriverDropdown';
 import ZoneDropdown from './ZoneDropDown';
+import DropdownActionButton from './DropdownActionButton';
 
 const AdminOrders = () => {
   const navigate = useNavigate();
@@ -179,6 +180,49 @@ const AdminOrders = () => {
       setLoading(false); // Set loading to false once the import is finished
     }
   };
+
+  const handleDelete = async () => {
+    setLoading(true); 
+    try {
+      const res = await axios.delete(
+        `${import.meta.env.VITE_API_URL}/admin/orders/by-date`,
+        { 
+          headers: { Authorization: `Bearer ${token}` },
+          params: {
+            date: formattedDate, // Make sure formattedDate is in correct format
+          }
+        }
+      );
+  
+      toast.success(`Orders from ${formattedDate} deleted successfully.`);
+      fetchOrders(); // Refresh the order list
+    } catch (error) {
+      console.error("Failed to delete orders by date:", error);
+      toast.error("Unable to delete orders by date. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.delete(
+        `${import.meta.env.VITE_API_URL}/admin/orders`,
+        { 
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+  
+      toast.success("All orders deleted successfully.");
+      fetchOrders(); // Refresh the order list
+    } catch (error) {
+      console.error("Failed to delete all orders:", error);
+      toast.error("Unable to delete all orders. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
   
   return (
     <>
@@ -242,17 +286,12 @@ const AdminOrders = () => {
             className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-400 transition"
             dateFormat="yyyy/MM/dd"
           />
-          <button
-            className="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md transition disabled:opacity-50"
-            onClick={handleImport}
-            disabled={loading}
-          >
-            {loading ? (
-              <ArrowPathIcon className="animate-spin h-5 w-5 text-white" />
-            ) : (
-              'Import'
-            )}
-          </button>
+          <DropdownActionButton
+            loading={loading}
+            handleImport={handleImport}
+            handleDelete={handleDelete}
+            handleDeleteAll={handleDeleteAll}
+          />
         </div>
       </div>
 
