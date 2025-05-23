@@ -18,6 +18,8 @@ const Order = () => {
     const [isImageOpen, setIsImageOpen] = useState(false);
     const [enlargedImage, setEnlargedImage] = useState('');
 
+    const [showDialog, setShowDialog] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
     const token = localStorage.getItem("token");
 
     useEffect(() => {
@@ -29,9 +31,6 @@ const Order = () => {
         };
         fetchOrder();
     }, [id]);
-
-    const [showDialog, setShowDialog] = useState(false);
-    const [selectedItem, setSelectedItem] = useState(null);
 
     const openNoteDialog = (item) => {
         setSelectedItem(item);
