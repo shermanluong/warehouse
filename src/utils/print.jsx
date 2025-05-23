@@ -107,11 +107,11 @@ export const generateDeliveryLabel = (order, boxCount) => {
   
       // Customer Name
       doc.setFontSize(24);
-      doc.text(`${order.customer.first_name} ${order.customer.last_name}`, 10, 20);
+      doc.text(`${order.customer.first_name} ${order.customer.last_name}`, 5, 20);
   
       // Stop Number
-      doc.setFontSize(100);
-      doc.text(`${order.delivery.stopNumber}`, 30, 60);
+      doc.setFontSize(160);
+      doc.text(`${order.delivery.stopNumber}`, 20, 70);
   
       // Driver Name
       doc.setFontSize(12);

@@ -17,6 +17,7 @@ import {
   } from '@heroicons/react/24/outline';
 
 import ToteSelector from './ToteSelector';
+import { toast } from 'react-toastify';
 
 const SingleItemView = ({id}) => {
     const navigate = useNavigate();
@@ -56,8 +57,10 @@ const SingleItemView = ({id}) => {
                 {},
                 { headers: { Authorization: `Bearer ${token}` } 
             });
+            toast.success(`Order ${order.name} picked`);
             navigate(`/picker/orders`);
         } catch (err) {
+          toast.error('Failed to pick order');
           console.error(err?.response?.data?.message);
         }
     };

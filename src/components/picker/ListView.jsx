@@ -8,6 +8,7 @@ import BarcodeScanner from '../../components/BarcodeScanner';
 import BarcodeListener from '../../components/BarcodeListener';
 import PickLineItem from '../../components/PickLineItem';
 import ToteSelector from './ToteSelector';
+import { toast } from 'react-toastify';
 
 const ListView = ({id}) => {
     const navigate = useNavigate();
@@ -39,8 +40,10 @@ const ListView = ({id}) => {
                 {},
                 { headers: { Authorization: `Bearer ${token}` } 
             });
+            toast.success(`Order ${order.name} picked`);
             navigate(`/picker/orders`);
         } catch (err) {
+          toast.error('Failed to pick order');
           console.error(err?.response?.data?.message);
         }
     };
