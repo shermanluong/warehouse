@@ -175,7 +175,16 @@ const ListView = ({id}) => {
                 <p className="text-lg font-semibold text-blue-600">Customer Note: {order.orderNote}</p>
               </div>
             )}
-      
+
+            {/* Tote Selector */}
+            <div className="my-6">
+              <ToteSelector 
+                orderId={order._id}
+                assignedTotes={assignedTotes}
+                onAssignedTotesChange={setAssignedTotes}
+              />
+            </div>
+
             {/* Barcode section */}
             <div className="mb-5">
                 <BarcodeScanner onScan={handleScan}/>
@@ -199,15 +208,6 @@ const ListView = ({id}) => {
                   OnFlagDialog={openFlagDialog}
                 />
               ))}
-            </div>
-            
-            {/* Tote Selector */}
-            <div className="my-6">
-              <ToteSelector 
-                orderId={order._id}
-                assignedTotes={assignedTotes}
-                onAssignedTotesChange={setAssignedTotes}
-              />
             </div>
       
             {/* Complete Picking Button */}

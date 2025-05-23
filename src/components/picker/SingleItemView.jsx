@@ -244,6 +244,14 @@ const SingleItemView = ({id}) => {
                     </div>
                 )}
 
+                <div className="mb-5">
+                    <ToteSelector 
+                        orderId={order._id}
+                        assignedTotes={assignedTotes}
+                        onAssignedTotesChange={setAssignedTotes}
+                    />
+                </div>
+
                 {/* Barcode section */}
                 <div className="mb-5">
                     <BarcodeScanner onScan={handleScan}/>
@@ -425,14 +433,6 @@ const SingleItemView = ({id}) => {
                             }
                         </div>
                     )}
-                </div>
-
-                <div className="mt-10">
-                    <ToteSelector 
-                        orderId={order._id}
-                        assignedTotes={assignedTotes}
-                        onAssignedTotesChange={setAssignedTotes}
-                    />
                 </div>
 
                 <button 
