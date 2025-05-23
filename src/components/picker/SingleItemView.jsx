@@ -33,6 +33,7 @@ const SingleItemView = ({id}) => {
     const [assignedTotes, setAssignedTotes] = useState([]);
     const [imageLoaded, setImageLoaded] = useState(false);
     const currentImage = lineItems[currentItemIndex]?.image;
+    const [showDropdown, setShowDropdown] = useState(false);
 
     const token = localStorage.getItem("token");
     useEffect(() => {
@@ -161,6 +162,9 @@ const SingleItemView = ({id}) => {
     };
 
     const handlePickPlus = async (shopifyLineItemId) => {
+        const currentItem = lineItems[currentItemIndex];
+        const isLastPick = currentItem.pickedStatus.verified.quantity + 1 >= currentItem.quantity;
+
         try {
             await axios.patch(
                 `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-plus`,
@@ -169,9 +173,6 @@ const SingleItemView = ({id}) => {
             );
     
             fetchOrder();
-    
-            const currentItem = lineItems[currentItemIndex];
-            const isLastPick = currentItem.pickedStatus.verified.quantity === currentItem.quantity - 1;
     
             if (currentItemIndex < lineItems.length - 1 && isLastPick) {
                 setTimeout(() => {
@@ -182,6 +183,38 @@ const SingleItemView = ({id}) => {
             console.error('Failed to pick plus', err);
         }
     };    
+
+    const handlePickPlusQuantity = async (shopifyLineItemId, quantity) => {
+        const currentItem = lineItems[currentItemIndex];
+        const isLastPick = currentItem.pickedStatus.verified.quantity + quantity >= currentItem.quantity;
+        
+        let realQuantity = 0;
+        if (currentItem.pickedStatus.verified.quantity + quantity >= currentItem.quantity) {
+            realQuantity = currentItem.quantity - currentItem.pickedStatus.verified.quantity;
+        } else {
+            realQuantity = quantity;
+        }
+        
+        try {
+          for (let i = 0; i < realQuantity; i++) {
+            await axios.patch(
+              `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-plus`,
+              { shopifyLineItemId },
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+          }
+      
+          fetchOrder();
+      
+          if (currentItemIndex < lineItems.length - 1 && isLastPick) {
+            setTimeout(() => {
+              setCurrentItemIndex(currentItemIndex + 1);
+            }, 1500); // Delay for UX
+          }
+        } catch (err) {
+          console.error("Failed to pick quantity", err);
+        }
+    };
 
     const handlePickMinus = async (shopifyLineItemId) => {
         try {
@@ -386,14 +419,44 @@ const SingleItemView = ({id}) => {
                                             </button>
                                         }
                                         {!lineItems[currentItemIndex].picked && lineItems[currentItemIndex].quantity > 1 &&
-                                            <>
+                                            <div className="relative inline-block">
                                                 <button
-                                                    title="Add one Item"
-                                                    onClick={() => handlePickPlus(lineItems[currentItemIndex].shopifyLineItemId)}
-                                                    className="bg-white text-blue-700 border-4 border-blue-500 hover:bg-blue-200 w-20 h-20 rounded-full flex items-center justify-center text-3xl shadow-xl"
+                                                  title="Add Item(s)"
+                                                  onClick={() => {
+                                                    if (lineItems[currentItemIndex].quantity === 1) {
+                                                      handlePickPlus(lineItems[currentItemIndex].shopifyLineItemId);
+                                                    } else {
+                                                      setShowDropdown((prev) => !prev);
+                                                    }
+                                                  }}
+                                                  className="bg-white text-blue-700 border-4 border-blue-500 hover:bg-blue-200 w-20 h-20 rounded-full flex items-center justify-center text-3xl shadow-xl"
                                                 >
-                                                    <PlusIcon className="w-10 h-10" />
+                                                  <PlusIcon className="w-10 h-10" />
                                                 </button>
+                                              
+                                                {showDropdown && lineItems[currentItemIndex].quantity > 1 && (
+                                                  <ul className="absolute z-10 mt-2 w-24 bg-white border border-gray-300 rounded shadow-lg">
+                                                    {Array.from({ length: lineItems[currentItemIndex].quantity }).map((_, i) => (
+                                                      <li
+                                                        key={i}
+                                                        onClick={() => {
+                                                          handlePickPlusQuantity(
+                                                            lineItems[currentItemIndex].shopifyLineItemId,
+                                                            i + 1
+                                                          );
+                                                          setShowDropdown(false); // Hide dropdown after selection
+                                                        }}
+                                                        className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
+                                                      >
+                                                        {i + 1}
+                                                      </li>
+                                                    ))}
+                                                  </ul>
+                                                )}
+                                            </div>
+                                        }
+
+                                        {!lineItems[currentItemIndex].picked && lineItems[currentItemIndex].quantity > 1 &&
                                                 <button
                                                     title="Remove one Item"
                                                     onClick={() => handlePickMinus(lineItems[currentItemIndex].shopifyLineItemId)}
@@ -401,7 +464,6 @@ const SingleItemView = ({id}) => {
                                                 >
                                                     <MinusIcon className="w-10 h-10" />
                                                 </button>
-                                            </>
                                         }
                                         {!lineItems[currentItemIndex].picked && 
                                             <button 
