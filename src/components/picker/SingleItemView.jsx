@@ -83,8 +83,11 @@ const SingleItemView = ({id}) => {
         
         fetchOrder();
 
-        if ( currentItemIndex < lineItems.length - 1 ) 
-            setCurrentItemIndex(currentItemIndex + 1);
+        if ( currentItemIndex < lineItems.length - 1 ) {
+            setTimeout(() => {
+                setCurrentItemIndex(currentItemIndex + 1);
+            }, 1500);
+        }
     };
 
     const handleSubstitutionSelect = async ({
@@ -164,15 +167,21 @@ const SingleItemView = ({id}) => {
                 { shopifyLineItemId },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-
+    
             fetchOrder();
-
-            if (currentItemIndex < lineItems.length - 1 && lineItems[currentItemIndex].pickedStatus.verified.quantity == lineItems[currentItemIndex].quantity - 1) 
-                setCurrentItemIndex(currentItemIndex + 1);
+    
+            const currentItem = lineItems[currentItemIndex];
+            const isLastPick = currentItem.pickedStatus.verified.quantity === currentItem.quantity - 1;
+    
+            if (currentItemIndex < lineItems.length - 1 && isLastPick) {
+                setTimeout(() => {
+                    setCurrentItemIndex(currentItemIndex + 1);
+                }, 1500);
+            }
         } catch (err) {
             console.error('Failed to pick plus', err);
         }
-    };
+    };    
 
     const handlePickMinus = async (shopifyLineItemId) => {
         try {
