@@ -66,13 +66,13 @@ export default function Orders() {
                   <div className="flex justify-between text-base md:text-lg font-bold text-gray-600 mb-2">
                     <span>{order?.pickedCount} / {order?.lineItemCount} picked</span>
                     <span>
-                      {order.totalQuantity ? Math.round(order.pickedCount * 100 / order.totalQuantity) : 0}%
+                      {Math.round(order?.pickedCount * 100 / order?.lineItemCount)}%
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-3 md:h-4">
                     <div
                       className="bg-green-500 h-3 md:h-4 rounded-full transition-all duration-300"
-                      style={{ width: `${order.totalQuantity ? Math.round(order.pickedCount * 100 / order.totalQuantity) : 0}%` }}
+                      style={{ width: `${Math.round(order?.pickedCount * 100 / order?.lineItemCount)}%` }}
                     ></div>
                   </div>
                 </div>
@@ -95,7 +95,7 @@ export default function Orders() {
                     onClick={() => navigate(`/picker/order/${order._id}`)}
                     className="flex-1 bg-blue-600 hover:bg-blue-800 text-white py-2 text-lg font-bold rounded-xl shadow-lg transition"
                   >
-                    {(order.totalQuantity ? Math.round(order.pickedCount * 100 / order.totalQuantity) : 0) > 0
+                    {Math.round(order?.pickedCount * 100 / order?.lineItemCount) > 0
                       ? "Continue"
                       : "Start Picking"
                     }
