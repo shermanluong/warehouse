@@ -161,55 +161,28 @@ const SingleItemView = ({id}) => {
         setCurrentItemIndex(newItemIndex);
     };
 
-    const handlePickPlus = async (shopifyLineItemId) => {
-        const currentItem = lineItems[currentItemIndex];
-        const isLastPick = currentItem.pickedStatus.verified.quantity + 1 >= currentItem.quantity;
-
-        try {
-            await axios.patch(
-                `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-plus`,
-                { shopifyLineItemId },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-    
-            fetchOrder();
-    
-            if (currentItemIndex < lineItems.length - 1 && isLastPick) {
-                setTimeout(() => {
-                    setCurrentItemIndex(currentItemIndex + 1);
-                }, 1500);
-            }
-        } catch (err) {
-            console.error('Failed to pick plus', err);
-        }
-    };    
-
     const handlePickPlusQuantity = async (shopifyLineItemId, quantity) => {
         const currentItem = lineItems[currentItemIndex];
-        const isLastPick = currentItem.pickedStatus.verified.quantity + quantity >= currentItem.quantity;
-        
-        let realQuantity = 0;
-        if (currentItem.pickedStatus.verified.quantity + quantity >= currentItem.quantity) {
-            realQuantity = currentItem.quantity - currentItem.pickedStatus.verified.quantity;
-        } else {
-            realQuantity = quantity;
-        }
-        
+        const pickedQty = currentItem.pickedStatus.verified.quantity;
+        const remainingQty = currentItem.quantity - pickedQty;
+      
+        // Calculate the quantity to actually send (prevent over-picking)
+        const realQuantity = Math.min(quantity, remainingQty);
+        const isLastPick = pickedQty + realQuantity >= currentItem.quantity;
+      
         try {
-          for (let i = 0; i < realQuantity; i++) {
-            await axios.patch(
-              `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-plus`,
-              { shopifyLineItemId },
-              { headers: { Authorization: `Bearer ${token}` } }
-            );
-          }
+          await axios.patch(
+            `${import.meta.env.VITE_API_URL}/picker/order/${order._id}/pick-plus`,
+            { shopifyLineItemId, quantity: realQuantity },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
       
           fetchOrder();
       
           if (currentItemIndex < lineItems.length - 1 && isLastPick) {
             setTimeout(() => {
               setCurrentItemIndex(currentItemIndex + 1);
-            }, 1500); // Delay for UX
+            }, 1500); // UX delay
           }
         } catch (err) {
           console.error("Failed to pick quantity", err);
@@ -407,31 +380,27 @@ const SingleItemView = ({id}) => {
                                     {lineItems[currentItemIndex].customerNote && (
                                         <p className="text-2xl text-blue-700 mt-1 text-center">Customer: {lineItems[currentItemIndex].customerNote}</p>
                                     )}
+
                                     {/* Action buttons */}
                                     <div className="flex justify-center mt-4 space-x-10">
-                                        {!lineItems[currentItemIndex].picked && lineItems[currentItemIndex].quantity <= 1 &&
-                                            <button
-                                                title="Pick item"
-                                                onClick={() => handlePickPlus(lineItems[currentItemIndex].shopifyLineItemId)}
-                                                className="bg-white text-green-700 border-4 border-green-600 hover:bg-green-200 w-20 h-20 rounded-full flex items-center justify-center text-3xl shadow-xl"
-                                            >
-                                                <CheckIcon className="w-10 h-10" />
-                                            </button>
-                                        }
-                                        {!lineItems[currentItemIndex].picked && lineItems[currentItemIndex].quantity > 1 &&
+                                        {!lineItems[currentItemIndex].picked &&
                                             <div className="relative inline-block">
                                                 <button
                                                   title="Add Item(s)"
                                                   onClick={() => {
                                                     if (lineItems[currentItemIndex].quantity === 1) {
-                                                      handlePickPlus(lineItems[currentItemIndex].shopifyLineItemId);
+                                                        handlePickPlusQuantity(lineItems[currentItemIndex].shopifyLineItemId, 1);
                                                     } else {
                                                       setShowDropdown((prev) => !prev);
                                                     }
                                                   }}
                                                   className="bg-white text-blue-700 border-4 border-blue-500 hover:bg-blue-200 w-20 h-20 rounded-full flex items-center justify-center text-3xl shadow-xl"
                                                 >
-                                                  <PlusIcon className="w-10 h-10" />
+                                                    {lineItems[currentItemIndex].quantity > 1 ? 
+                                                        <PlusIcon className="w-10 h-10" /> 
+                                                        :
+                                                        <CheckIcon className="w-10 h-10" /> 
+                                                    }
                                                 </button>
                                               
                                                 {showDropdown && lineItems[currentItemIndex].quantity > 1 && (
@@ -465,6 +434,7 @@ const SingleItemView = ({id}) => {
                                                     <MinusIcon className="w-10 h-10" />
                                                 </button>
                                         }
+
                                         {!lineItems[currentItemIndex].picked && 
                                             <button 
                                                 title="Flag Item"
@@ -474,6 +444,7 @@ const SingleItemView = ({id}) => {
                                                 <XMarkIcon className="w-10 h-10" />
                                             </button>
                                         }
+
                                         {lineItems[currentItemIndex].picked && 
                                             <button
                                                 title="Undo" 
@@ -486,6 +457,7 @@ const SingleItemView = ({id}) => {
                                     </div>
                                 </div>
                             </div>
+                            
                             {/* Substitution Display */}
                             {lineItems[currentItemIndex]?.substitution?.shopifyVariantId && 
                                 <div className="flex flex-col sm:flex-row mt-6 mb-2 justify-center border-4 border-yellow-600 rounded-xl p-6 bg-yellow-50">
