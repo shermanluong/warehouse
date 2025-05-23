@@ -2,8 +2,8 @@ import Layout from '../../layouts/layout';
 import { useParams, useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from "react";
 import {
-  PlusIcon, MinusIcon, CheckIcon, ArrowPathIcon,
-  XMarkIcon, PrinterIcon, ArrowLongRightIcon, PencilSquareIcon, FlagIcon
+  PlusIcon, MinusIcon, CheckIcon, ArrowPathIcon, XMarkIcon,
+  CurrencyDollarIcon, PrinterIcon, ArrowLongRightIcon, PencilSquareIcon, FlagIcon
 } from '@heroicons/react/24/outline';
 import axios from 'axios';
 import dataURLToFile from '../../utils/dataURLToFile';
@@ -119,6 +119,15 @@ export default function Finalise() {
     }
   };
 
+  const postOrder = async (url, data) => {
+    try {
+        await axios.post(`${import.meta.env.VITE_API_URL}${url}`, data, { headers: { Authorization: `Bearer ${token}` } });
+        fetchOrder();
+    } catch (err) {
+        toast.error('Failed to update item');
+    }
+  };
+
   // --- Barcode ---
   const handleScan = async (barcode) => {
     if (!barcode) {
@@ -150,6 +159,7 @@ export default function Finalise() {
     await patchOrder(`/packer/order/${order._id}/save-photo`, { photoUrl: imageUrl, fileId });
     setCapturedPhotos(prev => [...prev, { photoUrl: imageUrl, fileId }]);
   };
+
   const handleDeletePhoto = async (fileIdToDelete) => {
     try {
       await axios.delete(`${import.meta.env.VITE_API_URL}/packer/order/${order._id}/delete-photo`, {
@@ -166,6 +176,19 @@ export default function Finalise() {
   const handBoxCountChange = (newValue) => setBoxCount(newValue);
   const handlePrintPackingSlip = () => { generatePackingSlip(order); };
   const handlePrintDeliveryLabel = () => { generateDeliveryLabel(order, boxCount); };
+
+  // --- Substitution & Refund ---
+  const handleCancelSubstitution = async (shopifyLineItemId) => {
+    await patchOrder(`/packer/order/${order._id}/cancel-sub-item`, { shopifyLineItemId });
+  };
+    
+  const handleConfirmSubstitution = async (shopifyLineItemId) => {
+    await patchOrder(`/packer/order/${order._id}/confirm-sub-item`, { shopifyLineItemId });
+  };
+    
+  const refundItem = async (id, shopifyOrderId, shopifyLineItemId, quantity) => {
+    await postOrder(`/packer/refund-item`, { id, shopifyOrderId, shopifyLineItemId, quantity });
+  };
 
   const handleCompletePacking = async () => {
     setLoading(true);
@@ -256,159 +279,228 @@ export default function Finalise() {
               // Pick mode or pack mode for the item
               const isPickMode = pickModeIdx === idx;
               return (
-                <div
-                  key={item.variantId}
-                  className={`border-2  rounded-2xl p-6 shadow-lg bg-white flex flex-row gap-6 items-center justify-between
+                <div 
+                key={item.variantId}
+                className={`border-2  rounded-2xl p-6 shadow-lg bg-white
                     ${isPickMode
-                      ? "border-l-8 border-l-blue-500 border-blue-200"
-                      : "border-l-8 border-l-yellow-400 border-yellow-200"
+                    ? "border-l-8 border-l-blue-500 border-blue-200"
+                    : "border-l-8 border-l-yellow-400 border-yellow-200"
                     }`}
                 >
-                  {/* Left: Image + info */}
-                  <div className="flex-1 flex items-start gap-6 min-w-0">
-                    <img
-                      src={item?.image}
-                      alt={item?.productTitle}
-                      className="w-32 h-32 sm:w-48 sm:h-48 rounded-2xl object-cover cursor-pointer border-2 border-gray-200"
-                      onClick={() => {
-                        setEnlargedImage(item?.image);
-                        setIsImageOpen(true);
-                      }}
-                    />
-                    <div className="min-w-0">
-                      <h3 className="font-bold text-2xl text-gray-900 truncate">
-                        {item?.variantInfo?.title === "Default Title"
-                          ? item?.productTitle
-                          : item?.variantInfo?.title}
-                        {(item.adminNote || item.customerNote) && (
-                          <span title="This item has notes" className="text-yellow-500 text-2xl ml-2">📌</span>
-                        )}
-                      </h3>
-                      <p className="font-bold text-lg text-gray-900 truncate">Quantity: {item.quantity}</p>
-                      <p className="font-bold text-lg text-gray-900 mb-2">SKU: {item?.variantInfo?.sku}</p>
-                      <div className="flex gap-2 flex-wrap mt-2 mb-2">
-                        {item.pickedStatus?.verified.quantity > 0 && (
-                          <span className="bg-green-600 text-white px-4 py-1 rounded-2xl text-lg font-bold">
-                            {item.pickedStatus.verified.quantity} Picked
-                          </span>
-                        )}
-                        {item.pickedStatus?.outOfStock.quantity > 0 && (
-                          <span className="bg-red-600 text-white px-4 py-1 rounded-2xl text-lg font-bold">
-                            {item.pickedStatus.outOfStock.quantity} Out Of Stock
-                          </span>
-                        )}
-                        {item.pickedStatus?.damaged.quantity > 0 && (
-                          <span className="bg-yellow-500 text-white px-4 py-1 rounded-2xl text-lg font-bold">
-                            {item.pickedStatus.damaged.quantity} Damaged
-                          </span>
-                        )}
-                        {(item.packedStatus?.verified.quantity > 0 ||
-                          item.packedStatus?.outOfStock.quantity > 0 ||
-                          item.packedStatus?.damaged.quantity > 0) && (
-                          <span className="bg-blue-600 text-white px-4 py-1 rounded-2xl text-lg font-bold">
-                            {item.packedStatus.verified.quantity + item.packedStatus.outOfStock.quantity + item.packedStatus.damaged.quantity} Packed
-                          </span>
-                        )}
-                      </div>
-                      
-                      {item.adminNote && (
-                        <p className="text-lg text-red-600 font-bold">Admin note: {item.adminNote}</p>
-                      )}
-                      {item.customerNote && (
-                        <p className="text-lg text-blue-600 font-bold">Customer note: {item.customerNote}</p>
-                      )}
-                    </div>
-                  </div>
-                  {/* Right: Actions */}
-                  <div className="flex flex-col gap-4 items-end min-w-fit">
-                    {/* PICK MODE UI */}
-                    {isPickMode ? (
-                      <>
-                        {/* Plus (pick), Minus (remove pick), Flag, Undo */}
-                        {!item.picked && 
-                            <>
-                                <button
-                                title="Pick one"
-                                onClick={() => handlePickPlus(item.shopifyLineItemId)}
-                                className="bg-white text-blue-700 border-2 border-blue-500 hover:bg-blue-100 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg text-3xl font-extrabold"
-                                >
-                                <PlusIcon className="w-9 h-9" />
-                                </button>
-                                {item.quantity > 1 &&
-                                    <button
-                                    title="Remove one pick"
-                                    onClick={() => handlePickMinus(item.shopifyLineItemId)}
-                                    className="bg-white text-gray-500 border-2 border-gray-400 hover:bg-stone-200 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg text-3xl font-extrabold"
-                                    >
-                                    <MinusIcon className="w-9 h-9" />
-                                    </button>
-                                }
-                                <button
-                                title="Flag"
-                                onClick={() => openFlagDialog(item)}
-                                className="bg-white text-red-700 border-2 border-red-600 hover:bg-red-100 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg text-3xl font-extrabold"
-                                >
-                                <FlagIcon className="w-9 h-9" />
-                                </button>
-                            </>
-                        }
-
-                        {item.picked &&
-                            <>
-                                <button
-                                title="Undo all"
-                                onClick={() => handlePickUndo(item.shopifyLineItemId)}
-                                className="bg-white text-yellow-600 border-2 border-yellow-600 hover:bg-yellow-100 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg text-3xl font-extrabold"
-                                >
-                                <ArrowPathIcon className="w-9 h-9" />
-                                </button>
-                                <button
-                                title="Done Picking"
-                                onClick={cancelPickMode}
-                                className="bg-white text-blue-600 border-2 border-blue-600 hover:bg-blue-100 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg text-2xl font-extrabold"
-                                >
-                                <CheckIcon className="w-9 h-9" />
-                                </button>
-                            </>
-                        }
-                      </>
-                    ) : (
-                      <>
-                        {/* PACK MODE UI */}
-                        {item.pickedStatus?.verified.quantity > item.packedStatus?.verified.quantity && (
-                          <button
-                            title="Pack One"
-                            onClick={() => handlePackPlus(item.shopifyLineItemId)}
-                            className="bg-white text-blue-600 border-2 border-blue-600 hover:bg-green-100 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg text-3xl font-extrabold"
-                          >
-                            {item.quantity > 1 ? (
-                                <PlusIcon className="w-10 h-10" />
-                            ) : (
-                                <CheckIcon className="w-10 h-10" />
+                    <div className="flex flex-row justify-between gap-6"
+                    >
+                        {/* Left: Image + info */}
+                        <div className="flex-1 flex items-start gap-6 min-w-0">
+                            <img
+                            src={item?.image}
+                            alt={item?.productTitle}
+                            className="w-32 h-32 sm:w-48 sm:h-48 rounded-2xl object-cover cursor-pointer border-2 border-gray-200"
+                            onClick={() => {
+                                setEnlargedImage(item?.image);
+                                setIsImageOpen(true);
+                            }}
+                            />
+                            <div className="min-w-0">
+                            <h3 className="font-bold text-2xl text-gray-900 truncate">
+                                {item?.variantInfo?.title === "Default Title"
+                                ? item?.productTitle
+                                : item?.variantInfo?.title}
+                                {(item.adminNote || item.customerNote) && (
+                                <span title="This item has notes" className="text-yellow-500 text-2xl ml-2">📌</span>
+                                )}
+                            </h3>
+                            <p className="font-bold text-lg text-gray-900 truncate">Quantity: {item.quantity}</p>
+                            <p className="font-bold text-lg text-gray-900 mb-2">SKU: {item?.variantInfo?.sku}</p>
+                            <div className="flex gap-2 flex-wrap mt-2 mb-2">
+                                {item.pickedStatus?.verified.quantity > 0 && (
+                                <span className="bg-green-600 text-white px-4 py-1 rounded-2xl text-lg font-bold">
+                                    {item.pickedStatus.verified.quantity} Picked
+                                </span>
+                                )}
+                                {!item?.refund && item.pickedStatus?.outOfStock.quantity > 0 && (
+                                <span className="bg-red-600 text-white px-4 py-1 rounded-2xl text-lg font-bold">
+                                    {item.pickedStatus.outOfStock.quantity} Out Of Stock
+                                </span>
+                                )}
+                                {!item?.refund &&item.pickedStatus?.damaged.quantity > 0 && (
+                                <span className="bg-yellow-500 text-white px-4 py-1 rounded-2xl text-lg font-bold">
+                                    {item.pickedStatus.damaged.quantity} Damaged
+                                </span>
+                                )}
+                                {(item.packedStatus?.verified.quantity > 0 ||
+                                item.packedStatus?.outOfStock.quantity > 0 ||
+                                item.packedStatus?.damaged.quantity > 0) && (
+                                <span className="bg-blue-600 text-white px-4 py-1 rounded-2xl text-lg font-bold">
+                                    {item.packedStatus.verified.quantity + item.packedStatus.outOfStock.quantity + item.packedStatus.damaged.quantity} Packed
+                                </span>
+                                )}
+                                {item?.refund && (
+                                    <span className="bg-red-600 text-white px-4 py-1 rounded-2xl text-lg font-bold">
+                                        {item?.pickedStatus?.outOfStock.quantity + item?.pickedStatus?.damaged.quantity} refunded
+                                    </span>
+                                )}
+                            </div>
+                            
+                            {item.adminNote && (
+                                <p className="text-lg text-red-600 font-bold">Admin note: {item.adminNote}</p>
                             )}
-                          </button>
-                        )}
-                        {item.pickedStatus?.verified.quantity <= item.packedStatus?.verified.quantity && item.pickedStatus?.verified.quantity > 0 && (
-                          <button
-                            title="Undo Pack"
-                            onClick={() => handleUndo(item.shopifyLineItemId)}
-                            className="bg-white text-yellow-600 border-2 border-yellow-600 hover:bg-blue-100 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg text-3xl font-extrabold"
-                          >
-                            <ArrowPathIcon className="w-10 h-10" />
-                          </button>
-                        )}
-                        {!(item.refund || item.subbed) &&
-                            <button
-                                className="bg-white text-blue-400 border-2 border-blue-400 hover:bg-yellow-100 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg text-3xl font-extrabold"
-                                onClick={() => handleRePick(idx)}
-                                title="Re-pick this item"
-                            >
-                                <PencilSquareIcon className="w-10 h-10" />
-                            </button>
-                        }
-                      </>
+                            {item.customerNote && (
+                                <p className="text-lg text-blue-600 font-bold">Customer note: {item.customerNote}</p>
+                            )}
+                            </div>
+                        </div>
+                        {/* Right: Actions */}
+                        <div className="flex flex-col gap-4 items-end min-w-fit">
+                            {/* PICK MODE UI */}
+                            {isPickMode ? (
+                            <>
+                                {/* Plus (pick), Minus (remove pick), Flag, Undo */}
+                                {!item.picked && 
+                                    <>
+                                        <button
+                                        title="Pick one"
+                                        onClick={() => handlePickPlus(item.shopifyLineItemId)}
+                                        className="bg-white text-blue-700 border-2 border-blue-500 hover:bg-blue-100 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg text-3xl font-extrabold"
+                                        >
+                                        <PlusIcon className="w-9 h-9" />
+                                        </button>
+                                        {item.quantity > 1 &&
+                                            <button
+                                            title="Remove one pick"
+                                            onClick={() => handlePickMinus(item.shopifyLineItemId)}
+                                            className="bg-white text-gray-500 border-2 border-gray-400 hover:bg-stone-200 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg text-3xl font-extrabold"
+                                            >
+                                            <MinusIcon className="w-9 h-9" />
+                                            </button>
+                                        }
+                                        <button
+                                        title="Flag"
+                                        onClick={() => openFlagDialog(item)}
+                                        className="bg-white text-red-700 border-2 border-red-600 hover:bg-red-100 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg text-3xl font-extrabold"
+                                        >
+                                        <FlagIcon className="w-9 h-9" />
+                                        </button>
+                                    </>
+                                }
+
+                                {item.picked &&
+                                    <>
+                                        <button
+                                        title="Undo all"
+                                        onClick={() => handlePickUndo(item.shopifyLineItemId)}
+                                        className="bg-white text-yellow-600 border-2 border-yellow-600 hover:bg-yellow-100 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg text-3xl font-extrabold"
+                                        >
+                                        <ArrowPathIcon className="w-9 h-9" />
+                                        </button>
+                                        <button
+                                        title="Done Picking"
+                                        onClick={cancelPickMode}
+                                        className="bg-white text-blue-600 border-2 border-blue-600 hover:bg-blue-100 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg text-2xl font-extrabold"
+                                        >
+                                        <CheckIcon className="w-9 h-9" />
+                                        </button>
+                                    </>
+                                }
+                            </>
+                            ) : (
+                            <>
+                                {/* PACK MODE UI */}
+                                {!item.refund &&
+                                    <>
+                                        {item.pickedStatus?.verified.quantity > item.packedStatus?.verified.quantity && (
+                                        <button
+                                            title="Pack One"
+                                            onClick={() => handlePackPlus(item.shopifyLineItemId)}
+                                            className="bg-white text-blue-600 border-2 border-blue-600 hover:bg-green-100 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg text-3xl font-extrabold"
+                                        >
+                                            {item.quantity > 1 ? (
+                                                <PlusIcon className="w-10 h-10" />
+                                            ) : (
+                                                <CheckIcon className="w-10 h-10" />
+                                            )}
+                                        </button>
+                                        )}
+                                        {item.pickedStatus?.verified.quantity <= item.packedStatus?.verified.quantity && item.pickedStatus?.verified.quantity > 0 && (
+                                        <button
+                                            title="Undo Pack"
+                                            onClick={() => handleUndo(item.shopifyLineItemId)}
+                                            className="bg-white text-yellow-600 border-2 border-yellow-600 hover:bg-blue-100 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg text-3xl font-extrabold"
+                                        >
+                                            <ArrowPathIcon className="w-10 h-10" />
+                                        </button>
+                                        )}
+                                        {((item.pickedStatus.damaged.quantity > 0 && !item.pickedStatus.damaged?.subbed) ||
+                                            (item.pickedStatus.outOfStock.quantity > 0 && !item.pickedStatus.outOfStock?.subbed)) && 
+                                            <button
+                                                className="bg-white text-red-600 border-2 border-red-600 hover:bg-red-100 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg text-3xl font-extrabold"
+                                                onClick={() => refundItem(order._id, order.shopifyOrderId, item.shopifyLineItemId, item.quantity)}
+                                                title="Refund this item"
+                                            >
+                                                <CurrencyDollarIcon className="w-10 h-10" />
+                                            </button>
+                                        }
+                                        {!(item.refund || item.subbed) &&
+                                            <button
+                                                className="bg-white text-blue-400 border-2 border-blue-400 hover:bg-yellow-100 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg text-3xl font-extrabold"
+                                                onClick={() => handleRePick(idx)}
+                                                title="Re-pick this item"
+                                            >
+                                                <PencilSquareIcon className="w-10 h-10" />
+                                            </button>
+                                        }
+                                    </>
+                                }
+                            </>
+                            )}
+                        </div>
+                    </div>
+                    {/* Substitution */}
+                    {item?.substitution?.shopifyVariantId && (
+                        <div className="flex flex-col sm:flex-row justify-between border-2 border-yellow-600 rounded-2xl p-4 mt-4 bg-yellow-50">
+                            <div className="flex items-start">
+                                <img
+                                    src={item?.substitution?.image}
+                                    alt={item?.substitution?.title}
+                                    className="w-24 h-24 sm:w-36 sm:h-36 rounded-xl object-cover cursor-pointer border-2 border-yellow-200"
+                                    onClick={() => {
+                                        setEnlargedImage(item?.substitution?.image);
+                                        setIsImageOpen(true);
+                                    }}
+                                />
+                                <div className="ml-4 mt-2 sm:mt-0">
+                                    <h3 className="font-bold text-2xl text-yellow-700">
+                                        Subbed: {item?.substitution?.title}
+                                    </h3>
+                                    <div className="flex gap-2 mt-2 mb-2">
+                                        {item?.substitution?.used && (
+                                            <span className="text-lg text-white bg-green-500 rounded-2xl px-3 mt-2 sm:mt-0">Verified</span>
+                                        )}
+                                    </div>
+                                    <p className="font-bold text-xl text-gray-900">SKU: {item?.substitution?.sku}</p>
+                                </div>
+                            </div>
+                            <div className="flex justify-end mt-4 space-x-3 sm:flex-col sm:justify-start sm:mt-0 sm:space-x-0 sm:space-y-2">
+                                {!isPickMode && !item?.subbed && (
+                                    <>
+                                        <button
+                                            title="Confirm Substitution"
+                                            onClick={() => handleConfirmSubstitution(item?.shopifyLineItemId)}
+                                            className="w-16 h-16 flex items-center justify-center rounded-2xl  bg-white border-2 border-green-600 text-green-600 hover:bg-green-200 shadow-lg text-3xl transition"
+                                        >
+                                            <CheckIcon className="w-10 h-10" />
+                                        </button>
+                                        <button
+                                            title="Cancel Substitution"
+                                            onClick={() => handleCancelSubstitution(item?.shopifyLineItemId)}
+                                            className="w-16 h-16 flex items-center justify-center rounded-2xl bg-white border-2 border-red-600 text-red-600 hover:bg-red-200 shadow-lg text-3xl transition"
+                                        >
+                                            <XMarkIcon className="w-10 h-10" />
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                        </div>
                     )}
-                  </div>
                 </div>
               );
             })}
