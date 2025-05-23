@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Layout from '../../layouts/layout';
-import ProductPickerDialog from '../../components/ProductPickerDialog';
-import ImageZoomModal from '../../components/ImageZoomModal';
+import ProductPickerDialog from '../../components/Modal/ProductPickerDialog';
+import ImageZoomModal from '../../components/Modal/ImageZoomModal';
 
 const Substitution = () => {
   const [rules, setRules] = useState([]);

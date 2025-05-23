@@ -1,7 +1,7 @@
 import Layout from '../../layouts/layout';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import UserDialog from '../../components/UserDialog';
+import UserDialog from '../../components/admin/UserDialog';
 
 export default function UsersPage() {
   const [users, setUsers] = useState([]);

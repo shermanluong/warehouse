@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef} from 'react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import Layout from '../../layouts/layout';
-import ImageZoomModal from '../../components/ImageZoomModal';
+import ImageZoomModal from '../../components/Modal/ImageZoomModal';
 
 const ApprovalOrder = () => {
     const { id } = useParams();

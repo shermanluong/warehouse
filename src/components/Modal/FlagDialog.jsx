@@ -1,7 +1,7 @@
 import { Dialog } from '@headlessui/react';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import Spinbox from './Spinbox';
+import Spinbox from '../common/Spinbox';
 
 const FlagDialog = ({ isOpen, onClose, lineItem, onSubmit, onSelectSubstitution }) => {
   const [selectedFlag, setSelectedFlag] = useState('Out Of Stock');

@@ -9,7 +9,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { toast } from 'react-toastify';
 import { useLoading } from "../../Context/LoadingContext";
-import ImageZoomModal from '../../components/ImageZoomModal';
+import ImageZoomModal from '../../components/Modal/ImageZoomModal';
 
 const Product = () => {
   const [products, setProducts] = useState([]);

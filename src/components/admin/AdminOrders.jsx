@@ -1,14 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import statusColorMap from '../utils/statusColorMap';
+import statusColorMap from '../../utils/statusColorMap';
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
-  EllipsisVerticalIcon,
-  ArrowPathIcon
+  EllipsisVerticalIcon
 } from '@heroicons/react/24/outline';
-import NoteDialog from './NoteDialog';
+import NoteDialog from '../Modal/NoteDialog';
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css';
 import { toast } from 'react-toastify';

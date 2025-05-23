@@ -13,13 +13,13 @@ import {
 } from '@heroicons/react/24/outline'
 import axios from 'axios';
 import dataURLToFile from '../../utils/dataURLToFile';
-import BarcodeScanner from '../../components/BarcodeScanner';
-import BarcodeListener from '../../components/BarcodeListener';
-import CameraModal from '../../components/CameraModal';
-import ImageZoomModal from '../../components/ImageZoomModal';
-import Spinbox from '../../components/Spinbox';
-import SwitchButton from '../../components/SwitchButton';
-import FlagDialog from '../../components/FlagDialog'
+import BarcodeScanner from '../../components/common/BarcodeScanner';
+import BarcodeListener from '../../components/common/BarcodeListener';
+import CameraModal from '../../components/Modal/CameraModal';
+import ImageZoomModal from '../../components/Modal/ImageZoomModal';
+import Spinbox from '../../components/common/Spinbox';
+import SwitchButton from '../../components/common/SwitchButton';
+import FlagDialog from '../../components/Modal/FlagDialog'
 import { generatePackingSlip, generateDeliveryLabel } from '../../utils/print';
 import { useLoading } from "../../Context/LoadingContext";
 import { toast } from 'react-toastify';

@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import FlagDialog from '../../components/FlagDialog';
-import ImageZoomModal from '../../components/ImageZoomModal';
-import BarcodeScanner from '../../components/BarcodeScanner';
-import BarcodeListener from '../BarcodeListener';
+import FlagDialog from '../Modal/FlagDialog';
+import ImageZoomModal from '../Modal/ImageZoomModal';
+import BarcodeScanner from '../common/BarcodeScanner';
+import BarcodeListener from '../common/BarcodeListener';
 import {
   PlusIcon,
   MinusIcon,

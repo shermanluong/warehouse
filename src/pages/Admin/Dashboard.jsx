@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Layout from '../../layouts/layout';
-import AdminOrders from '../../components/AdminOrders';
-import AdminPerformance from '../../components/AdminPerformance';
-import AdminPhotos from '../../components/AdminPhotos';
+import AdminOrders from '../../components/admin/AdminOrders';
+import AdminPerformance from '../../components/admin/AdminPerformance';
+import AdminPhotos from '../../components/admin/AdminPhotos';
 import {
     CubeIcon,
     CheckCircleIcon,

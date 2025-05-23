@@ -3,10 +3,10 @@ import React, { useEffect, useState} from 'react';
 import { 
     PencilIcon
 } from '@heroicons/react/24/outline'
-import NoteDialog from '../../components/NoteDialog'
+import NoteDialog from '../../components/Modal/NoteDialog'
 import axios from 'axios';
 import Layout from '../../layouts/layout';
-import ImageZoomModal from '../../components/ImageZoomModal';
+import ImageZoomModal from '../../components/Modal/ImageZoomModal';
 
 const Order = () => {
     const { id } = useParams();
