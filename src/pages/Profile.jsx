@@ -19,8 +19,9 @@ export default function Profile() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/picker/orders`, { headers: { Authorization: `Bearer ${token}` } });
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/getUser`, { headers: { Authorization: `Bearer ${token}` } });
         console.log(res?.data);
+        setProfile(res.data);
       } catch (err) {
         console.error('Failed to fetch profile:', err);
       }
@@ -61,12 +62,12 @@ export default function Profile() {
                         <input
                         type="text"
                         name="name"
-                        value={profile.name}
+                        value={profile.realName}
                         onChange={handleChange}
                         className="input input-bordered w-full mt-1 border rounded px-2 py-1"
                         />
                     ) : (
-                        <div className="mt-1">{profile.name}</div>
+                        <div className="mt-1">{profile.realName}</div>
                     )}
                     </div>
                     <div>
@@ -75,12 +76,12 @@ export default function Profile() {
                         <input
                         type="text"
                         name="username"
-                        value={profile.username}
+                        value={profile.userName}
                         onChange={handleChange}
                         className="input input-bordered w-full mt-1 border rounded px-2 py-1"
                         />
                     ) : (
-                        <div className="mt-1">{profile.username}</div>
+                        <div className="mt-1">{profile.userName}</div>
                     )}
                     </div>
                     <div>
