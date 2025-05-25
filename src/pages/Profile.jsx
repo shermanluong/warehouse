@@ -1,16 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import Layout from "../layouts/layout";
 import axios from "axios";
-
-const initialProfile = {
-  name: "John Doe",
-  username: "johndoe",
-  role: "User",
-  active: true,
-};
+import { toast } from 'react-toastify';
 
 export default function Profile() {
-  const [profile, setProfile] = useState(initialProfile);
+  const [profile, setProfile] = useState({});
   const [editMode, setEditMode] = useState(false);
   const [password, setPassword] = useState("");
   const [showPasswordForm, setShowPasswordForm] = useState(false);
@@ -19,7 +13,7 @@ export default function Profile() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/getUser`, { headers: { Authorization: `Bearer ${token}` } });
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/getProfile`, { headers: { Authorization: `Bearer ${token}` } });
         console.log(res?.data);
         setProfile(res.data);
       } catch (err) {
@@ -38,17 +32,47 @@ export default function Profile() {
     }));
   };
 
-  const handleSave = () => {
-    // TODO: Save profile to backend
-    setEditMode(false);
+  const handleSave = async () => {
+    try {
+      const res = await axios.put(
+        `${import.meta.env.VITE_API_URL}/user/saveProfile`,
+        {
+          realName: profile.realName,
+          userName: profile.userName,
+          role: profile.role,
+          active: profile.active,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setProfile(res.data); // Optionally update local profile state with response
+      setEditMode(false);
+      toast.success("Profile updated!");
+    } catch (err) {
+      alert("Failed to update profile.");
+      toast.error(err);
+      setEditMode(false);
+    }
   };
 
-  const handlePasswordChange = (e) => {
+  const handlePasswordChange = async (e) => {
     e.preventDefault();
-    // TODO: Implement password change logic
-    setPassword("");
-    setShowPasswordForm(false);
-    alert("Password changed!");
+    try {
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/user/changePassword`,
+        { password },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setPassword("");
+      setShowPasswordForm(false);
+      toast.success("Password changed!");
+    } catch (err) {
+      alert("Failed to change password.");
+      toast.error(err);
+    }
   };
 
   return (
@@ -61,7 +85,7 @@ export default function Profile() {
                     {editMode ? (
                         <input
                         type="text"
-                        name="name"
+                        name="realName"
                         value={profile.realName}
                         onChange={handleChange}
                         className="input input-bordered w-full mt-1 border rounded px-2 py-1"
@@ -75,7 +99,7 @@ export default function Profile() {
                     {editMode ? (
                         <input
                         type="text"
-                        name="username"
+                        name="userName"
                         value={profile.userName}
                         onChange={handleChange}
                         className="input input-bordered w-full mt-1 border rounded px-2 py-1"
