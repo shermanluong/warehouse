@@ -6,13 +6,10 @@ import axios from 'axios';
 export default function Orders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    // Function to fetch orders from API
-    const token = localStorage.getItem("token");
-
     const fetchOrders = async () => {
       try {
         const res = await axios.get(`${import.meta.env.VITE_API_URL}/picker/orders`, { headers: { Authorization: `Bearer ${token}` } });

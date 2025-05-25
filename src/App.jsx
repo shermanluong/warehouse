@@ -20,6 +20,7 @@ import { ViewPreferenceProvider} from './Context/ViewPreferenceContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { LoadingProvider } from './Context/LoadingContext';
+import Profile from './pages/profile';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -50,6 +51,7 @@ function App() {
             <Route path="/picker/order/:id" element={<ProtectedRoute allowedRoles={["picker"]}><PickOrder /></ProtectedRoute>} />
             <Route path="/packer/orders" element={<ProtectedRoute allowedRoles={["packer"]}><PackerOrders /></ProtectedRoute>} />
             <Route path="/packer/order/:id" element={<ProtectedRoute allowedRoles={["packer"]}><Finalise /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute allowedRoles={["admin", "picker", "packer"]}><Profile /></ProtectedRoute>} />
           </Routes>
         </Router>
       </ViewPreferenceProvider>

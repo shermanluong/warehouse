@@ -1,0 +1,170 @@
+import React, { useEffect, useState } from 'react';
+import Layout from "../layouts/layout";
+import axios from "axios";
+
+const initialProfile = {
+  name: "John Doe",
+  username: "johndoe",
+  role: "User",
+  active: true,
+};
+
+export default function Profile() {
+  const [profile, setProfile] = useState(initialProfile);
+  const [editMode, setEditMode] = useState(false);
+  const [password, setPassword] = useState("");
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/picker/orders`, { headers: { Authorization: `Bearer ${token}` } });
+        console.log(res?.data);
+      } catch (err) {
+        console.error('Failed to fetch profile:', err);
+      }
+    };
+
+    fetchProfile(); // Call the function on page load
+  }, []); // Empty dependency array = run once on mount
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setProfile((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleSave = () => {
+    // TODO: Save profile to backend
+    setEditMode(false);
+  };
+
+  const handlePasswordChange = (e) => {
+    e.preventDefault();
+    // TODO: Implement password change logic
+    setPassword("");
+    setShowPasswordForm(false);
+    alert("Password changed!");
+  };
+
+  return (
+    <Layout headerTitle="Profile">
+        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <div className="bg-white p-6 rounded-xl shadow-xl">
+                <div className="space-y-4">
+                    <div>
+                    <label className="block text-gray-700">Name</label>
+                    {editMode ? (
+                        <input
+                        type="text"
+                        name="name"
+                        value={profile.name}
+                        onChange={handleChange}
+                        className="input input-bordered w-full mt-1 border rounded px-2 py-1"
+                        />
+                    ) : (
+                        <div className="mt-1">{profile.name}</div>
+                    )}
+                    </div>
+                    <div>
+                    <label className="block text-gray-700">Username</label>
+                    {editMode ? (
+                        <input
+                        type="text"
+                        name="username"
+                        value={profile.username}
+                        onChange={handleChange}
+                        className="input input-bordered w-full mt-1 border rounded px-2 py-1"
+                        />
+                    ) : (
+                        <div className="mt-1">{profile.username}</div>
+                    )}
+                    </div>
+                    <div>
+                    <label className="block text-gray-700">Role</label>
+                    {editMode ? (
+                        <input
+                        type="text"
+                        name="role"
+                        value={profile.role}
+                        onChange={handleChange}
+                        className="input input-bordered w-full mt-1 border rounded px-2 py-1"
+                        />
+                    ) : (
+                        <div className="mt-1">{profile.role}</div>
+                    )}
+                    </div>
+                    <div>
+                    <label className="block text-gray-700">Active</label>
+                    {editMode ? (
+                        <input
+                        type="checkbox"
+                        name="active"
+                        checked={profile.active}
+                        onChange={handleChange}
+                        className="ml-2"
+                        />
+                    ) : (
+                        <span className={`ml-2 px-2 py-1 rounded ${profile.active ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}`}>
+                        {profile.active ? "Active" : "Inactive"}
+                        </span>
+                    )}
+                    </div>
+                </div>
+                <div className="mt-6 flex gap-2">
+                    {editMode ? (
+                    <>
+                        <button
+                        className="bg-blue-600 text-white px-4 py-2 rounded"
+                        onClick={handleSave}
+                        >
+                        Save
+                        </button>
+                        <button
+                        className="bg-gray-300 px-4 py-2 rounded"
+                        onClick={() => setEditMode(false)}
+                        >
+                        Cancel
+                        </button>
+                    </>
+                    ) : (
+                    <button
+                        className="bg-blue-500 text-white px-4 py-2 rounded"
+                        onClick={() => setEditMode(true)}
+                    >
+                        Edit
+                    </button>
+                    )}
+                    <button
+                    className="bg-yellow-500 text-white px-4 py-2 rounded ml-auto"
+                    onClick={() => setShowPasswordForm((s) => !s)}
+                    >
+                    Change Password
+                    </button>
+                </div>
+                {showPasswordForm && (
+                    <form className="mt-4 space-y-2" onSubmit={handlePasswordChange}>
+                    <input
+                        type="password"
+                        placeholder="New Password"
+                        className="input input-bordered w-full border rounded px-2 py-1"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                    <button
+                        type="submit"
+                        className="bg-green-600 text-white px-4 py-2 rounded"
+                    >
+                        Save Password
+                    </button>
+                    </form>
+                )}
+            </div>
+        </div>
+    </Layout>
+  );
+}

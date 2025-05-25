@@ -79,6 +79,10 @@ const Layout = ({children, headerTitle}) => {
         fetchNotifications();
     }, []);
 
+    const handleProfile = () => {
+      navigate("/profile");
+    }
+
     const handleSignOut = () => {
         localStorage.removeItem("user");
         localStorage.removeItem("token");
@@ -167,7 +171,7 @@ const Layout = ({children, headerTitle}) => {
                         >
                           <MenuItem key={userName}>
                             <a
-                              href="#"
+                              onClick={handleProfile}
                               className="block px-4 py-2 text-base text-gray-700 hover:bg-gray-100 focus:outline-none"
                             >
                               {userName}
@@ -257,6 +261,7 @@ const Layout = ({children, headerTitle}) => {
                   </div>
                   <div className="mt-3 space-y-1 px-2">
                     <DisclosureButton
+                      onClick={handleProfile}
                       key={userName}
                       as="a"
                       className="block rounded-md px-3 py-2 text-lg font-bold text-gray-400 hover:bg-gray-700 hover:text-white"
