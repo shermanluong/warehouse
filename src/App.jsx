@@ -20,7 +20,7 @@ import { ViewPreferenceProvider} from './Context/ViewPreferenceContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { LoadingProvider } from './Context/LoadingContext';
-import Profile from './pages/profile';
+import Profile from './pages/Profile';
 
 function App() {
   const [user, setUser] = useState(null);
